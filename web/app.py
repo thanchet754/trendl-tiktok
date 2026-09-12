@@ -3,10 +3,17 @@ FastAPI Application for TikTok Shop US Trend Radar
 Serves Web Dashboard, triggers collectors, and handles Excel exports.
 """
 
+import sys
 import os
 import json
 import logging
 from datetime import datetime, timedelta
+
+# Ensure repo root is always in sys.path regardless of execution environment
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -39,9 +46,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DATA_FILE = os.path.join("data", "latest_trends.json")
-os.makedirs("data", exist_ok=True)
-os.makedirs("exports", exist_ok=True)
+DATA_FILE = os.path.join(BASE_DIR, "data", "latest_trends.json")
+try:
+    os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
+    os.makedirs(os.path.join(BASE_DIR, "exports"), exist_ok=True)
+except Exception:
+    pass
 
 latest_cache = None
 
@@ -148,19 +158,47 @@ def on_startup():
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_dashboard():
-    for fpath in ["index.html", "dashboard.html"]:
+    candidate_paths = [
+        os.path.join(BASE_DIR, "index.html"),
+        os.path.join(BASE_DIR, "dashboard.html"),
+        os.path.join(os.getcwd(), "index.html"),
+        os.path.join(os.getcwd(), "dashboard.html"),
+        "index.html",
+        "dashboard.html"
+    ]
+    for fpath in candidate_paths:
         if os.path.exists(fpath):
-            with open(fpath, "r", encoding="utf-8") as f:
-                return f.read()
-    template_path = os.path.join("web", "templates", "index.html")
+            try:
+                with open(fpath, "r", encoding="utf-8") as f:
+                    return f.read()
+            except Exception as e:
+                logger.error(f"Error reading {fpath}: {e}")
+                continue
+
+    template_path = os.path.join(BASE_DIR, "web", "templates", "index.html")
     if os.path.exists(template_path):
-        with open(template_path, "r", encoding="utf-8") as f:
-            return f.read()
-    return HTMLResponse("<h1>TikTok Shop US Trend Radar Pro</h1>")
+        try:
+            with open(template_path, "r", encoding="utf-8") as f:
+                return f.read()
+        except Exception:
+            pass
+
+    return HTMLResponse("<!DOCTYPE html><html><body><h1>TikTok Shop US Trend Radar Pro</h1><p>Dashboard is loading...</p></body></html>")
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def serve_dashboard_page():
     return await serve_dashboard()
+
+@app.get("/api/health")
+async def health_check():
+    return {
+        "status": "healthy",
+        "env": "vercel" if os.environ.get("VERCEL") else "local",
+        "python": sys.version,
+        "base_dir": BASE_DIR,
+        "has_index_html": os.path.exists(os.path.join(BASE_DIR, "index.html")),
+        "has_data_file": os.path.exists(DATA_FILE)
+    }
 
 @app.get("/api/data")
 async def get_data():
@@ -168,15 +206,45 @@ async def get_data():
     if latest_cache is not None:
         return latest_cache
     
-    if os.path.exists(DATA_FILE):
-        try:
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                latest_cache = json.load(f)
-                return latest_cache
-        except Exception:
-            pass
+    candidate_data_paths = [
+        DATA_FILE,
+        os.path.join(BASE_DIR, "data", "latest_trends.json"),
+        os.path.join(os.getcwd(), "data", "latest_trends.json"),
+        os.path.join("data", "latest_trends.json")
+    ]
+    for dp in candidate_data_paths:
+        if os.path.exists(dp):
+            try:
+                with open(dp, "r", encoding="utf-8") as f:
+                    latest_cache = json.load(f)
+                    return latest_cache
+            except Exception:
+                pass
 
-    # Initial fast scan if empty
+    # On Vercel Serverless, fallback to fetching from Supabase instead of triggering local browser scrape
+    if os.environ.get("VERCEL"):
+        try:
+            from database.supabase_client import fetch_trends_from_supabase, fetch_creators_from_supabase, fetch_videos_from_supabase
+            trends = fetch_trends_from_supabase(limit=1000)
+            creators = fetch_creators_from_supabase(limit=50)
+            videos = fetch_videos_from_supabase(limit=50)
+            if trends:
+                return {
+                    "all_ideas": trends,
+                    "top_influencers": creators,
+                    "top_videos": videos,
+                    "updated_at": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                    "stats": {
+                        "total_analyzed": len(trends),
+                        "total_viral_24h": len([x for x in trends if x.get("classification") == "VIRAL_SPIKE_24H"]),
+                        "total_evergreen": len([x for x in trends if x.get("classification") == "EVERGREEN_WINNER"])
+                    }
+                }
+        except Exception as e:
+            logger.error(f"Supabase fallback error: {e}")
+        return {"all_ideas": [], "stats": {"total_analyzed": 0}}
+
+    # Initial fast scan if local
     return perform_full_scan()
 
 @app.get("/api/supabase-trends")
@@ -189,19 +257,21 @@ async def get_supabase_trends(limit: int = 100):
 
 @app.post("/api/scan")
 async def scan_trends():
+    if os.environ.get("VERCEL"):
+        return {"message": "Full browser crawling runs on your local PC to preserve resources. Data syncs to Supabase."}
     data = perform_full_scan()
     return data
 
 @app.get("/api/export-excel")
 async def download_excel():
-    excel_path = os.path.join("exports", "TikTok_Shop_US_Latest_Trends.xlsx")
-    if not os.path.exists(excel_path):
-        perform_full_scan()
-    return FileResponse(
-        excel_path,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename=f"TikTok_Shop_US_Trends_{datetime.now().strftime('%Y%m%d')}.xlsx"
-    )
+    excel_path = os.path.join(BASE_DIR, "exports", "TikTok_Shop_US_Latest_Trends.xlsx")
+    if os.path.exists(excel_path):
+        return FileResponse(
+            excel_path,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=f"TikTok_Shop_US_Trends_{datetime.now().strftime('%Y%m%d')}.xlsx"
+        )
+    return JSONResponse(status_code=404, content={"message": "Excel file not generated yet."})
 
 if __name__ == "__main__":
     import uvicorn
