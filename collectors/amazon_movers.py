@@ -3,7 +3,11 @@ Amazon US Best Sellers & Movers Scraper
 Extracts high-velocity, trending products across key TikTok Shop niches in the US.
 """
 
-from playwright.sync_api import sync_playwright
+try:
+    from playwright.sync_api import sync_playwright
+except ImportError:
+    sync_playwright = None
+
 import time
 import re
 import logging
@@ -24,6 +28,10 @@ def scrape_amazon_bestsellers(limit_per_category: int = 12) -> List[Dict[str, An
     """
     Scrapes top selling products from Amazon US Best Sellers.
     """
+    if not sync_playwright:
+        logger.warning("Playwright is not available in current environment, skipping live Amazon scrape.")
+        return []
+
     all_products = []
     
     with sync_playwright() as p:
