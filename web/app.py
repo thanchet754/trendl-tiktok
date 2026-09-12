@@ -121,6 +121,14 @@ def perform_full_scan():
 
     # Generate Standalone HTML
     export_to_standalone_html(analyzed, "dashboard.html")
+    export_to_standalone_html(analyzed, "index.html")
+
+    # Sync to Supabase Cloud Database
+    try:
+        from database.supabase_client import sync_trends_to_supabase
+        sync_trends_to_supabase(analyzed)
+    except Exception as e:
+        logger.error(f"Lỗi đồng bộ Supabase: {e}")
 
     # Save to disk
     with open(DATA_FILE, "w", encoding="utf-8") as f:
@@ -132,17 +140,27 @@ def perform_full_scan():
 
 @app.on_event("startup")
 def on_startup():
-    scheduler_instance.start(perform_full_scan)
-    logger.info("AutoScheduler initialized on app startup.")
+    if not os.environ.get("VERCEL"):
+        scheduler_instance.start(perform_full_scan)
+        logger.info("AutoScheduler initialized on local app startup.")
+    else:
+        logger.info("Running on Vercel Serverless. AutoScheduler deactivated for serverless worker.")
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_dashboard():
-    if os.path.exists("dashboard.html"):
-        with open("dashboard.html", "r", encoding="utf-8") as f:
-            return f.read()
+    for fpath in ["index.html", "dashboard.html"]:
+        if os.path.exists(fpath):
+            with open(fpath, "r", encoding="utf-8") as f:
+                return f.read()
     template_path = os.path.join("web", "templates", "index.html")
-    with open(template_path, "r", encoding="utf-8") as f:
-        return f.read()
+    if os.path.exists(template_path):
+        with open(template_path, "r", encoding="utf-8") as f:
+            return f.read()
+    return HTMLResponse("<h1>TikTok Shop US Trend Radar Pro</h1>")
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def serve_dashboard_page():
+    return await serve_dashboard()
 
 @app.get("/api/data")
 async def get_data():
@@ -160,6 +178,14 @@ async def get_data():
 
     # Initial fast scan if empty
     return perform_full_scan()
+
+@app.get("/api/supabase-trends")
+async def get_supabase_trends(limit: int = 100):
+    try:
+        from database.supabase_client import fetch_trends_from_supabase
+        return fetch_trends_from_supabase(limit=limit)
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.post("/api/scan")
 async def scan_trends():

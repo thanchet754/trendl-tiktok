@@ -15,7 +15,7 @@ if hasattr(sys.stderr, 'reconfigure'):
 import time
 import argparse
 import webbrowser
-from web.app import perform_full_scan
+from web.app import app, perform_full_scan
 from scheduler import scheduler_instance
 
 def run_main(open_browser: bool = True, daemon_scheduler: bool = True):
