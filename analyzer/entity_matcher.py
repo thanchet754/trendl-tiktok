@@ -219,17 +219,35 @@ def synthesize_and_rank_ideas(
                 item["opportunity_score"] = min(99.5, item["opportunity_score"] + 5.0)
                 break
 
-    # Sort all ideas by opportunity score descending
-    all_sorted = sorted(raw_all, key=lambda x: x["opportunity_score"], reverse=True)
+    # Sort all ideas by 24h GMV / sales velocity first to determine ranking
+    all_by_gmv = sorted(raw_all, key=lambda x: (x.get("sales_24h", 0), x.get("opportunity_score", 0)), reverse=True)
+    for idx, it in enumerate(all_by_gmv):
+        it["rank_overall"] = idx + 1
 
-    # Filter into Viral 24h vs Evergreen
-    viral_24h = [x for x in all_sorted if x["classification"] == "VIRAL_SPIKE_24H"]
-    evergreen = [x for x in all_sorted if x["classification"] == "EVERGREEN_WINNER"]
+    # Group by category to determine rank_in_category
+    cat_groups = {}
+    for it in all_by_gmv:
+        cat = it.get("category", "General")
+        cat_groups.setdefault(cat, []).append(it)
+
+    for cat, items_in_cat in cat_groups.items():
+        sorted_cat = sorted(items_in_cat, key=lambda x: (x.get("sales_24h", 0), x.get("opportunity_score", 0)), reverse=True)
+        for cat_idx, it in enumerate(sorted_cat):
+            it["rank_in_category"] = cat_idx + 1
+
+    # Sort final ideas by opportunity score descending (or rank_overall)
+    all_sorted = sorted(all_by_gmv, key=lambda x: x.get("rank_overall", 999))
+
+    # Filter into Viral 24h vs Evergreen vs New Listings 24h
+    viral_24h = [x for x in all_sorted if x.get("classification") == "VIRAL_SPIKE_24H"]
+    evergreen = [x for x in all_sorted if x.get("classification") == "EVERGREEN_WINNER"]
+    new_listings_24h = [x for x in all_sorted if x.get("is_new_listing_24h", False)]
 
     stats = {
         "total_analyzed": len(all_sorted),
         "total_viral_24h": len(viral_24h),
         "total_evergreen": len(evergreen),
+        "total_new_listings_24h": len(new_listings_24h),
         "google_trends_count": len(google_trends),
         "tiktok_count": len(tiktok_items),
         "amazon_count": len(amazon_items),
@@ -241,5 +259,6 @@ def synthesize_and_rank_ideas(
         "all_ideas": all_sorted,
         "viral_24h": viral_24h,
         "evergreen": evergreen,
+        "new_listings_24h": new_listings_24h,
         "stats": stats
     }

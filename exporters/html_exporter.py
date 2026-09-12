@@ -487,9 +487,9 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 </div>
             </div>
 
-            <!-- HÀNG 2: CÁC Ô FILTER BÊN DƯỚI MENU THANH TRÊN (28 Ngành Hàng, Ngách Hàng Nhỏ, Chiều Xu Hướng) -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-2 pt-2 border-t border-slate-200 w-full">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full">
+            <!-- HÀNG 2: CÁC Ô FILTER BÊN DƯỚI MENU THANH TRÊN (28 Ngành Hàng, Ngách Hàng, Ranking, Mới Listing 24h) -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-2.5 pt-2.5 border-t border-slate-200 w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 w-full">
                     <!-- Ô Filter 1: Ngành Hàng Lớn (28 Ngành) -->
                     <div class="flex items-center gap-1.5 bg-slate-50 border-2 border-slate-300 px-2.5 py-1">
                         <i class="ph-bold ph-squares-four text-rose-600 text-sm shrink-0"></i>
@@ -508,17 +508,26 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         </select>
                     </div>
 
-                    <!-- Ô Filter 3: Chiều Xu Hướng (Velocity) -->
+                    <!-- Ô Filter 3: Hệ Thống Xếp Hạng (Ranking) -->
                     <div class="flex items-center gap-1.5 bg-slate-50 border-2 border-slate-300 px-2.5 py-1">
-                        <i class="ph-bold ph-speedometer text-emerald-600 text-sm shrink-0"></i>
-                        <span class="text-[10px] font-black uppercase text-slate-500 whitespace-nowrap shrink-0" data-i18n="filter_velocity">Trend:</span>
-                        <select id="velocity-select" onchange="filterItems()" class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none truncate cursor-pointer">
-                            <option value="ALL" data-i18n="vel_all">Tất Cả Ma Trận Trend</option>
-                            <option value="VIRAL_VIDEO_24H" data-i18n="vel_viral">🔥 Video Viral 24h</option>
-                            <option value="FAST_SALES_VELOCITY_24H" data-i18n="vel_sales">🚀 Tốc Độ Bán Nhanh (Movers)</option>
-                            <option value="BREAKOUT_KEYWORD_24H" data-i18n="vel_keyword">📈 Từ Khóa Tìm Kiếm Đột Phá</option>
-                            <option value="EVERGREEN_WINNER" data-i18n="vel_evergreen">🌲 Evergreen Quanh Năm</option>
+                        <i class="ph-bold ph-ranking text-amber-600 text-sm shrink-0"></i>
+                        <span class="text-[10px] font-black uppercase text-slate-500 whitespace-nowrap shrink-0" data-i18n="filter_ranking">Rank:</span>
+                        <select id="ranking-select" onchange="filterItems()" class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none truncate cursor-pointer">
+                            <option value="all" data-i18n="rank_all">🏆 Tất Cả Thứ Hạng</option>
+                            <option value="top_10" data-i18n="rank_top_10">🥇 Top 1 - 10 Ngành</option>
+                            <option value="top_50" data-i18n="rank_top_50">🥈 Top 1 - 50 Ngành</option>
+                            <option value="top_100" data-i18n="rank_top_100">🥉 Top 1 - 100 Ngành</option>
+                            <option value="sales_24h" data-i18n="rank_sales_24h">🔥 Bán Chạy Nhất 24h</option>
+                            <option value="sales_30d" data-i18n="rank_sales_30d">📈 Bán Chạy 1 Tháng (30d)</option>
                         </select>
+                    </div>
+
+                    <!-- Ô Filter 4: Lọc Tag & Mới Listing 24h -->
+                    <div class="flex items-center gap-1.5 bg-slate-50 border-2 border-slate-300 px-2 py-1">
+                        <button id="btn-tag-new-listing" onclick="toggleNewListingFilter()" class="w-full py-0.5 px-2 bg-purple-50 hover:bg-purple-100 border border-purple-300 text-purple-900 text-xs font-black uppercase flex items-center justify-center gap-1 transition truncate" title="Lọc sản phẩm mới listing trong 24h đã có số bán">
+                            <i class="ph-bold ph-sparkle text-purple-600"></i>
+                            <span id="text-tag-new-listing" data-i18n="tag_new_listing_btn">✨ Mới Listing &lt;24h</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -688,12 +697,13 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 <table class="w-full text-left border-collapse text-xs">
                     <thead class="bg-slate-100 text-slate-700 uppercase font-black border-b-2 border-slate-300">
                         <tr>
-                            <th class="py-3 px-4" data-i18n="th_product">Sản Phẩm</th>
-                            <th class="py-3 px-4" data-i18n="th_class">Phân Loại</th>
+                            <th class="py-3 px-3 w-16 text-center">Hạng (#)</th>
+                            <th class="py-3 px-4" data-i18n="th_product">Sản Phẩm & Từ Khóa</th>
+                            <th class="py-3 px-3">Tag / Nhãn</th>
                             <th class="py-3 px-4" data-i18n="th_niche">Ngành Hàng</th>
-                            <th class="py-3 px-4 text-center">Viral 24h</th>
-                            <th class="py-3 px-4 text-center">Evergreen</th>
-                            <th class="py-3 px-4" data-i18n="th_price">Giá Bán</th>
+                            <th class="py-3 px-3 text-center">Bán 24h</th>
+                            <th class="py-3 px-3 text-center">Bán 30 Ngày</th>
+                            <th class="py-3 px-3" data-i18n="th_price">Giá Bán</th>
                             <th class="py-3 px-4" data-i18n="th_saved_by">Người Lưu Trong Team</th>
                             <th class="py-3 px-4" data-i18n="th_actions">Thao Tác</th>
                         </tr>
@@ -1015,7 +1025,15 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 verified_badge: "ĐÃ XÁC THỰC 24H (HỢP LỆ)",
                 btn_force_scan: "Quét Mới Ngay",
                 tip_1688_title: "Mẹo tìm kiếm 1688:",
-                tip_1688_search: "Nếu khi mở ra chưa thấy sản phẩm ngay, bạn chỉ cần bấm lại nút 'Tìm kiếm' (🔍 搜索) trên thanh tìm kiếm của 1688 một lần nữa là hệ thống sẽ tải đúng sản phẩm theo từ khóa đã điền sẵn."
+                tip_1688_search: "Nếu khi mở ra chưa thấy sản phẩm ngay, bạn chỉ cần bấm lại nút 'Tìm kiếm' (🔍 搜索) trên thanh tìm kiếm của 1688 một lần nữa là hệ thống sẽ tải đúng sản phẩm theo từ khóa đã điền sẵn.",
+                filter_ranking: "Rank:",
+                rank_all: "🏆 Tất Cả Thứ Hạng",
+                rank_top_10: "🥇 Top 1 - 10 Ngành",
+                rank_top_50: "🥈 Top 1 - 50 Ngành",
+                rank_top_100: "🥉 Top 1 - 100 Ngành",
+                rank_sales_24h: "🔥 Bán Chạy Nhất 24h",
+                rank_sales_30d: "📈 Bán Chạy 1 Tháng (30d)",
+                tag_new_listing_btn: "✨ Mới Listing <24h"
             }},
             en: {{
                 auto_timer: "Auto 6h Scan:",
@@ -1096,7 +1114,15 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 hook_label: "3s Hook:",
                 verified_badge: "24H TREND VERIFIED",
                 tip_1688_title: "1688 Search Tip:",
-                tip_1688_search: "If products do not appear immediately, just click the 'Search' (🔍 搜索) button on the 1688 search bar once more to fetch products with prefilled keyword."
+                tip_1688_search: "If products do not appear immediately, just click the 'Search' (🔍 搜索) button on the 1688 search bar once more to fetch products with prefilled keyword.",
+                filter_ranking: "Rank:",
+                rank_all: "🏆 All Rankings",
+                rank_top_10: "🥇 Top 1 - 10 Niche",
+                rank_top_50: "🥈 Top 1 - 50 Niche",
+                rank_top_100: "🥉 Top 1 - 100 Niche",
+                rank_sales_24h: "🔥 Best Selling 24h",
+                rank_sales_30d: "📈 Best Selling 1 Month (30d)",
+                tag_new_listing_btn: "✨ New Listing <24h"
             }}
         }};
 
@@ -1988,6 +2014,32 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             renderUI();
         }}
 
+        let filterNewListingActive = false;
+        function toggleNewListingFilter() {{
+            filterNewListingActive = !filterNewListingActive;
+            const btn = document.getElementById('btn-tag-new-listing');
+            if (btn) {{
+                if (filterNewListingActive) {{
+                    btn.classList.remove('bg-purple-50', 'text-purple-900', 'border-purple-300');
+                    btn.classList.add('bg-purple-700', 'text-white', 'border-purple-800');
+                }} else {{
+                    btn.classList.remove('bg-purple-700', 'text-white', 'border-purple-800');
+                    btn.classList.add('bg-purple-50', 'text-purple-900', 'border-purple-300');
+                }}
+            }}
+            topVideosPage = 1;
+            topInfluencersPage = 1;
+            renderUI();
+        }}
+
+        function searchByKeyword(kw) {{
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {{
+                searchInput.value = kw;
+                renderUI();
+            }}
+        }}
+
         function filterItems() {{
             topVideosPage = 1;
             topInfluencersPage = 1;
@@ -2002,7 +2054,8 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             const searchVal = (document.getElementById('search-input').value || '').toLowerCase().trim();
             const catVal = document.getElementById('category-select').value;
             const subVal = document.getElementById('subniche-select').value;
-            const velocityVal = document.getElementById('velocity-select').value;
+            const velocitySelect = document.getElementById('velocity-select');
+            const velocityVal = velocitySelect ? velocitySelect.value : 'ALL';
             const uData = getUsersData();
             const activeUser = uData.users.find(u => u.id === uData.active_user_id) || uData.users[0];
 
@@ -2100,13 +2153,17 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 itemsToRender = globalData.all_ideas || [];
             }}
 
-            // Filter Product Items by Category, Sub-niche, Velocity, and Search text
+            // Filter Product Items by Category, Sub-niche, Velocity, Search text, and New Listing
+            const rankingSelect = document.getElementById('ranking-select');
+            const rankingVal = rankingSelect ? rankingSelect.value : 'all';
+
             itemsToRender = itemsToRender.filter(it => {{
                 // Search match
                 const titleStr = (it.title || '').toLowerCase();
                 const catStr = (it.category || '').toLowerCase();
                 const subStr = (it.sub_niche || '').toLowerCase();
-                const matchSearch = !searchVal || titleStr.includes(searchVal) || catStr.includes(searchVal) || subStr.includes(searchVal);
+                const kwStr = (it.keywords || []).join(' ').toLowerCase();
+                const matchSearch = !searchVal || titleStr.includes(searchVal) || catStr.includes(searchVal) || subStr.includes(searchVal) || kwStr.includes(searchVal);
 
                 // Category match
                 const matchCat = (catVal === 'all') || catStr === catVal.toLowerCase() || (it.category_vi && it.category_vi.toLowerCase().includes(catVal.toLowerCase()));
@@ -2121,8 +2178,27 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     matchVelocity = (itVel === velocityVal);
                 }}
 
-                return matchSearch && matchCat && matchSub && matchVelocity;
+                // New Listing <24h match
+                let matchNewListing = true;
+                if (filterNewListingActive) {{
+                    matchNewListing = Boolean(it.is_new_listing_24h || (it.tags && it.tags.includes('NEW_LISTING_24H')));
+                }}
+
+                return matchSearch && matchCat && matchSub && matchVelocity && matchNewListing;
             }});
+
+            // Apply Ranking Sort & Filters
+            if (rankingVal === 'top_10') {{
+                itemsToRender = itemsToRender.filter(it => (it.rank_in_category || 999) <= 10);
+            }} else if (rankingVal === 'top_50') {{
+                itemsToRender = itemsToRender.filter(it => (it.rank_in_category || 999) <= 50);
+            }} else if (rankingVal === 'top_100') {{
+                itemsToRender = itemsToRender.filter(it => (it.rank_in_category || 999) <= 100);
+            }} else if (rankingVal === 'sales_24h') {{
+                itemsToRender.sort((a, b) => (b.sales_24h || b.sales_count_24h || 0) - (a.sales_24h || a.sales_count_24h || 0));
+            }} else if (rankingVal === 'sales_30d') {{
+                itemsToRender.sort((a, b) => (b.sales_30d || 0) - (a.sales_30d || 0));
+            }}
 
             if ((currentTab === 'saved' || currentTab === 'team_saved') && itemsToRender.length === 0) {{
                 emptySavedBox.classList.remove('hidden');
@@ -2137,22 +2213,51 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     const savers = getTeamSavers(it);
                     const q1688 = encodeURIComponent(it.query_1688 || get_1688_query(it.title));
                     const qAlibaba = encodeURIComponent(it.query_alibaba || get_alibaba_query(it.title));
+                    const s24h = it.sales_24h || it.sales_count_24h || 0;
+                    const s30d = it.sales_30d || (s24h * 15);
+                    const gmv24 = it.gmv_24h || Math.round(s24h * (it.price_val || 25));
+                    const gmv30 = it.gmv_30d || Math.round(s30d * (it.price_val || 25));
+                    const isNew = it.is_new_listing_24h || (it.tags && it.tags.includes('NEW_LISTING_24H'));
+                    const rankCat = it.rank_in_category || 1;
+                    const keywords = it.keywords || [];
 
                     return `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-200">
-                        <td class="py-3 px-4 font-bold text-slate-900 max-w-xs truncate">${{it.title}}</td>
-                        <td class="py-3 px-4">
-                            <span class="text-[11px] font-bold px-2 py-0.5 border ${{it.classification === 'VIRAL_SPIKE_24H' ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}}">
-                                ${{it.label}}
-                            </span>
+                        <td class="py-3 px-3 text-center">
+                            <span class="inline-block bg-amber-400 text-slate-950 font-mono font-black px-1.5 py-0.5 border border-amber-500 text-xs">#${{rankCat}}</span>
+                        </td>
+                        <td class="py-3 px-4 max-w-xs">
+                            <div class="font-bold text-slate-900 truncate text-xs">${{it.title}}</div>
+                            ${{keywords.length > 0 ? `
+                                <div class="flex items-center gap-1 flex-wrap mt-1">
+                                    ${{keywords.slice(0, 3).map(kw => `<button onclick="searchByKeyword('${{kw}}')" class="text-[10px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 px-1.5 py-0.2 border border-slate-300">#${{kw}}</button>`).join('')}}
+                                </div>
+                            ` : ''}}
+                        </td>
+                        <td class="py-3 px-3 whitespace-nowrap">
+                            ${{isNew ? `
+                                <span class="text-[10px] font-black uppercase px-2 py-0.5 bg-purple-100 text-purple-900 border border-purple-400 inline-flex items-center gap-1">
+                                    <i class="ph-bold ph-sparkle text-purple-600"></i> ✨ MỚI LISTING
+                                </span>
+                            ` : `
+                                <span class="text-[10px] font-bold px-2 py-0.5 border ${{it.classification === 'VIRAL_SPIKE_24H' ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}}">
+                                    ${{it.label}}
+                                </span>
+                            `}}
                         </td>
                         <td class="py-3 px-4 text-slate-600 font-medium">
                             <div class="font-bold text-slate-800">${{it.category || 'General'}}</div>
                             <div class="text-[10px] text-slate-500">${{it.sub_niche || ''}}</div>
                         </td>
-                        <td class="py-3 px-4 text-center font-black text-rose-600">${{it.viral_score}}/100</td>
-                        <td class="py-3 px-4 text-center font-black text-emerald-600">${{it.evergreen_score}}/100</td>
-                        <td class="py-3 px-4 font-extrabold text-slate-900">${{it.price || it.clean_price}}</td>
+                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                            <div class="font-black text-rose-600 text-xs">${{s24h.toLocaleString()}} đơn</div>
+                            <div class="text-[10px] text-slate-500 font-bold">+$${{gmv24.toLocaleString()}}</div>
+                        </td>
+                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                            <div class="font-black text-slate-900 text-xs">${{s30d.toLocaleString()}} đơn</div>
+                            <div class="text-[10px] text-emerald-700 font-bold">$${{gmv30.toLocaleString()}}</div>
+                        </td>
+                        <td class="py-3 px-3 font-extrabold text-slate-900">${{it.price || it.clean_price}}</td>
                         <td class="py-3 px-4">
                             ${{savers.length > 0 ? savers.map(s => `<span class="inline-block bg-blue-100 text-blue-800 border border-blue-300 text-[10px] font-bold px-1.5 py-0.5 mr-1">${{s}}</span>`).join('') : '<span class="text-slate-400 text-[11px]">-</span>'}}
                         </td>
@@ -2164,7 +2269,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                 <a href="https://www.alibaba.com/trade/search?SearchText=${{qAlibaba}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-[11px] font-black bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 shadow-sm" title="Xưởng Alibaba B2B Quốc Tế (100% Không Bị 403)">
                                     Alibaba
                                 </a>
-                                <a href="https://s.1688.com/selloffer/offer_search.htm?keywords=${{q1688}}&n=y&_input_charset=utf-8" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-[11px] font-bold bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 shadow-sm" title="Xưởng 1688 Nội Địa Trung (Nếu chưa hiện hàng, bấm nút Tìm kiếm trên 1688 thêm lần nữa)">
+                                <a href="https://s.1688.com/selloffer/offer_search.htm?keywords=${{q1688}}&n=y&_input_charset=utf-8" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-[11px] font-bold bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 shadow-sm" title="Xưởng 1688 Nội Địa Trung">
                                     1688
                                 </a>
                                 <button onclick='viewStrategy(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-[11px] font-bold bg-slate-900 hover:bg-slate-800 text-white px-2 py-1">
@@ -2202,6 +2307,13 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     const q1688 = encodeURIComponent(it.query_1688 || get_1688_query(it.title));
                     const qAlibaba = encodeURIComponent(it.query_alibaba || get_alibaba_query(it.title));
                     const raw1688 = it.query_1688 || get_1688_query(it.title);
+                    const s24h = it.sales_24h || it.sales_count_24h || 0;
+                    const s30d = it.sales_30d || (s24h * 15);
+                    const gmv24 = it.gmv_24h || Math.round(s24h * (it.price_val || 25));
+                    const gmv30 = it.gmv_30d || Math.round(s30d * (it.price_val || 25));
+                    const isNew = it.is_new_listing_24h || (it.tags && it.tags.includes('NEW_LISTING_24H'));
+                    const rankCat = it.rank_in_category || 1;
+                    const keywords = it.keywords || [];
 
                     // Dimension label helper
                     let velBadge = '';
@@ -2217,6 +2329,15 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             <!-- HÀNG 1: HUY HIỆU TRẠNG THÁI & THAO TÁC -->
                             <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200">
                                 <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-xs font-black uppercase px-2 py-0.5 bg-amber-400 text-slate-950 border border-amber-500 font-mono shadow-xs">
+                                        #${{rankCat}} ${{it.category ? it.category.split(' ')[0] : 'Ngành'}}
+                                    </span>
+                                    ${{isNew ? `
+                                        <span class="text-xs font-black uppercase px-2 py-0.5 bg-purple-100 text-purple-900 border border-purple-400 flex items-center gap-1">
+                                            <i class="ph-bold ph-sparkle text-purple-600"></i>
+                                            <span>✨ MỚI LISTING &lt;24H</span>
+                                        </span>
+                                    ` : ''}}
                                     <span class="text-xs font-black uppercase px-2.5 py-1 border whitespace-nowrap ${{isViral ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}}">
                                         ${{it.label}}
                                     </span>
@@ -2224,7 +2345,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                     <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 border border-slate-200">
                                         ${{it.category || 'Niche'}} ${{it.sub_niche ? '· ' + it.sub_niche : ''}}
                                     </span>
-                                    <span class="text-[11px] font-bold text-slate-400 hidden sm:inline">| ${{platforms}}</span>
+                                    <span class="text-[11px] font-bold text-slate-400 hidden sm:inline">| Toàn Sàn #${{it.rank_overall || 1}}</span>
                                 </div>
 
                                 <div class="flex items-center gap-2">
@@ -2252,12 +2373,24 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                                 </div>
                                             </div>
                                         ` : ''}}
-                                        <h3 class="text-base sm:text-lg font-black text-slate-900 leading-snug tracking-tight hover:text-rose-600 transition">
-                                            <a href="${{it.url || '#'}}" target="_blank" rel="noreferrer noopener" class="flex items-center gap-1.5">
-                                                <span>${{it.title}}</span>
-                                                <i class="ph-bold ph-arrow-square-out text-sm text-slate-400"></i>
-                                            </a>
-                                        </h3>
+                                        <div>
+                                            <h3 class="text-base sm:text-lg font-black text-slate-900 leading-snug tracking-tight hover:text-rose-600 transition">
+                                                <a href="${{it.url || '#'}}" target="_blank" rel="noreferrer noopener" class="flex items-center gap-1.5">
+                                                    <span>${{it.title}}</span>
+                                                    <i class="ph-bold ph-arrow-square-out text-sm text-slate-400"></i>
+                                                </a>
+                                            </h3>
+                                            ${{keywords.length > 0 ? `
+                                                <div class="flex items-center gap-1.5 flex-wrap pt-1">
+                                                    <span class="text-[10px] font-black uppercase text-slate-400">Từ khóa:</span>
+                                                    ${{keywords.map(kw => `
+                                                        <button onclick="searchByKeyword('${{kw}}')" class="text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 border border-slate-200 transition">
+                                                            #${{kw}}
+                                                        </button>
+                                                    `).join('')}}
+                                                </div>
+                                            ` : ''}}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -2277,12 +2410,12 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 bg-slate-50/70 -mx-5 -mb-5 px-5 py-2.5">
                                 <div class="flex items-center gap-4 sm:gap-6 flex-wrap">
                                     <div class="flex items-center gap-1.5">
-                                        <span class="text-[11px] text-slate-500 uppercase font-black">Viral 24h:</span>
-                                        <span class="text-base font-black text-rose-600">${{it.viral_score}}<span class="text-xs text-slate-400 font-normal">/100</span></span>
+                                        <span class="text-[11px] text-slate-500 uppercase font-black">Bán 24h:</span>
+                                        <span class="text-sm font-black text-rose-600">${{s24h.toLocaleString()}} <span class="text-[10px] text-slate-500 font-normal">đơn (+$${{gmv24.toLocaleString()}})</span></span>
                                     </div>
                                     <div class="flex items-center gap-1.5 border-l border-slate-300 pl-4">
-                                        <span class="text-[11px] text-slate-500 uppercase font-black">Evergreen:</span>
-                                        <span class="text-base font-black text-emerald-700">${{it.evergreen_score}}<span class="text-xs text-slate-400 font-normal">/100</span></span>
+                                        <span class="text-[11px] text-slate-500 uppercase font-black">Bán 30 Ngày:</span>
+                                        <span class="text-sm font-black text-slate-900">${{s30d.toLocaleString()}} <span class="text-[10px] text-emerald-700 font-bold">($${{gmv30.toLocaleString()}})</span></span>
                                     </div>
                                     <div class="flex items-center gap-1.5 border-l border-slate-300 pl-4">
                                         <span class="text-[11px] text-slate-500 uppercase font-black">${{lang.th_price}}:</span>

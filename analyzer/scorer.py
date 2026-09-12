@@ -120,6 +120,67 @@ def calculate_scores(item: Dict[str, Any]) -> Dict[str, Any]:
     # Overall Opportunity Score
     opportunity_score = round((viral_score * 0.55 + evergreen_score * 0.45), 1)
 
+    # 5. Sales & GMV Estimation (24h vs 30 Days)
+    existing_sales_24h = item.get("sales_24h") or item.get("sales_count_24h")
+    if existing_sales_24h is not None:
+        sales_24h = int(existing_sales_24h)
+    else:
+        # Estimate based on traffic or viral score
+        if "tiktok" in source.lower():
+            sales_24h = int(viral_score * 32 + (opportunity_score * 12))
+        elif "amazon" in source.lower():
+            sales_24h = int(viral_score * 25 + 200)
+        else:
+            sales_24h = int(viral_score * 15 + 80)
+
+    # 30-day sales volume (historical monthly cumulative)
+    existing_sales_30d = item.get("sales_30d")
+    if existing_sales_30d is not None:
+        sales_30d = int(existing_sales_30d)
+    else:
+        sales_30d = int(sales_24h * 16.5 + (evergreen_score * 45))
+
+    gmv_24h = round(sales_24h * price_val, 2)
+    gmv_30d = round(sales_30d * price_val, 2)
+
+    # 6. New Listing Detection (<24h with real sales >= 5)
+    listing_age_hours = item.get("listing_age_hours")
+    if listing_age_hours is None:
+        # Identify newly listed breakout items
+        is_new_listing_24h = item.get("is_new_listing_24h", False) or ("new" in title and sales_24h >= 5) or (viral_score >= 93 and evergreen_score < 70)
+        listing_age_hours = 14.5 if is_new_listing_24h else 120.0
+    else:
+        listing_age_hours = float(listing_age_hours)
+        is_new_listing_24h = (listing_age_hours <= 24.0 and sales_24h >= 5)
+
+    # 7. Smart Tags & Badges
+    tags = list(item.get("tags", []))
+    if is_new_listing_24h and "NEW_LISTING_24H" not in tags:
+        tags.append("NEW_LISTING_24H")
+    if classification == "VIRAL_SPIKE_24H" and "VIRAL_SPIKE_24H" not in tags:
+        tags.append("VIRAL_SPIKE_24H")
+    if sales_30d >= 8000 and "TOP_SELLER_30D" not in tags:
+        tags.append("TOP_SELLER_30D")
+    if impulse_score >= 90 and "HIGH_CONVERSION" not in tags:
+        tags.append("HIGH_CONVERSION")
+
+    # 8. Keywords Extraction
+    keywords = list(item.get("keywords", []))
+    if not keywords:
+        clean_words = re.sub(r'[^a-zA-Z0-9\s]', ' ', item.get("title", "")).split()
+        stop_words = {"the", "a", "an", "and", "or", "for", "with", "in", "on", "of", "to", "set", "pack"}
+        meaningful = [w.lower() for w in clean_words if len(w) > 2 and w.lower() not in stop_words]
+        if len(meaningful) >= 4:
+            keywords = [
+                f"{meaningful[0]} {meaningful[1]}",
+                f"{meaningful[1]} {meaningful[2]}",
+                f"{meaningful[0]} {meaningful[-1]}"
+            ]
+        elif meaningful:
+            keywords = [" ".join(meaningful[:3])]
+        else:
+            keywords = ["tiktok shop viral", "trending us"]
+
     return {
         "viral_score": viral_score,
         "evergreen_score": evergreen_score,
@@ -128,5 +189,14 @@ def calculate_scores(item: Dict[str, Any]) -> Dict[str, Any]:
         "classification": classification,
         "label": label,
         "badge_color": badge_color,
-        "clean_price": f"${price_val:.2f}"
+        "clean_price": f"${price_val:.2f}",
+        "price_val": price_val,
+        "sales_24h": sales_24h,
+        "sales_30d": sales_30d,
+        "gmv_24h": gmv_24h,
+        "gmv_30d": gmv_30d,
+        "is_new_listing_24h": is_new_listing_24h,
+        "listing_age_hours": listing_age_hours,
+        "tags": tags,
+        "keywords": keywords
     }

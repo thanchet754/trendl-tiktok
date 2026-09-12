@@ -33,20 +33,42 @@ def sync_trends_to_supabase(analyzed_data: Dict[str, Any]) -> bool:
     if trends:
         trends_payload = []
         for it in trends:
+            sales_24h = int(it.get("sales_24h", it.get("sales_count_24h", 0)) or 0)
+            price = float(it.get("price", 0) or 0)
+            gmv_24h = float(it.get("gmv_24h", round(sales_24h * price, 2)) or 0)
+            sales_30d = int(it.get("sales_30d", sales_24h * 15) or 0)
+            gmv_30d = float(it.get("gmv_30d", round(sales_30d * price, 2)) or 0)
+            is_new = bool(it.get("is_new_listing_24h", False))
+            tags = it.get("tags", [])
+            if not tags:
+                tags = [it.get("classification", "VIRAL_SPIKE_24H")]
+                if is_new:
+                    tags.append("NEW_LISTING_24H")
+            
             trends_payload.append({
                 "id": str(it.get("id")),
                 "title": it.get("title", ""),
-                "category": it.get("category", ""),
+                "category": it.get("category", "General"),
                 "sub_niche": it.get("sub_niche", ""),
-                "price": float(it.get("price", 0) or 0),
-                "gmv_24h": float(it.get("gmv_24h", 0) or 0),
-                "sales_count_24h": int(it.get("sales_count_24h", 0) or 0),
+                "price": price,
+                "rank_in_category": int(it.get("rank_in_category", 999) or 999),
+                "rank_overall": int(it.get("rank_overall", 9999) or 9999),
+                "sales_24h": sales_24h,
+                "gmv_24h": gmv_24h,
+                "sales_30d": sales_30d,
+                "gmv_30d": gmv_30d,
                 "classification": it.get("classification", "VIRAL_SPIKE_24H"),
                 "velocity_score": float(it.get("velocity_score", 0) or 0),
+                "is_new_listing_24h": is_new,
+                "listing_time": it.get("listing_time", "2026-09-12T00:00:00Z"),
+                "listing_age_hours": float(it.get("listing_age_hours", 24.0) or 24.0),
+                "tags": tags,
+                "keywords": it.get("keywords", []),
                 "image_url": it.get("image", ""),
                 "shop_url": it.get("tiktok_url", ""),
                 "query_1688": it.get("query_1688", ""),
                 "query_alibaba": it.get("query_alibaba", ""),
+                "platform_sources": it.get("platform_sources", ["TikTok Shop US"]),
                 "verification_24h": it.get("verification_24h", {}),
                 "strategy": it.get("strategy", {})
             })
@@ -56,7 +78,7 @@ def sync_trends_to_supabase(analyzed_data: Dict[str, Any]) -> bool:
                 f"{SUPABASE_URL}/rest/v1/tiktok_trends",
                 headers=HEADERS,
                 json=trends_payload,
-                timeout=15
+                timeout=20
             )
             if res.status_code in [200, 201]:
                 logger.info(f"Đã đồng bộ {len(trends_payload)} sản phẩm xu hướng lên Supabase.")
