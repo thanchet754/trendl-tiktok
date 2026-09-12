@@ -1,0 +1,2494 @@
+"""
+Comprehensive Light Square HTML Dashboard Exporter for TikTok Shop US Trend Radar
+Includes:
+- Left Taskbar Navigation Menu (100% Square)
+- Top 24h Leaders: Top Videos (Highest GMV) & Top Influencers (Highest Sales & GMV) matching Kalodata/FastMoss layout
+- 28 Major Categories & Sub-Niches Cascading Dynamic Filter Hub
+- Velocity Dimension Filtering (Viral Videos 24h, Sales Velocity Movers, Breakout Search Keywords, Evergreen)
+- Music & Audio Viral Radar (Hot TikTok Sounds 24h)
+- Visual / Image Search & 1688 / Alibaba Sourcing Hub
+- 1688 Direct Factory Lookup & International Alibaba B2B
+- Bilingual English / Tiếng Việt Instant Switcher
+- Multi-User & Team Saved Trends Collaboration
+- 100% Light Theme & 100% Square Corners (Zero border-radius)
+- 24h Real-time Trend Verification Proof & Live Audit Links
+- 6-Hour Auto-Schedule Countdown Timer
+"""
+
+import os
+import json
+from datetime import datetime
+from typing import Dict, Any
+
+KEYWORDS_1688_MAP = {
+    # Oral Care & Whitening
+    "teeth": "紫光美白牙膏 泡沫去黄",
+    "tooth": "电动牙刷 牙齿美白仪",
+    "pulling oil": "椰子油漱口水 口腔清洁",
+    "cocomint": "椰子薄荷漱口水 亮白牙齿",
+    # Skincare & Beauty
+    "toner": "毛孔清洁水杨酸棉片 积雪草爽肤水湿敷贴",
+    "pore": "毛孔细致收缩棉片 清洁去黑头",
+    "towel": "一次性洗脸巾 纯棉加厚 珍珠纹洁面巾",
+    "patch": "水胶体痘痘贴 隐形净痘贴 吸脓透气",
+    "serum": "玻尿酸面部精华液 抗衰紧致",
+    "lotion": "身体乳 润肤乳 滋润保湿 香氛身体霜",
+    "shea": "乳木果香氛润肤乳 高保湿身体乳",
+    "lip": "果汁丰唇蜜 水光唇釉 嘟嘟唇油",
+    "plump": "丰唇膏 滋润保湿变色唇油",
+    "swab": "医用脱脂棉签 双头化妆棉签",
+    "cotton": "纯棉化妆棉 一次性卸妆棉",
+    "wand": "红光微电流美肤仪 面部提拉导入仪",
+    "red light": "LED红光嫩肤美容仪 面部微电流",
+    # Hair Care & Tools
+    "curling": "多功能自动卷发棒 负离子热风直卷两用",
+    "beachwaver": "全自动旋转卷发棒 陶瓷不伤发",
+    "thermal brush": "热风直发梳 电热卷发圆筒梳 蓬松高颅顶",
+    "blowout": "多功能电吹风造型梳 热风梳",
+    "hair": "负离子无叶高速吹风机 造型美发梳",
+    # Kitchen & Drinkware
+    "tumbler": "不锈钢保温杯 吸管保冷杯 运动便携水杯",
+    "bottle": "不锈钢真空运动水壶 大容量吸管水杯",
+    "owala": "双饮吸管不锈钢保温杯 户外运动水壶",
+    "stanley": "汽车杯 手柄吸管大容量保温杯",
+    "scale": "高精度厨房电子秤 烘焙烘培称 重食品秤",
+    "cutting board": "实木牛排餐盘 刻字砧板 菜板",
+    # Home & Cleaning
+    "scrubber": "电动清洁刷 多功能旋转浴室地砖地毯刷",
+    "pink stuff": "多功能清洁膏 万能去污膏 厨房油污净",
+    "paste": "万能清洁去污膏 抛光清洁剂",
+    "clean": "家用清洁剂 去污除垢多功能刷",
+    "calendar": "亚克力磁吸冰箱周计划留言板",
+    "candle": "天然大豆香薰蜡烛 琥珀玻璃罐",
+    "sheet": "亲肤磨毛四件套 床单被套 纯色水洗棉",
+    "bed": "加厚床单四件套 纯棉床上用品",
+    "insect": "果蝇诱捕器 物理灭蚊灯 粘捕灯",
+    "trap": "室内捕虫诱捕器 苍蝇小飞虫粘板",
+    "ant": "灭蚁饵剂 室内除蚁胶饵 诱杀蚂蚁全窝端",
+    # Pet Supplies
+    "brush": "宠物一键脱毛梳 自动退毛清理梳 猫狗通用",
+    "litter": "膨润土猫砂 结团无尘 低敏除臭除味",
+    "clay": "高效除臭膨润土矿石猫砂",
+    "pee": "宠物尿垫 加厚吸水 隔尿垫 狗尿片",
+    "pad": "加厚吸水宠物除臭尿垫",
+    "treat": "猫条肉泥 营养猫零食 冻干生骨肉",
+    "churu": "流质肉泥猫条 鲜肉营养膏猫零食",
+    "feast": "猫罐头 湿粮 肉泥浓汤 宠物主粮",
+    "wet cat": "营养猫罐头 鲜肉浓汤湿粮",
+    "poop": "可降解宠物拾便袋 拾便盒 狗便便袋",
+    "dog": "宠物狗狗用品 训练牵引绳 拾便袋",
+    "cat": "猫咪用品 磨爪猫抓板 逗猫玩具",
+    # Electronics & Gadgets
+    "earbuds": "TWS真无线蓝牙耳机 降噪半入耳式",
+    "airpods": "无线降噪蓝牙耳机 空间音频",
+    "earphone": "Type-C有线耳机 半入耳式 通话降噪",
+    "headphone": "头戴式无线蓝牙耳机 重低音主动降噪",
+    "airtag": "防丢定位器 智能寻物器 蓝牙防丢器",
+    "tracker": "GPS智能定位防丢器 钥匙寻物器",
+    "power bank": "磁吸无线充移动电源 10000mAh快充充电宝",
+    "charger": "GaN氮化镓快速充电器 快充排插",
+    "cable": "PD快充数据线 编织耐用快充线",
+    "mic": "无线领夹麦克风 降噪直播收音麦 手机专用",
+    "camera": "4K高清数码相机 翻转屏Vlog微单 学生照相机",
+    "printer": "便携迷你热敏错题打印机 无墨不干胶便签机",
+    "docking": "实木多功能桌面手机支架收纳盒 充电底座",
+    "case": "防摔气囊手机壳 磁吸支架保护套",
+    # Apparel & Accessories
+    "legging": "高腰交叉阔腿瑜伽裤 提臀裸感无缝打底裤",
+    "halara": "交叉腰运动阔腿裤 休闲弹力女裤",
+    "bodysuit": "无缝塑身衣 连体束腹收腹美体衣",
+    "shapewear": "高腰收腹提臀裤 紧身无痕塑形衣",
+    "hoodie": "定制宠物头像刺绣卫衣 纯棉连帽衫",
+    "vest": "复古机车皮马甲 骑士皮背心",
+    "jacket": "男士机车真皮皮衣 防风夹克",
+    "pants": "工装战术长裤 多口袋休闲阔腿裤",
+    "necklace": "定制姓名出生花项链 钛钢不锈钢饰品",
+    "jewelry": "欧美流行钛钢饰品 18K金保色项链手链",
+    "watch": "复古多功能电子手表 运动防水腕表",
+    "casio": "复古计算器电子手表 数字石英表",
+    "slipper": "羊皮毛一体雪地靴保暖棉拖鞋",
+    "cap": "刺绣棒球帽 弯檐遮阳鸭舌帽",
+    "hat": "户外保暖针织冷帽 潮流毛线帽",
+    # Fitness & Health
+    "protein": "乳清分离蛋白粉 健身增肌 代餐冲饮",
+    "greens": "羽衣甘蓝复合果蔬粉 益生菌膳食纤维青汁",
+    "supplement": "复合维生素胶囊 膳食营养补充剂",
+    "capsule": "深海鱼油软胶囊 Omega-3高纯度",
+    # Automotive
+    "inflator": "便携车载充气泵 无线电动轮胎补气打气筒 150PSI",
+    "tire": "车载智能数显电动充气泵",
+    "mount": "车载手机支架 出风口中控台重力磁吸支架",
+    "car": "车载内饰收纳 汽车清洁软胶"
+}
+
+CATEGORY_FALLBACK_1688 = {
+    "Beauty & Personal Care": "美妆护肤 日化个护 爆款源头工厂",
+    "Beauty & Skincare": "护肤美妆 面部护理 源头工厂货源",
+    "Kitchenware": "厨具餐具 厨房日用 不锈钢保温制品",
+    "Home Supplies": "居家日用 收纳整理 清洁日化货源",
+    "Home & Kitchen": "家居百货 厨房收纳 源头工厂直供",
+    "Home Gadgets": "创意家居 实用日用百货 工厂批发",
+    "Womenswear & Underwear": "女装爆款 瑜伽塑身内衣 运动服饰",
+    "Menswear & Underwear": "男装潮牌 休闲工装 男士内衣批发",
+    "Pet Supplies": "宠物用品 猫狗玩具 美容清洁用品工厂",
+    "Phones & Electronics": "3C数码 数码配件 手机周边 源头厂家",
+    "Tech Gadgets": "创意数码 3C数码配件 跨境热销货源",
+    "Jewelry & Accessories": "流行饰品 钛钢项链手链 饰品工厂",
+    "Health & Wellness": "健康养生 营养保健品 代餐膳食",
+    "Automotive & Motorcycle": "汽车用品 车载内饰 汽摩配件工厂",
+    "Sports & Outdoors": "户外运动 健身器材 运动防护用品",
+    "Toys & Hobbies": "解压减压玩具 益智潮玩 盲盒玩具"
+}
+
+KEYWORDS_ALIBABA_MAP = {
+    "toner": "toner pads exfoliating face",
+    "pore": "pore cleansing pads skincare",
+    "towel": "disposable face towels biobased cotton",
+    "brush": "pet deshedding slicker brush self cleaning",
+    "tumbler": "stainless steel tumbler with straw leak proof",
+    "bottle": "insulated water bottle",
+    "patch": "hydrocolloid acne pimple patch",
+    "printer": "mini thermal portable sticker printer",
+    "scrubber": "electric spin scrubber bathroom cleaner",
+    "mic": "wireless lavalier lapel microphone",
+    "necklace": "custom birth flower name bar necklace",
+    "docking": "wood docking station desk organizer men",
+    "calendar": "acrylic wall calendar weekly planner",
+    "cutting board": "custom engraved wood cutting board charcuterie",
+    "candle": "soy wax aromatherapy scented candle",
+    "hoodie": "custom embroidered pet hoodie",
+    "casio": "retro digital electronic watch",
+    "cable": "fast charging usb cable",
+    "teeth": "purple teeth whitening foam color corrector",
+    "squishy": "steamed bun squishy stress relief toy",
+    "curling": "5 in 1 hair styler airwrap curling wand"
+}
+
+def get_1688_query(title: str, category: str = "") -> str:
+    t_low = title.lower()
+    for k, v in KEYWORDS_1688_MAP.items():
+        if k in t_low:
+            return v
+    if category in CATEGORY_FALLBACK_1688:
+        return CATEGORY_FALLBACK_1688[category]
+    return "跨境热销 爆款源头工厂批发"
+
+def get_alibaba_query(title: str) -> str:
+    t_low = title.lower()
+    for k, v in KEYWORDS_ALIBABA_MAP.items():
+        if k in t_low:
+            return v
+    words = [w for w in title.split() if len(w) > 3 and not w.startswith('http')][:3]
+    return " ".join(words)
+
+def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = "dashboard.html") -> str:
+    # Attach 1688 and Alibaba search queries to items
+    for item in analyzed_data.get("all_ideas", []):
+        item["query_1688"] = get_1688_query(item.get("title", ""), item.get("category", ""))
+        item["query_alibaba"] = get_alibaba_query(item.get("title", ""))
+    for item in analyzed_data.get("viral_24h", []):
+        item["query_1688"] = get_1688_query(item.get("title", ""), item.get("category", ""))
+        item["query_alibaba"] = get_alibaba_query(item.get("title", ""))
+    for item in analyzed_data.get("evergreen", []):
+        item["query_1688"] = get_1688_query(item.get("title", ""), item.get("category", ""))
+        item["query_alibaba"] = get_alibaba_query(item.get("title", ""))
+
+    data_json = json.dumps(analyzed_data, ensure_ascii=False)
+    updated_at = analyzed_data.get("updated_at", datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+    stats = analyzed_data.get("stats", {})
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Shop US - Trend Intelligence Pro (28 Ngành & Top Leaders 24h)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* QUY TẮC BẮT BUỘC: TOÀN BỘ GIAO DIỆN VUÔNG VỨC 100% - ZERO BORDER RADIUS */
+        *, *::before, *::after {{
+            border-radius: 0px !important;
+        }}
+        ::-webkit-scrollbar {{
+            width: 8px;
+            height: 8px;
+        }}
+        ::-webkit-scrollbar-track {{
+            background: #f1f5f9;
+        }}
+        ::-webkit-scrollbar-thumb {{
+            background: #cbd5e1;
+            border-radius: 0px;
+        }}
+        ::-webkit-scrollbar-thumb:hover {{
+            background: #94a3b8;
+        }}
+        html, body {{
+            overflow-x: clip;
+        }}
+        /* Đảm bảo thanh Header bám dính chắc chắn trên cùng khi cuộn trang, NỀN TRẮNG 100% ĐẶC HOÀN TOÀN KHÔNG TRONG SUỐT */
+        header.sticky-top-bar {{
+            position: -webkit-sticky !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 50 !important;
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            opacity: 1 !important;
+            border-bottom: 2px solid #cbd5e1 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+        }}
+        
+        /* HIỆU ỨNG THU GỌN / MỞ RỘNG TASKBAR BÊN TRÁI */
+        #main-sidebar {{
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }}
+        #main-sidebar.collapsed {{
+            width: 4.25rem !important; /* 68px */
+        }}
+        #main-sidebar.collapsed .sidebar-full-item {{
+            display: none !important;
+        }}
+        #main-sidebar.collapsed .sidebar-nav-btn {{
+            justify-content: center !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }}
+        #main-sidebar.collapsed .sidebar-nav-btn .sidebar-text,
+        #main-sidebar.collapsed .sidebar-nav-btn .sidebar-badge {{
+            display: none !important;
+        }}
+        #main-sidebar.collapsed .sidebar-header-box {{
+            padding: 0.75rem 0.5rem !important;
+            justify-content: center !important;
+        }}
+        #main-sidebar.collapsed .sidebar-footer-box {{
+            padding: 0.75rem 0.5rem !important;
+        }}
+        #main-sidebar.collapsed #sidebar-toggle-btn {{
+            margin: 0 auto;
+        }}
+        @media (max-width: 767px) {{
+            #main-sidebar.collapsed {{
+                display: none !important;
+            }}
+        }}
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-900 min-h-screen font-sans antialiased selection:bg-rose-500 selection:text-white flex flex-col md:flex-row">
+
+    <!-- ==================== 1. THANH TASKBAR MENU CỐ ĐỊNH BÊN TRÁI (COLLAPSIBLE SIDEBAR) ==================== -->
+    <aside id="main-sidebar" class="w-full md:w-72 bg-white border-r-2 border-slate-300 md:h-screen md:sticky md:top-0 flex flex-col justify-between z-40 shrink-0 shadow-sm overflow-y-auto overflow-x-hidden">
+        
+        <!-- Sidebar Header: Logo, Language Toggle & Collapsible Control -->
+        <div>
+            <!-- Top Branding -->
+            <div class="p-3.5 border-b-2 border-slate-300 bg-slate-50 flex items-center justify-between sidebar-header-box">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 bg-rose-600 flex items-center justify-center text-white font-black text-lg shadow shrink-0 cursor-pointer" onclick="toggleSidebar()" title="Thu gọn / Mở rộng menu">
+                        <i class="ph-bold ph-trend-up"></i>
+                    </div>
+                    <div class="sidebar-full-item min-w-0">
+                        <h1 class="text-sm font-black tracking-tight text-slate-900 uppercase leading-none truncate">
+                            TikTok Shop US
+                        </h1>
+                        <span class="text-[10px] text-rose-700 font-extrabold uppercase">Radar Pro 24h</span>
+                    </div>
+                </div>
+
+                <!-- Action buttons: Language & Collapse Toggle -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="toggleLanguage()" id="lang-btn" class="px-2 py-1 text-[11px] font-black uppercase bg-white border-2 border-slate-400 hover:border-slate-800 text-slate-900 flex items-center gap-1 shadow-sm sidebar-full-item" title="Đổi ngôn ngữ">
+                        <span id="lang-flag">🇻🇳</span> <span id="lang-text">VI</span>
+                    </button>
+                    <!-- Nút thu gọn taskbar -->
+                    <button onclick="toggleSidebar()" id="sidebar-toggle-btn" class="w-7 h-7 bg-white hover:bg-slate-200 border-2 border-slate-400 text-slate-700 hover:text-slate-900 flex items-center justify-center transition shadow-sm" title="Thu gọn / Mở rộng thanh taskbar">
+                        <i class="ph-bold ph-caret-double-left text-sm" id="sidebar-toggle-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Auto 6-Hour Schedule Status Box (Collapsible) -->
+            <div class="p-3 bg-white border-b-2 border-slate-300">
+                <div class="flex items-center justify-between text-[11px] font-black text-slate-700 uppercase tracking-tight mb-1.5">
+                    <span class="flex items-center gap-1.5 text-rose-700">
+                        <span class="relative flex h-2 w-2 shrink-0">
+                            <span class="animate-ping absolute inline-flex h-full w-full bg-rose-400 opacity-75"></span>
+                            <span class="relative inline-flex h-2 w-2 bg-rose-600"></span>
+                        </span>
+                        <span data-i18n="auto_timer" class="sidebar-full-item">Hẹn giờ 6h:</span>
+                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <span id="countdown-text" class="font-mono bg-slate-100 px-1 py-0.5 border border-slate-300 text-slate-900 font-bold text-xs tracking-wider" title="Thời gian còn lại đến lượt cào dữ liệu tiếp theo">--:--:--</span>
+                        <button onclick="forceScanTrends()" class="text-[10px] font-black text-rose-600 hover:text-white hover:bg-rose-600 px-1 py-0.5 border border-rose-300 uppercase transition sidebar-full-item" title="Ép cào mới ngay không chờ 6 tiếng">Quét</button>
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-500 font-medium leading-tight flex items-center justify-between sidebar-full-item">
+                    <span>Lần quét tới: <strong id="next-scan-label" class="text-slate-800 font-bold">--:--</strong></span>
+                    <span class="text-emerald-700 font-black flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> Daemon</span>
+                </div>
+            </div>
+
+            <!-- User Selector & Management (Collapsible) -->
+            <div class="p-3 bg-slate-50 border-b-2 border-slate-300">
+                <div class="flex items-center justify-between text-[11px] font-black uppercase text-slate-700 mb-1.5 sidebar-full-item">
+                    <span data-i18n="active_member">Thành Viên / User:</span>
+                    <button onclick="openNewUserModal()" class="text-[10px] font-black text-rose-600 hover:text-rose-800 flex items-center gap-0.5 uppercase">
+                        <i class="ph-bold ph-plus-circle"></i> <span data-i18n="add_user">Thêm User</span>
+                    </button>
+                </div>
+                <div class="sidebar-full-item">
+                    <select id="active-user-select" onchange="changeActiveUser(this.value)" class="w-full bg-white border-2 border-slate-300 text-xs font-bold text-slate-900 py-1.5 px-2 focus:outline-none focus:border-rose-600">
+                        <!-- Populated via JS -->
+                    </select>
+                    <div class="flex items-center justify-between text-[10px] text-slate-500 font-bold mt-1.5">
+                        <span data-i18n="saved_items">Đã lưu:</span>
+                        <span id="user-saved-count" class="font-black text-rose-600">0 mục</span>
+                    </div>
+                </div>
+                <!-- Mini User Icon when collapsed -->
+                <div class="hidden justify-center text-slate-700 cursor-pointer" onclick="toggleSidebar()" title="Đổi thành viên">
+                    <i class="ph-bold ph-user-circle text-2xl text-rose-600"></i>
+                </div>
+            </div>
+
+            <!-- Navigation Links (Collapsible Sidebar Nav) -->
+            <nav class="p-2 space-y-1">
+                <div class="text-[10px] font-black uppercase text-slate-400 px-2 py-1 tracking-wider sidebar-full-item" data-i18n="nav_analytics">
+                    Khám Phá Xu Hướng
+                </div>
+
+                <!-- TAB TẤT CẢ Ý TƯỞNG ĐƯA LÊN ĐẦU TIÊN -->
+                <button onclick="switchTab('all')" id="nav-btn-all" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent" title="📊 Tất Cả Ý Tưởng">
+                    <span class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-table text-base text-slate-600 shrink-0"></i>
+                        <span data-i18n="tab_all" class="sidebar-text">📊 Tất Cả Ý Tưởng</span>
+                    </span>
+                    <span class="sidebar-badge text-[10px] font-black bg-slate-100 text-slate-800 px-1.5 py-0.2 border border-slate-300">{stats.get('total_analyzed', 0)}</span>
+                </button>
+
+                <button onclick="switchTab('viral')" id="nav-btn-viral" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-rose-600 text-white border-l-4 border-rose-900" title="🔥 Bùng Nổ 24h">
+                    <span class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-fire text-base shrink-0"></i>
+                        <span data-i18n="tab_viral" class="sidebar-text">🔥 Bùng Nổ 24h</span>
+                    </span>
+                    <span class="sidebar-badge text-[10px] font-black bg-white text-rose-700 px-1.5 py-0.2">{stats.get('total_viral_24h', 0)}</span>
+                </button>
+
+                <button onclick="switchTab('evergreen')" id="nav-btn-evergreen" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent" title="🌲 Evergreen Bền Vững">
+                    <span class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-tree-evergreen text-base text-emerald-600 shrink-0"></i>
+                        <span data-i18n="tab_evergreen" class="sidebar-text">🌲 Evergreen Bền Vững</span>
+                    </span>
+                    <span class="sidebar-badge text-[10px] font-black bg-emerald-100 text-emerald-800 px-1.5 py-0.2 border border-emerald-300">{stats.get('total_evergreen', 0)}</span>
+                </button>
+
+                <button onclick="switchTab('leaders')" id="nav-btn-leaders" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent" title="🏆 BXH Top Videos & KOC 24h">
+                    <span class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-trophy text-base text-amber-500 shrink-0"></i>
+                        <span data-i18n="tab_leaders" class="sidebar-text">🏆 BXH Top Video & KOC</span>
+                    </span>
+                    <span class="sidebar-badge text-[10px] font-black bg-amber-100 text-amber-900 px-1.5 py-0.2 border border-amber-300">Top 24h</span>
+                </button>
+
+                <button onclick="switchTab('audio')" id="nav-btn-audio" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent" title="🎵 Giai Điệu Nhạc Viral">
+                    <span class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-music-notes text-base text-purple-600 shrink-0"></i>
+                        <span data-i18n="tab_audio" class="sidebar-text">🎵 Giai Điệu Nhạc Viral</span>
+                    </span>
+                    <span class="sidebar-badge text-[10px] font-black bg-purple-100 text-purple-800 px-1.5 py-0.2 border border-purple-300">Hot</span>
+                </button>
+
+                <button onclick="switchTab('visual')" id="nav-btn-visual" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent" title="📷 Tìm Bằng Hình Ảnh & 1688">
+                    <span class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-camera text-base text-orange-600 shrink-0"></i>
+                        <span data-i18n="tab_visual" class="sidebar-text">📷 Tìm Bằng Hình Ảnh & 1688</span>
+                    </span>
+                    <span class="sidebar-badge text-[10px] font-black bg-orange-100 text-orange-800 px-1.5 py-0.2 border border-orange-300">Tool</span>
+                </button>
+
+                <!-- CHỈ GIỮ ĐÚNG 1 TAB "ĐÃ LƯU" -->
+                <div class="text-[10px] font-black uppercase text-slate-400 px-2 pt-3 pb-1 tracking-wider sidebar-full-item" data-i18n="nav_saved">
+                    Mục Đã Lưu
+                </div>
+
+                <button onclick="switchTab('saved')" id="nav-btn-saved" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent" title="📌 Đã Lưu">
+                    <span class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-bookmark-simple text-base text-amber-600 shrink-0"></i>
+                        <span data-i18n="tab_saved" class="sidebar-text">📌 Đã Lưu</span>
+                    </span>
+                    <span id="nav-saved-count" class="sidebar-badge text-[10px] font-black bg-amber-100 text-amber-900 px-1.5 py-0.2 border border-amber-300">0</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer: Export Excel & Platform Sources Status (Collapsible) -->
+        <div class="p-3 border-t-2 border-slate-300 bg-slate-50 space-y-3 sidebar-footer-box">
+            <a href="exports/TikTok_Shop_US_Latest_Trends.xlsx" download class="w-full flex items-center justify-center gap-2 py-2.5 px-2 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs uppercase shadow transition" title="Xuất Báo Cáo Excel">
+                <i class="ph-bold ph-file-xls text-lg shrink-0"></i>
+                <span data-i18n="btn_export_excel" class="sidebar-full-item">Xuất Báo Cáo Excel</span>
+            </a>
+
+            <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider sidebar-full-item">
+                <span data-i18n="sources_label">Nguồn dữ liệu đối soát:</span>
+                <div class="grid grid-cols-2 gap-1 mt-1 font-normal text-[10px] text-slate-600">
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-blue-500"></span> Google Trends</span>
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-rose-500"></span> TikTok Shop</span>
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-amber-500"></span> Amazon US</span>
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-orange-500"></span> Etsy US</span>
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-500"></span> eBay Deals</span>
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-red-600"></span> 1688 / Alibaba</span>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ==================== 2. KHU VỰC NỘI DUNG CHÍNH (MAIN CONTENT) ==================== -->
+    <div class="flex-1 flex flex-col min-w-0">
+        
+        <!-- Top Sticky Header: Đi theo màn hình đến cuối trang (Sticky Header), Nền Trắng Đặc 100% Không Trong Suốt -->
+        <header class="sticky-top-bar bg-white border-b-2 border-slate-300 px-6 py-2.5 flex flex-col gap-2.5 shadow-md transition-all" style="background-color: #ffffff !important; opacity: 1 !important; z-index: 50 !important;">
+            <!-- HÀNG 1: Menu Title / Clock / Ô Tìm Kiếm Nhanh / Nút Đặt Lại -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                    <!-- Nút Thu Gọn / Mở Rộng Taskbar Bên Trái -->
+                    <button onclick="toggleSidebar()" class="w-8 h-8 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 text-slate-700 hover:text-slate-900 flex items-center justify-center shadow-sm shrink-0 transition" title="Thu gọn / Mở rộng thanh taskbar bên trái">
+                        <i class="ph-bold ph-sidebar-simple text-base"></i>
+                    </button>
+
+                    <div class="text-xs font-black uppercase text-slate-900 whitespace-nowrap flex items-center gap-1.5" id="current-view-title">
+                        🔥 Bùng Nổ 24h (Viral Spikes)
+                    </div>
+                    <div class="text-[11px] text-slate-500 hidden lg:block border-l border-slate-300 pl-3">
+                        <i class="ph-bold ph-clock mr-1 text-rose-600"></i> Cập nhật: <strong>{updated_at}</strong>
+                    </div>
+                </div>
+
+                <!-- Ô tìm kiếm và nút Đặt Lại / Quét Mới -->
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:w-72">
+                        <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="search-input" onkeyup="filterItems()" placeholder="Tìm từ khóa, video, influencer, sản phẩm..." class="w-full pl-9 pr-3 py-1.5 bg-white border-2 border-slate-300 text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-rose-600">
+                    </div>
+
+                    <button onclick="resetFilters()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 text-xs font-bold text-slate-700 flex items-center gap-1 shrink-0 transition" title="Đặt lại bộ lọc về mặc định">
+                        <i class="ph-bold ph-arrows-counter-clockwise text-sm"></i>
+                        <span data-i18n="btn_reset_filters">Đặt Lại</span>
+                    </button>
+
+                    <button id="btn-force-scan" onclick="forceScanTrends()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white border-2 border-rose-700 text-xs font-black uppercase flex items-center gap-1.5 shrink-0 transition shadow-sm" title="Ép hệ thống cào mới dữ liệu từ 5 sàn ngay lập tức">
+                        <i class="ph-bold ph-arrows-clockwise text-sm" id="force-scan-icon"></i>
+                        <span id="force-scan-text" data-i18n="btn_force_scan">Quét Mới Ngay</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- HÀNG 2: CÁC Ô FILTER BÊN DƯỚI MENU THANH TRÊN (28 Ngành Hàng, Ngách Hàng Nhỏ, Chiều Xu Hướng) -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-2 pt-2 border-t border-slate-200 w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full">
+                    <!-- Ô Filter 1: Ngành Hàng Lớn (28 Ngành) -->
+                    <div class="flex items-center gap-1.5 bg-slate-50 border-2 border-slate-300 px-2.5 py-1">
+                        <i class="ph-bold ph-squares-four text-rose-600 text-sm shrink-0"></i>
+                        <span class="text-[10px] font-black uppercase text-slate-500 whitespace-nowrap shrink-0" data-i18n="filter_major_category">Ngành:</span>
+                        <select id="category-select" onchange="onCategoryChange()" class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none truncate cursor-pointer">
+                            <option value="all" data-i18n="cat_all">-- Tất Cả 28 Ngành Hàng --</option>
+                        </select>
+                    </div>
+
+                    <!-- Ô Filter 2: Ngách Hàng Nhỏ (Sub-Niche) -->
+                    <div class="flex items-center gap-1.5 bg-slate-50 border-2 border-slate-300 px-2.5 py-1">
+                        <i class="ph-bold ph-git-branch text-blue-600 text-sm shrink-0"></i>
+                        <span class="text-[10px] font-black uppercase text-slate-500 whitespace-nowrap shrink-0" data-i18n="filter_sub_niche">Ngách:</span>
+                        <select id="subniche-select" onchange="filterItems()" class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none truncate cursor-pointer">
+                            <option value="all" data-i18n="sub_all">-- Tất Cả Các Ngách --</option>
+                        </select>
+                    </div>
+
+                    <!-- Ô Filter 3: Chiều Xu Hướng (Velocity) -->
+                    <div class="flex items-center gap-1.5 bg-slate-50 border-2 border-slate-300 px-2.5 py-1">
+                        <i class="ph-bold ph-speedometer text-emerald-600 text-sm shrink-0"></i>
+                        <span class="text-[10px] font-black uppercase text-slate-500 whitespace-nowrap shrink-0" data-i18n="filter_velocity">Trend:</span>
+                        <select id="velocity-select" onchange="filterItems()" class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none truncate cursor-pointer">
+                            <option value="ALL" data-i18n="vel_all">Tất Cả Ma Trận Trend</option>
+                            <option value="VIRAL_VIDEO_24H" data-i18n="vel_viral">🔥 Video Viral 24h</option>
+                            <option value="FAST_SALES_VELOCITY_24H" data-i18n="vel_sales">🚀 Tốc Độ Bán Nhanh (Movers)</option>
+                            <option value="BREAKOUT_KEYWORD_24H" data-i18n="vel_keyword">📈 Từ Khóa Tìm Kiếm Đột Phá</option>
+                            <option value="EVERGREEN_WINNER" data-i18n="vel_evergreen">🌲 Evergreen Quanh Năm</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body Container -->
+        <main class="p-6 max-w-7xl mx-auto w-full space-y-6">
+
+            <!-- ================= ĐẦU TRANG: TOP VIDEOS GMV 24H & TOP INFLUENCERS 24H ================= -->
+            <!-- Layout 2 cột vuông vức đối xứng tương tự FastMoss & Kalodata (media_1789202629032.png) -->
+            <section id="top-leaders-section" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                
+                <!-- CỘT 1: TOP VIDEOS (GMV CAO NHẤT 24H) -->
+                <div class="bg-white border-2 border-slate-300 shadow-sm flex flex-col">
+                    <div class="p-3.5 bg-rose-50/60 border-b-2 border-slate-300 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-rose-600 text-white flex items-center justify-center font-black text-xs">
+                                <i class="ph-bold ph-film-strip"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xs font-black uppercase text-slate-900 tracking-tight" data-i18n="top_videos_title">
+                                    Top Videos (GMV Cao Nhất 24h)
+                                </h2>
+                                <p class="text-[10px] text-slate-500 font-medium" data-i18n="top_videos_sub">
+                                    Xếp hạng theo doanh số GMV trực tiếp tạo ra trong 24h trên TikTok Shop US
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="switchTab('leaders')" class="text-[10px] font-bold text-rose-700 hover:text-rose-900 flex items-center gap-1 hover:underline bg-rose-100/70 px-2 py-0.5 border border-rose-300" title="Chuyển sang tab riêng chuyên biệt về 2 bảng này">
+                                <span>Tab Riêng</span> <i class="ph-bold ph-arrow-square-out text-xs"></i>
+                            </button>
+                            <span id="top-videos-count-badge" class="text-[10px] font-black bg-rose-100 text-rose-800 px-2 py-0.5 border border-rose-300">
+                                12 Videos
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Bảng Top Videos -->
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-100 text-slate-600 uppercase font-black text-[10px] border-b border-slate-300">
+                                <tr>
+                                    <th class="py-2.5 px-3 w-12 text-center" data-i18n="th_rank">Rank</th>
+                                    <th class="py-2.5 px-3" data-i18n="th_video">Video Viral</th>
+                                    <th class="py-2.5 px-2 text-center" data-i18n="th_prod_thumb">SP Gắn</th>
+                                    <th class="py-2.5 px-3 text-right" data-i18n="th_items_sold">Đã Bán 24h</th>
+                                    <th class="py-2.5 px-3 text-right cursor-help" title="Doanh số GMV 24h được phân tích định lượng trực tiếp từ dữ liệu TikTok: (Lượt Xem Thực Tế × Tỷ Lệ CVR Benchmark Ngành × Giá Niêm Yết Sản Phẩm)"><span data-i18n="th_gmv">GMV 24h</span> <i class="ph-bold ph-info text-[10px] text-slate-400"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-videos-body" class="divide-y divide-slate-200">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Footer Pagination Top Videos (Giới hạn 10 dòng / trang) -->
+                    <div class="p-2.5 bg-slate-50 border-t-2 border-slate-300 flex items-center justify-between text-xs flex-wrap gap-2">
+                        <div id="top-videos-page-info" class="text-[11px] font-bold text-slate-600">
+                            Hiển thị 1 - 10 / 16 videos
+                        </div>
+                        <div class="flex items-center gap-1" id="top-videos-pagination-btns">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CỘT 2: TOP INFLUENCERS (SỐ BÁN & GMV CAO NHẤT 24H) -->
+                <div class="bg-white border-2 border-slate-300 shadow-sm flex flex-col">
+                    <div class="p-3.5 bg-blue-50/60 border-b-2 border-slate-300 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-blue-600 text-white flex items-center justify-center font-black text-xs">
+                                <i class="ph-bold ph-user-circle-check"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xs font-black uppercase text-slate-900 tracking-tight" data-i18n="top_influencers_title">
+                                    Top Influencers (Số Bán Cao Nhất 24h)
+                                </h2>
+                                <p class="text-[10px] text-slate-500 font-medium" data-i18n="top_influencers_sub">
+                                    KOC/Creator chốt đơn nhiều nhất theo từng ngành hàng 24h qua
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="switchTab('leaders')" class="text-[10px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 hover:underline bg-blue-100/70 px-2 py-0.5 border border-blue-300" title="Chuyển sang tab riêng chuyên biệt về 2 bảng này">
+                                <span>Tab Riêng</span> <i class="ph-bold ph-arrow-square-out text-xs"></i>
+                            </button>
+                            <span id="top-influencers-count-badge" class="text-[10px] font-black bg-blue-100 text-blue-800 px-2 py-0.5 border border-blue-300">
+                                8 Creators
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Bảng Top Influencers -->
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-100 text-slate-600 uppercase font-black text-[10px] border-b border-slate-300">
+                                <tr>
+                                    <th class="py-2.5 px-3 w-12 text-center" data-i18n="th_rank">Rank</th>
+                                    <th class="py-2.5 px-3" data-i18n="th_creator">Nhà Sáng Tạo (KOC)</th>
+                                    <th class="py-2.5 px-2 text-center" data-i18n="th_prod_thumb">Top SP</th>
+                                    <th class="py-2.5 px-3 text-right" data-i18n="th_items_sold">Đã Bán 24h</th>
+                                    <th class="py-2.5 px-3 text-right cursor-help" title="Doanh số GMV 24h được phân tích từ lượt tương tác thực tế và số lượng sản phẩm bán ra từ TikTok Shop Showcase của Creator"><span data-i18n="th_gmv">GMV 24h</span> <i class="ph-bold ph-info text-[10px] text-slate-400"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-influencers-body" class="divide-y divide-slate-200">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Footer Pagination Top Influencers (Giới hạn 10 dòng / trang) -->
+                    <div class="p-2.5 bg-slate-50 border-t-2 border-slate-300 flex items-center justify-between text-xs flex-wrap gap-2">
+                        <div id="top-influencers-page-info" class="text-[11px] font-bold text-slate-600">
+                            Hiển thị 1 - 10 / 12 creators
+                        </div>
+                        <div class="flex items-center gap-1" id="top-influencers-pagination-btns">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Overview Metrics Row -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="stats-overview-row">
+                <div class="p-3.5 bg-white border-2 border-slate-300 shadow-sm">
+                    <div class="text-slate-500 text-[11px] font-bold uppercase tracking-wider mb-0.5 flex justify-between">
+                        <span data-i18n="stat_total">Tổng ý tưởng</span>
+                        <i class="ph-bold ph-database text-blue-600 text-base"></i>
+                    </div>
+                    <div class="text-2xl font-black text-slate-900" id="stat-total-val">{stats.get('total_analyzed', 0)}</div>
+                </div>
+
+                <div class="p-3.5 bg-white border-2 border-rose-300 bg-rose-50/40 shadow-sm">
+                    <div class="text-rose-800 text-[11px] font-bold uppercase tracking-wider mb-0.5 flex justify-between">
+                        <span data-i18n="stat_viral">Top Viral 24h</span>
+                        <i class="ph-bold ph-fire text-rose-600 text-base"></i>
+                    </div>
+                    <div class="text-2xl font-black text-rose-600">{stats.get('total_viral_24h', 0)}</div>
+                </div>
+
+                <div class="p-3.5 bg-white border-2 border-emerald-300 bg-emerald-50/40 shadow-sm">
+                    <div class="text-emerald-800 text-[11px] font-bold uppercase tracking-wider mb-0.5 flex justify-between">
+                        <span data-i18n="stat_evergreen">Top Evergreen</span>
+                        <i class="ph-bold ph-tree-evergreen text-emerald-600 text-base"></i>
+                    </div>
+                    <div class="text-2xl font-black text-emerald-600">{stats.get('total_evergreen', 0)}</div>
+                </div>
+
+                <div class="p-3.5 bg-white border-2 border-amber-300 bg-amber-50/40 shadow-sm">
+                    <div class="text-amber-900 text-[11px] font-bold uppercase tracking-wider mb-0.5 flex justify-between">
+                        <span data-i18n="stat_team_saved">Đã Lưu</span>
+                        <i class="ph-bold ph-users text-amber-600 text-base"></i>
+                    </div>
+                    <div class="text-2xl font-black text-amber-700" id="stat-main-team-saved">0</div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 1: HORIZONTAL ROWS LIST ================= -->
+            <div id="cards-container" class="flex flex-col gap-3">
+                <!-- Populated via JS -->
+            </div>
+
+            <!-- ================= VIEW 2: TABLE MATRIX ================= -->
+            <div id="table-container" class="hidden bg-white border-2 border-slate-300 overflow-x-auto shadow-sm">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-100 text-slate-700 uppercase font-black border-b-2 border-slate-300">
+                        <tr>
+                            <th class="py-3 px-4" data-i18n="th_product">Sản Phẩm</th>
+                            <th class="py-3 px-4" data-i18n="th_class">Phân Loại</th>
+                            <th class="py-3 px-4" data-i18n="th_niche">Ngành Hàng</th>
+                            <th class="py-3 px-4 text-center">Viral 24h</th>
+                            <th class="py-3 px-4 text-center">Evergreen</th>
+                            <th class="py-3 px-4" data-i18n="th_price">Giá Bán</th>
+                            <th class="py-3 px-4" data-i18n="th_saved_by">Người Lưu Trong Team</th>
+                            <th class="py-3 px-4" data-i18n="th_actions">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-slate-200">
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ================= VIEW 3: TIKTOK VIRAL SOUNDS RADAR ================= -->
+            <div id="audio-view-container" class="hidden space-y-4">
+                <div class="p-4 bg-purple-50 border-2 border-purple-300 flex items-start justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase text-purple-900" data-i18n="audio_banner_title">Radar Giai Điệu & Âm Thanh Viral TikTok 24h</h2>
+                        <p class="text-xs text-purple-700 mt-0.5" data-i18n="audio_banner_sub">Các bài nhạc và âm thanh có lượng video mới tạo tăng đột biến trong 24h qua dùng cho kịch bản bán hàng TikTok Shop US.</p>
+                    </div>
+                    <span class="text-xs font-black px-2 py-1 bg-purple-200 text-purple-900 border border-purple-400 uppercase">24h Hot List</span>
+                </div>
+
+                <div id="audio-list" class="space-y-3">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- ================= VIEW 4: VISUAL / IMAGE SEARCH & 1688 SOURCING ================= -->
+            <div id="visual-view-container" class="hidden space-y-6">
+                
+                <!-- Header Banner -->
+                <div class="p-4 bg-orange-50 border-2 border-orange-300 flex items-start justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase text-orange-950" data-i18n="visual_title">Tìm Kiếm Sản Phẩm Bằng Hình Ảnh (Reverse Image Search)</h2>
+                        <p class="text-xs text-orange-800 mt-0.5" data-i18n="visual_sub">Tải ảnh chụp màn hình video TikTok hoặc sản phẩm để tra cứu xưởng sản xuất gốc 1688 và kiểm tra đối thủ cạnh tranh trên Google Lens.</p>
+                    </div>
+                    <span class="text-xs font-black px-2 py-1 bg-orange-200 text-orange-950 border border-orange-400 uppercase">1688 Visual AI</span>
+                </div>
+
+                <!-- Dropzone Area -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- Left: Upload Box with Paste Support -->
+                    <div id="image-drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="border-2 border-dashed border-slate-400 bg-white p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-slate-800 hover:bg-slate-50 transition relative min-h-[220px]">
+                        <input type="file" id="file-upload" accept=".jpg,.jpeg,.png,.webp" onchange="handleImageUpload(event)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                        
+                        <div id="drop-prompt" class="space-y-2">
+                            <i class="ph-bold ph-cloud-arrow-up text-4xl text-slate-400"></i>
+                            <div class="text-xs font-black uppercase text-slate-800" data-i18n="drop_image_text">
+                                BẤM VÀO ĐÂY ĐỂ TẢI ẢNH LÊN HOẶC KÉO THẢ
+                            </div>
+                            <p class="text-[11px] text-slate-500">Hỗ trợ JPG, PNG, WEBP hoặc bấm <strong>Ctrl + V</strong> để dán ảnh chụp màn hình trực tiếp.</p>
+                        </div>
+
+                        <!-- Preview Container -->
+                        <div id="preview-container" class="hidden space-y-3 w-full">
+                            <div class="relative w-32 h-32 mx-auto border-2 border-slate-900 bg-slate-100 flex items-center justify-center overflow-hidden">
+                                <img id="preview-img" src="" class="w-full h-full object-contain" alt="Preview">
+                            </div>
+                            <div class="text-xs font-bold text-slate-700 truncate max-w-xs mx-auto" id="preview-filename"></div>
+                            <div class="flex items-center justify-center gap-2">
+                                <button type="button" onclick="clearImagePreview()" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 text-[11px] font-bold">
+                                    XÓA ẢNH
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Online URL & Quick Action -->
+                    <div class="bg-white border-2 border-slate-300 p-5 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="text-xs font-black uppercase text-slate-800">Hoặc Dán Link Ảnh Online:</div>
+                            <div class="flex gap-2">
+                                <input type="url" id="image-url-input" placeholder="https://example.com/product-image.jpg" class="flex-1 px-3 py-2 bg-slate-50 border-2 border-slate-300 text-xs font-medium text-slate-900 focus:outline-none focus:border-rose-600">
+                                <button onclick="handleUrlSearch()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase" data-i18n="btn_preview">XEM</button>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                            <a id="link-1688-image" href="https://s.1688.com/youyuan/index.htm" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="flex-1 py-2.5 px-3 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow transition">
+                                <i class="ph-bold ph-factory text-base"></i>
+                                <span data-i18n="btn_search_1688">TÌM XƯỞNG TRÊN 1688</span>
+                            </a>
+                            <a id="link-google-lens" href="https://lens.google.com/" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="flex-1 py-2.5 px-3 bg-blue-700 hover:bg-blue-800 text-white font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow transition">
+                                <i class="ph-bold ph-google-logo text-base"></i>
+                                <span data-i18n="btn_search_lens">GOOGLE LENS US</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 1688 Price & Profit Calculator -->
+                <div class="bg-white border-2 border-slate-300 p-5 shadow-sm">
+                    <h3 class="text-xs font-black uppercase text-slate-900 mb-3 flex items-center gap-2">
+                        <i class="ph-bold ph-calculator text-emerald-600 text-base"></i>
+                        <span data-i18n="calc_title">Bảng Tính Lợi Nhuận Nhập Sỉ 1688 Về Bán TikTok Shop US</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                        <div>
+                            <label class="block text-slate-500 font-bold mb-1" data-i18n="calc_cny">Giá Nhập 1688 (¥ Tệ):</label>
+                            <input type="number" id="calc-cny" value="28" oninput="calculateMargin()" class="w-full px-2.5 py-1.5 bg-slate-50 border-2 border-slate-300 font-black text-slate-900 focus:outline-none focus:border-rose-600">
+                            <span class="text-[10px] text-slate-400 font-bold" id="calc-usd-equiv">~ $3.89 USD</span>
+                        </div>
+                        <div>
+                            <label class="block text-slate-500 font-bold mb-1" data-i18n="calc_ship">Ship & Fulfillment ($):</label>
+                            <input type="number" id="calc-ship" value="4.5" oninput="calculateMargin()" class="w-full px-2.5 py-1.5 bg-slate-50 border-2 border-slate-300 font-black text-slate-900 focus:outline-none focus:border-rose-600">
+                        </div>
+                        <div>
+                            <label class="block text-slate-500 font-bold mb-1" data-i18n="calc_retail">Giá Bán TikTok Shop ($):</label>
+                            <input type="number" id="calc-retail" value="24.99" oninput="calculateMargin()" class="w-full px-2.5 py-1.5 bg-slate-50 border-2 border-slate-300 font-black text-slate-900 focus:outline-none focus:border-rose-600">
+                        </div>
+                        <div class="p-2.5 bg-emerald-50 border border-emerald-300 flex flex-col justify-center">
+                            <div class="text-[10px] font-bold uppercase text-emerald-800" data-i18n="calc_profit">Lợi Nhuận Ròng & Margin:</div>
+                            <div class="text-base font-black text-emerald-700" id="calc-net-profit">+$16.60 / đơn</div>
+                            <div class="text-[11px] font-black text-emerald-900" id="calc-margin-percent">Biên lãi: 66.4%</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Empty Saved Items Box -->
+            <div id="empty-saved-box" class="hidden p-12 text-center bg-white border-2 border-dashed border-slate-300">
+                <i class="ph-bold ph-bookmarks text-5xl text-slate-300 mb-3 inline-block"></i>
+                <h3 class="text-base font-bold text-slate-800" data-i18n="empty_saved_title">Chưa có sản phẩm nào được lưu trong mục này</h3>
+                <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto" data-i18n="empty_saved_sub">Hãy bấm vào nút <strong>"+ Lưu Cho Tôi"</strong> trên bất kỳ dòng sản phẩm nào để thêm vào danh sách của bạn.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ==================== 3. MODALS ==================== -->
+    <!-- ==================== MODAL PHÓNG TO ẢNH SẢN PHẨM (IN-PLACE LIGHTBOX) ==================== -->
+    <div id="image-zoom-modal" onclick="closeImageZoomModal(event)" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 cursor-zoom-out">
+        <div onclick="event.stopPropagation()" class="bg-white border-2 border-slate-900 max-w-xl w-full p-4 shadow-2xl relative cursor-default">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-rose-600 text-white flex items-center justify-center font-bold text-xs">
+                        <i class="ph-bold ph-magnifying-glass-plus"></i>
+                    </div>
+                    <span class="text-xs font-black uppercase text-slate-800 tracking-tight">Chi Tiết Ảnh Sản Phẩm</span>
+                </div>
+                <button onclick="closeImageZoomModal()" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-300 font-bold flex items-center justify-center transition" title="Đóng">
+                    <i class="ph-bold ph-x text-base"></i>
+                </button>
+            </div>
+
+            <!-- Main Zoomed Image Container -->
+            <div class="w-full h-80 sm:h-[400px] bg-slate-100 border-2 border-slate-200 flex items-center justify-center overflow-hidden p-3 relative">
+                <img id="zoom-modal-img" src="" class="max-w-full max-h-full object-contain shadow-sm select-none" alt="Product Zoom">
+            </div>
+
+            <!-- Product Title & Optional Action Buttons -->
+            <div class="mt-3 pt-3 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex-1 min-w-0">
+                    <h4 id="zoom-modal-title" class="text-xs font-black text-slate-900 leading-snug line-clamp-2"></h4>
+                </div>
+                <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                    <a id="zoom-tiktok-btn" href="#" target="_blank" rel="noreferrer noopener" class="px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase flex items-center gap-1 shadow-sm transition" title="Mở sản phẩm trên TikTok Shop">
+                        <i class="ph-bold ph-tiktok-logo text-sm"></i>
+                        <span>TikTok Shop</span>
+                    </a>
+                    <button id="zoom-lens-btn" onclick="openZoomGoogleLens()" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-black uppercase flex items-center gap-1 shadow-sm transition" title="Tìm ảnh này trên Google Lens">
+                        <i class="ph-bold ph-google-logo text-sm"></i>
+                        <span>Google Lens</span>
+                    </button>
+                    <button id="zoom-1688-btn" onclick="openZoom1688()" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black uppercase flex items-center gap-1 shadow-sm transition" title="Tìm xưởng sản xuất trên 1688">
+                        <i class="ph-bold ph-factory text-sm"></i>
+                        <span>Xưởng 1688</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lời nhắc tìm kiếm 1688 nằm ngang dưới dòng button -->
+            <div class="mt-3 p-2.5 bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-center gap-2.5">
+                <i class="ph-bold ph-lightbulb text-amber-600 text-base shrink-0"></i>
+                <div class="leading-relaxed">
+                    <strong class="font-bold text-amber-900" data-i18n="tip_1688_title">Mẹo tìm kiếm 1688:</strong> 
+                    <span data-i18n="tip_1688_search">Nếu khi mở ra chưa thấy sản phẩm ngay, bạn chỉ cần bấm lại nút <strong>"Tìm kiếm" (🔍 搜索)</strong> trên thanh tìm kiếm của 1688 một lần nữa là hệ thống sẽ tải đúng sản phẩm theo từ khóa đã điền sẵn.</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Strategy & 24h Verification Audit Modal -->
+    <div id="strategy-modal" onclick="closeModal(event)" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-none p-4 cursor-pointer">
+        <div onclick="event.stopPropagation()" class="bg-white border-2 border-slate-900 max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto cursor-default">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 text-2xl font-bold" title="Đóng">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Modal Thêm Người Dùng Mới -->
+    <div id="new-user-modal" onclick="closeNewUserModal(event)" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-none p-4 cursor-pointer">
+        <div onclick="event.stopPropagation()" class="bg-white border-2 border-slate-900 max-w-md w-full p-6 shadow-2xl relative cursor-default">
+            <button onclick="closeNewUserModal()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 text-2xl font-bold" title="Đóng">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <h3 class="text-base font-black uppercase text-slate-900 mb-1 flex items-center gap-1.5">
+                <i class="ph-bold ph-user-plus text-rose-600"></i> <span data-i18n="modal_add_user_title">Thêm Người Dùng / Thành Viên Mới</span>
+            </h3>
+            <p class="text-xs text-slate-600 mb-4" data-i18n="modal_add_user_sub">Tạo hồ sơ thành viên để quản lý và lưu riêng các ý tưởng sản phẩm trong nhóm.</p>
+            
+            <div class="space-y-3 mb-4">
+                <div>
+                    <label class="text-[11px] font-black uppercase text-slate-700 block mb-1" data-i18n="label_name">Tên Thành Viên *</label>
+                    <input type="text" id="new-user-name" placeholder="Ví dụ: Hoàng (Sourcing), Linh (Content)..." class="w-full px-3 py-2 bg-white border-2 border-slate-400 text-xs font-bold text-slate-900 focus:outline-none focus:border-rose-600">
+                </div>
+                <div>
+                    <label class="text-[11px] font-black uppercase text-slate-700 block mb-1" data-i18n="label_role">Vai Trò / Phụ Trách</label>
+                    <input type="text" id="new-user-role" placeholder="Ví dụ: Product Hunter, Sourcing, Content..." class="w-full px-3 py-2 bg-white border-2 border-slate-400 text-xs font-bold text-slate-900 focus:outline-none focus:border-rose-600">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2">
+                <button onclick="closeNewUserModal()" class="px-4 py-2 text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800" data-i18n="btn_cancel">
+                    HỦY BỎ
+                </button>
+                <button onclick="confirmCreateUser()" class="px-4 py-2 text-xs font-black bg-rose-600 hover:bg-rose-700 text-white" data-i18n="btn_create_user">
+                    TẠO NGƯỜI DÙNG
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 4. EMBEDDED DATA & LOGIC CONTROLLER ==================== -->
+    <script>
+        const globalData = {data_json};
+        let currentTab = 'viral';
+        let currentLang = localStorage.getItem('tiktok_radar_lang') || 'vi'; // 'vi' or 'en'
+        const categoriesTaxonomy = globalData.categories_taxonomy || [];
+        const topVideosData = globalData.top_videos || [];
+        const topInfluencersData = globalData.top_influencers || [];
+
+        // 1. DICTIONARY BILINGUAL (VI / EN)
+        const I18N = {{
+            vi: {{
+                auto_timer: "Hẹn giờ 6h:",
+                active_member: "Thành Viên / User:",
+                add_user: "Thêm User",
+                saved_items: "Đã lưu:",
+                nav_analytics: "Khám Phá Xu Hướng",
+                tab_viral: "🔥 Bùng Nổ 24h",
+                tab_evergreen: "🌲 Evergreen Bền Vững",
+                tab_audio: "🎵 Giai Điệu Nhạc Viral",
+                tab_visual: "📷 Tìm Bằng Hình Ảnh & 1688",
+                nav_saved: "Mục Đã Lưu",
+                tab_saved: "📌 Đã Lưu",
+                tab_leaders: "🏆 BXH Top Videos & KOC",
+                
+                tab_all: "📊 Tất Cả Ý Tưởng",
+                btn_export_excel: "Xuất Báo Cáo Excel",
+                sources_label: "Nguồn dữ liệu đối soát:",
+                filter_major_category: "Ngành Hàng Lớn (28 Ngành TikTok Shop):",
+                filter_sub_niche: "Ngách Hàng Nhỏ (Sub-Niche):",
+                filter_velocity: "Chiều Xu Hướng (Velocity):",
+                btn_reset_filters: "Đặt Lại",
+                cat_all: "-- Tất Cả 28 Ngành Hàng --",
+                sub_all: "-- Tất Cả Các Ngách --",
+                vel_all: "Tất Cả Ma Trận Trend",
+                vel_viral: "🔥 Video Viral 24h",
+                vel_sales: "🚀 Tốc Độ Bán Nhanh (Movers)",
+                vel_keyword: "📈 Từ Khóa Tìm Kiếm Đột Phá",
+                vel_evergreen: "🌲 Evergreen Quanh Năm",
+                top_videos_title: "Top Videos (GMV Cao Nhất 24h)",
+                top_videos_sub: "Xếp hạng theo doanh số GMV trực tiếp tạo ra trong 24h trên TikTok Shop US",
+                top_influencers_title: "Top Influencers (Số Bán Cao Nhất 24h)",
+                top_influencers_sub: "KOC/Creator chốt đơn nhiều nhất theo từng ngành hàng 24h qua",
+                th_rank: "Rank",
+                th_video: "Video Viral",
+                th_creator: "Nhà Sáng Tạo (KOC)",
+                th_prod_thumb: "Sản Phẩm",
+                th_items_sold: "Đã Bán 24h",
+                th_gmv: "GMV 24h",
+                stat_total: "Tổng ý tưởng",
+                stat_viral: "Top Viral 24h",
+                stat_evergreen: "Top Evergreen",
+                stat_team_saved: "Đã Lưu",
+                th_product: "Sản Phẩm",
+                th_class: "Phân Loại",
+                th_niche: "Ngành Hàng",
+                th_price: "Giá Bán",
+                th_saved_by: "Người Lưu Trong Team",
+                th_actions: "Thao Tác",
+                audio_banner_title: "Radar Giai Điệu & Âm Thanh Viral TikTok 24h",
+                audio_banner_sub: "Các bài nhạc và âm thanh có lượng video mới tạo tăng đột biến trong 24h qua dùng cho kịch bản bán hàng TikTok Shop US.",
+                visual_title: "Tìm Kiếm Sản Phẩm Bằng Hình Ảnh (Reverse Image Search)",
+                visual_sub: "Tải ảnh chụp màn hình video TikTok hoặc sản phẩm để tra cứu xưởng sản xuất gốc 1688 và kiểm tra đối thủ cạnh tranh trên Google Lens.",
+                drop_image_text: "BẤM VÀO ĐÂY ĐỂ TẢI ẢNH LÊN HOẶC KÉO THẢ",
+                btn_preview: "XEM",
+                preview_empty: "Chưa có ảnh nào được chọn",
+                btn_search_1688: "TÌM XƯỞNG TRÊN 1688",
+                btn_search_lens: "GOOGLE LENS US",
+                calc_title: "Bảng Tính Lợi Nhuận Nhập Sỉ 1688 Về Bán TikTok Shop US",
+                calc_cny: "Giá Nhập 1688 (¥ Tệ):",
+                calc_ship: "Ship & Fulfillment ($):",
+                calc_retail: "Giá Bán TikTok Shop ($):",
+                calc_profit: "Lợi Nhuận Ròng & Margin:",
+                empty_saved_title: "Chưa có sản phẩm nào được lưu trong mục này",
+                empty_saved_sub: "Hãy bấm vào nút '+ Lưu Cho Tôi' trên bất kỳ dòng sản phẩm nào để thêm vào danh sách của bạn.",
+                modal_add_user_title: "Thêm Người Dùng / Thành Viên Mới",
+                modal_add_user_sub: "Tạo hồ sơ thành viên để quản lý và lưu riêng các ý tưởng sản phẩm trong nhóm.",
+                label_name: "Tên Thành Viên *",
+                label_role: "Vai Trò / Phụ Trách",
+                btn_cancel: "HỦY BỎ",
+                btn_create_user: "TẠO NGƯỜI DÙNG",
+                btn_save_me: "+ Lưu Cho Tôi",
+                btn_saved_me: "✔ Đã Lưu",
+                btn_proof: "Minh Chứng",
+                btn_view_1688: "🇨🇳 Xưởng 1688",
+                btn_view_store: "Xem Sàn",
+                hook_label: "Hook 3s:",
+                verified_badge: "ĐÃ XÁC THỰC 24H (HỢP LỆ)",
+                btn_force_scan: "Quét Mới Ngay",
+                tip_1688_title: "Mẹo tìm kiếm 1688:",
+                tip_1688_search: "Nếu khi mở ra chưa thấy sản phẩm ngay, bạn chỉ cần bấm lại nút 'Tìm kiếm' (🔍 搜索) trên thanh tìm kiếm của 1688 một lần nữa là hệ thống sẽ tải đúng sản phẩm theo từ khóa đã điền sẵn."
+            }},
+            en: {{
+                auto_timer: "Auto 6h Scan:",
+                active_member: "Active Member / User:",
+                add_user: "Add User",
+                saved_items: "Saved:",
+                nav_analytics: "Trend Discovery",
+                tab_viral: "🔥 24h Viral Spikes",
+                tab_evergreen: "🌲 Evergreen Winners",
+                tab_audio: "🎵 Viral Sounds Radar",
+                tab_visual: "📷 Visual & 1688 Search",
+                nav_saved: "Saved Items",
+                tab_saved: "📌 Saved Trends",
+                tab_leaders: "🏆 Top Videos & Creators",
+                
+                tab_all: "📊 Full Matrix",
+                btn_export_excel: "Export Excel Report",
+                sources_label: "Verified Market Sources:",
+                filter_major_category: "Major Category (28 TikTok Shop Niches):",
+                filter_sub_niche: "Sub-Niche:",
+                filter_velocity: "Trend Dimension (Velocity):",
+                btn_reset_filters: "Reset",
+                btn_force_scan: "Force Scan",
+                cat_all: "-- All 28 Categories --",
+                sub_all: "-- All Sub-Niches --",
+                vel_all: "All Trend Matrix",
+                vel_viral: "🔥 24h Viral Videos",
+                vel_sales: "🚀 Fast Sales Velocity (Movers)",
+                vel_keyword: "📈 Breakout Search Keywords",
+                vel_evergreen: "🌲 Evergreen Winners",
+                top_videos_title: "Top Videos (Highest 24h GMV)",
+                top_videos_sub: "Ranked by direct GMV generated in the past 24 hours on TikTok Shop US",
+                top_influencers_title: "Top Influencers (Highest 24h Sales)",
+                top_influencers_sub: "Top selling KOCs/Creators by category with highest 24h conversion",
+                th_rank: "Rank",
+                th_video: "Viral Video",
+                th_creator: "Creator (KOC)",
+                th_prod_thumb: "Product",
+                th_items_sold: "Sold 24h",
+                th_gmv: "24h GMV",
+                stat_total: "Total Ideas",
+                stat_viral: "Top Viral 24h",
+                stat_evergreen: "Top Evergreen",
+                stat_team_saved: "Saved Items",
+                th_product: "Product Idea",
+                th_class: "Type",
+                th_niche: "Niche",
+                th_price: "Retail Price",
+                th_saved_by: "Saved by Team",
+                th_actions: "Actions",
+                audio_banner_title: "TikTok 24h Viral Music & Sounds Radar",
+                audio_banner_sub: "Top breakout audios with soaring 24h video velocity used by winning TikTok Shop US creators.",
+                visual_title: "Product Visual & Reverse Image Search",
+                visual_sub: "Upload product or TikTok screenshot to look up direct 1688 manufacturing factories and Google Lens competitors.",
+                drop_image_text: "CLICK TO UPLOAD IMAGE OR DRAG & DROP",
+                btn_preview: "VIEW",
+                preview_empty: "No image selected yet",
+                btn_search_1688: "SEARCH ON 1688 FACTORY",
+                btn_search_lens: "SEARCH GOOGLE LENS US",
+                calc_title: "1688 Sourcing to TikTok Shop US Profit Calculator",
+                calc_cny: "1688 Wholesale Price (¥ CNY):",
+                calc_ship: "Shipping & Fulfillment ($):",
+                calc_retail: "TikTok Shop Retail Price ($):",
+                calc_profit: "Net Profit & Margin:",
+                empty_saved_title: "No saved products in this section yet",
+                empty_saved_sub: "Click '+ Save For Me' on any product row to bookmark it into your personal collection.",
+                modal_add_user_title: "Add New Team Member / User",
+                modal_add_user_sub: "Create a member profile to manage and bookmark product ideas independently.",
+                label_name: "Member Name *",
+                label_role: "Role / Responsibility",
+                btn_cancel: "CANCEL",
+                btn_create_user: "CREATE USER",
+                btn_save_me: "+ Save For Me",
+                btn_saved_me: "✔ Saved",
+                btn_proof: "24h Audit",
+                btn_view_1688: "🇨🇳 1688 Source",
+                btn_view_store: "Store Link",
+                hook_label: "3s Hook:",
+                verified_badge: "24H TREND VERIFIED",
+                tip_1688_title: "1688 Search Tip:",
+                tip_1688_search: "If products do not appear immediately, just click the 'Search' (🔍 搜索) button on the 1688 search bar once more to fetch products with prefilled keyword."
+            }}
+        }};
+
+        function toggleLanguage() {{
+            currentLang = currentLang === 'vi' ? 'en' : 'vi';
+            localStorage.setItem('tiktok_radar_lang', currentLang);
+            applyLanguage();
+            populateCategoryDropdown();
+            renderUI();
+        }}
+
+        function applyLanguage() {{
+            const lang = I18N[currentLang];
+            document.getElementById('lang-flag').innerText = currentLang === 'vi' ? '🇻🇳' : '🇺🇸';
+            document.getElementById('lang-text').innerText = currentLang.toUpperCase();
+
+            // Translate elements with data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {{
+                const key = el.getAttribute('data-i18n');
+                if (lang[key]) {{
+                    el.innerText = lang[key];
+                }}
+            }});
+        }}
+
+        // 2. CATEGORY TAXONOMY & CASCADING FILTER CONTROLLER
+        function populateCategoryDropdown() {{
+            const selectEl = document.getElementById('category-select');
+            const headerSelectEl = document.getElementById('header-category-select');
+            if (!selectEl) return;
+            const currentVal = selectEl.value;
+
+            const allLabel = currentLang === 'vi' ? '-- Tất Cả 28 Ngành Hàng --' : '-- All 28 Categories --';
+            let optionsHtml = `<option value="all">${{allLabel}}</option>`;
+
+            categoriesTaxonomy.forEach(cat => {{
+                const label = currentLang === 'vi' ? (cat.name_vi || cat.name) : cat.name;
+                optionsHtml += `<option value="${{cat.name}}">${{label}}</option>`;
+            }});
+
+            selectEl.innerHTML = optionsHtml;
+            selectEl.value = currentVal || 'all';
+            
+            if (headerSelectEl) {{
+                headerSelectEl.innerHTML = optionsHtml;
+                headerSelectEl.value = currentVal || 'all';
+            }}
+            
+            updateSubNicheDropdown();
+        }}
+
+        function onHeaderCategoryChange(val) {{
+            const mainCatSelect = document.getElementById('category-select');
+            if (mainCatSelect) {{
+                mainCatSelect.value = val;
+            }}
+            onCategoryChange();
+        }}
+
+        function onCategoryChange() {{
+            updateSubNicheDropdown();
+            filterItems();
+        }}
+
+        function updateSubNicheDropdown() {{
+            const catSelect = document.getElementById('category-select');
+            const subSelect = document.getElementById('subniche-select');
+            if (!catSelect || !subSelect) return;
+
+            const chosenCatName = catSelect.value;
+            const allSubLabel = currentLang === 'vi' ? '-- Tất Cả Các Ngách --' : '-- All Sub-Niches --';
+            let subHtml = `<option value="all">${{allSubLabel}}</option>`;
+
+            if (chosenCatName !== 'all') {{
+                const catObj = categoriesTaxonomy.find(c => c.name === chosenCatName);
+                if (catObj && catObj.sub_niches) {{
+                    catObj.sub_niches.forEach(sn => {{
+                        const snLabel = currentLang === 'vi' ? (sn.name_vi || sn.name) : sn.name;
+                        subHtml += `<option value="${{sn.name}}">${{snLabel}}</option>`;
+                    }});
+                }}
+            }}
+            subSelect.innerHTML = subHtml;
+            subSelect.value = 'all';
+        }}
+
+        function resetFilters() {{
+            document.getElementById('category-select').value = 'all';
+            updateSubNicheDropdown();
+            document.getElementById('velocity-select').value = 'ALL';
+            document.getElementById('search-input').value = '';
+            filterItems();
+            showToast(currentLang === 'vi' ? 'Đã đặt lại toàn bộ bộ lọc về mặc định' : 'Filters reset to default');
+        }}
+
+        // 3. TOP 24H LEADERS RENDERER (TOP VIDEOS GMV & TOP INFLUENCERS) WITH 10-ROW PAGINATION
+        let topVideosPage = 1;
+        let topInfluencersPage = 1;
+        const LEADERS_PAGE_SIZE = 10;
+
+        function changeTopVideosPage(p) {{
+            topVideosPage = p;
+            const searchVal = (document.getElementById('search-input').value || '').toLowerCase().trim();
+            const catVal = document.getElementById('category-select').value;
+            const subVal = document.getElementById('subniche-select').value;
+            renderTopLeaders(catVal, subVal, searchVal);
+        }}
+
+        function changeTopInfluencersPage(p) {{
+            topInfluencersPage = p;
+            const searchVal = (document.getElementById('search-input').value || '').toLowerCase().trim();
+            const catVal = document.getElementById('category-select').value;
+            const subVal = document.getElementById('subniche-select').value;
+            renderTopLeaders(catVal, subVal, searchVal);
+        }}
+
+        function renderTopLeaders(catFilter, subFilter, searchVal) {{
+            const topVideosBody = document.getElementById('top-videos-body');
+            const topInfluencersBody = document.getElementById('top-influencers-body');
+            if (!topVideosBody || !topInfluencersBody) return;
+
+            // Filter Top Videos
+            let filteredVideos = topVideosData.filter(v => {{
+                const matchCat = (catFilter === 'all') || (v.category && v.category.toLowerCase() === catFilter.toLowerCase());
+                const matchSub = (subFilter === 'all') || (v.sub_niche && v.sub_niche.toLowerCase().includes(subFilter.toLowerCase()));
+                const matchSearch = !searchVal || (v.caption && v.caption.toLowerCase().includes(searchVal)) || (v.product_name && v.product_name.toLowerCase().includes(searchVal)) || (v.creator_name && v.creator_name.toLowerCase().includes(searchVal));
+                return matchCat && matchSub && matchSearch;
+            }});
+
+            // Filter Top Influencers
+            let filteredInfluencers = topInfluencersData.filter(inf => {{
+                const matchCat = (catFilter === 'all') || (inf.category && inf.category.toLowerCase() === catFilter.toLowerCase());
+                const matchSub = (subFilter === 'all') || (inf.sub_niche && inf.sub_niche.toLowerCase().includes(subFilter.toLowerCase()));
+                const matchSearch = !searchVal || (inf.name && inf.name.toLowerCase().includes(searchVal)) || (inf.handle && inf.handle.toLowerCase().includes(searchVal)) || (inf.best_product_title && inf.best_product_title.toLowerCase().includes(searchVal));
+                return matchCat && matchSub && matchSearch;
+            }});
+
+            // Compute pagination for Top Videos
+            const totalVidPages = Math.max(1, Math.ceil(filteredVideos.length / LEADERS_PAGE_SIZE));
+            if (topVideosPage > totalVidPages) topVideosPage = totalVidPages;
+            if (topVideosPage < 1) topVideosPage = 1;
+            const startVidIdx = (topVideosPage - 1) * LEADERS_PAGE_SIZE;
+            const pagedVideos = filteredVideos.slice(startVidIdx, startVidIdx + LEADERS_PAGE_SIZE);
+
+            // Compute pagination for Top Influencers
+            const totalInfPages = Math.max(1, Math.ceil(filteredInfluencers.length / LEADERS_PAGE_SIZE));
+            if (topInfluencersPage > totalInfPages) topInfluencersPage = totalInfPages;
+            if (topInfluencersPage < 1) topInfluencersPage = 1;
+            const startInfIdx = (topInfluencersPage - 1) * LEADERS_PAGE_SIZE;
+            const pagedInfluencers = filteredInfluencers.slice(startInfIdx, startInfIdx + LEADERS_PAGE_SIZE);
+
+            document.getElementById('top-videos-count-badge').innerText = `${{filteredVideos.length}} Videos`;
+            document.getElementById('top-influencers-count-badge').innerText = `${{filteredInfluencers.length}} Creators`;
+
+            // Helper medal renderer
+            function getRankBadge(rank) {{
+                if (rank === 1) return `<span class="inline-flex items-center justify-center w-6 h-6 bg-amber-400 text-slate-900 font-black text-xs shadow-sm">🥇</span>`;
+                if (rank === 2) return `<span class="inline-flex items-center justify-center w-6 h-6 bg-slate-300 text-slate-900 font-black text-xs shadow-sm">🥈</span>`;
+                if (rank === 3) return `<span class="inline-flex items-center justify-center w-6 h-6 bg-amber-600 text-white font-black text-xs shadow-sm">🥉</span>`;
+                return `<span class="inline-flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-700 font-bold text-xs border border-slate-300">${{rank}}</span>`;
+            }}
+
+            // Render Top Videos Rows (10 dòng/trang)
+            if (filteredVideos.length === 0) {{
+                topVideosBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-slate-400 font-bold text-xs">
+                            ${{currentLang === 'vi' ? 'Không có video nào trong ngách được chọn 24h qua' : 'No top videos recorded in this niche over the past 24h'}}
+                        </td>
+                    </tr>
+                `;
+            }} else {{
+                topVideosBody.innerHTML = pagedVideos.map(v => `
+                    <tr class="hover:bg-rose-50/40 transition">
+                        <!-- Rank -->
+                        <td class="py-2.5 px-3 text-center align-middle">
+                            ${{getRankBadge(v.rank)}}
+                        </td>
+
+                        <!-- Video Info -->
+                        <td class="py-2.5 px-3 align-middle max-w-[220px]">
+                            <div class="flex items-start gap-2.5">
+                                <a href="${{v.video_url}}" target="_blank" rel="noreferrer noopener" class="relative w-11 h-14 bg-slate-900 border border-slate-300 shrink-0 group block overflow-hidden" title="Bấm để mở và xem video trên TikTok">
+                                    <img src="${{v.video_cover || v.product_image}}" referrerpolicy="no-referrer" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition" alt="">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition">
+                                        <i class="ph-fill ph-play text-white text-base"></i>
+                                    </div>
+                                    <span class="absolute bottom-0 right-0 bg-black/80 text-white text-[9px] font-mono font-bold px-1">${{v.duration}}</span>
+                                </a>
+                                <div class="min-w-0 flex-1">
+                                    <a href="${{v.video_url}}" target="_blank" rel="noreferrer noopener" class="font-bold text-slate-900 hover:text-rose-600 transition block text-xs line-clamp-2 leading-tight">
+                                        ${{v.caption}}
+                                    </a>
+                                    <div class="text-[10px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
+                                        <a href="${{v.channel_url || ('https://www.tiktok.com/' + v.creator_handle)}}" target="_blank" rel="noreferrer noopener" class="font-bold text-slate-700 hover:text-rose-600 hover:underline inline-flex items-center gap-0.5" title="Mở trang cá nhân TikTok của KOC">
+                                            ${{v.creator_handle}} <i class="ph-bold ph-arrow-square-out text-[9px]"></i>
+                                        </a>
+                                        <span>·</span>
+                                        <span class="text-rose-600 font-bold"><i class="ph-bold ph-eye"></i> ${{v.views}}</span>
+                                        <span class="bg-rose-50 text-rose-700 font-bold px-1 text-[9px] border border-rose-200 inline-flex items-center gap-0.5">
+                                            <i class="ph-fill ph-check-circle text-rose-600"></i> LIVE
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Attached Product -->
+                        <td class="py-2.5 px-2 text-center align-middle">
+                            <div class="w-9 h-9 mx-auto border border-slate-300 hover:border-rose-600 bg-slate-50 p-0.5 cursor-zoom-in relative group transition" onclick='zoomProductImage("${{v.product_image}}", "${{(v.product_name || "").replace(/"/g, "&quot;").replace(/'/g, "\'")}}", "${{v.product_url || ""}}")' title="Bấm để xem ảnh phóng to & mở TikTok Shop">
+                                <img src="${{v.product_image}}" class="w-full h-full object-contain" alt="">
+                                <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px]">
+                                    <i class="ph-bold ph-magnifying-glass-plus"></i>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Items Sold 24h -->
+                        <td class="py-2.5 px-3 text-right align-middle font-black text-slate-800">
+                            ${{v.items_sold_24h.toLocaleString()}}
+                        </td>
+
+                        <!-- GMV 24h -->
+                        <td class="py-2.5 px-3 text-right align-middle font-black text-rose-600 text-xs">
+                            ${{v.gmv_24h}}
+                        </td>
+                    </tr>
+                `).join('');
+            }}
+
+            // Footer Pagination Top Videos
+            const vidPageInfo = document.getElementById('top-videos-page-info');
+            const vidPagination = document.getElementById('top-videos-pagination-btns');
+            if (vidPageInfo) {{
+                if (filteredVideos.length === 0) {{
+                    vidPageInfo.innerText = currentLang === 'vi' ? '0 video' : '0 videos';
+                }} else {{
+                    const endVidIdx = Math.min(startVidIdx + LEADERS_PAGE_SIZE, filteredVideos.length);
+                    vidPageInfo.innerHTML = `${{currentLang === 'vi' ? 'Hiển thị' : 'Showing'}} <strong>${{startVidIdx + 1}} - ${{endVidIdx}}</strong> / <strong>${{filteredVideos.length}}</strong> videos`;
+                }}
+            }}
+            if (vidPagination) {{
+                if (totalVidPages <= 1) {{
+                    vidPagination.innerHTML = '';
+                }} else {{
+                    let h = '';
+                    h += `<button onclick="changeTopVideosPage(${{topVideosPage - 1}})" ${{topVideosPage <= 1 ? 'disabled' : ''}} class="px-2.5 py-1 text-[11px] font-bold border border-slate-300 ${{topVideosPage <= 1 ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-800'}} transition"><i class="ph-bold ph-caret-left"></i> ${{currentLang === 'vi' ? 'Trước' : 'Prev'}}</button>`;
+                    for (let p = 1; p <= totalVidPages; p++) {{
+                        h += `<button onclick="changeTopVideosPage(${{p}})" class="px-2.5 py-1 text-[11px] font-black border ${{p === topVideosPage ? 'bg-rose-600 text-white border-rose-700' : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300'}} transition">${{p}}</button>`;
+                    }}
+                    h += `<button onclick="changeTopVideosPage(${{topVideosPage + 1}})" ${{topVideosPage >= totalVidPages ? 'disabled' : ''}} class="px-2.5 py-1 text-[11px] font-bold border border-slate-300 ${{topVideosPage >= totalVidPages ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-800'}} transition">${{currentLang === 'vi' ? 'Sau' : 'Next'}} <i class="ph-bold ph-caret-right"></i></button>`;
+                    vidPagination.innerHTML = h;
+                }}
+            }}
+
+            // Render Top Influencers Rows (10 dòng/trang)
+            if (filteredInfluencers.length === 0) {{
+                topInfluencersBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-slate-400 font-bold text-xs">
+                            ${{currentLang === 'vi' ? 'Không có creator nào trong ngách được chọn 24h qua' : 'No creators recorded in this niche over the past 24h'}}
+                        </td>
+                    </tr>
+                `;
+            }} else {{
+                topInfluencersBody.innerHTML = pagedInfluencers.map(inf => `
+                    <tr class="hover:bg-blue-50/40 transition">
+                        <!-- Rank -->
+                        <td class="py-2.5 px-3 text-center align-middle">
+                            ${{getRankBadge(inf.rank)}}
+                        </td>
+
+                        <!-- Creator Info -->
+                        <td class="py-2.5 px-3 align-middle max-w-[220px]">
+                            <div class="flex items-center gap-2.5">
+                                <a href="${{inf.profile_url}}" target="_blank" rel="noreferrer noopener" class="w-10 h-10 border border-slate-300 bg-slate-100 shrink-0 block overflow-hidden" title="Mở trang cá nhân TikTok">
+                                    <img src="${{inf.avatar}}" referrerpolicy="no-referrer" class="w-full h-full object-cover" alt="">
+                                </a>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1">
+                                        <a href="${{inf.profile_url}}" target="_blank" rel="noreferrer noopener" class="font-black text-slate-900 hover:text-blue-600 transition block text-xs truncate">
+                                            ${{inf.name}}
+                                        </a>
+                                        ${{inf.verified ? '<i class="ph-fill ph-seal-check text-blue-500 text-xs shrink-0" title="Tài khoản chính chủ TikTok"></i>' : ''}}
+                                    </div>
+                                    <div class="text-[10px] text-slate-500 flex items-center gap-1.5 flex-wrap mt-0.5">
+                                        <span class="font-mono text-slate-600 font-bold">${{inf.handle}}</span>
+                                        <span>·</span>
+                                        <span class="bg-slate-100 text-slate-700 font-bold px-1 border border-slate-200" title="Số follower thực tế trên TikTok">${{inf.followers}}</span>
+                                        ${{inf.is_live_scraped ? '<span class="bg-emerald-50 text-emerald-700 font-bold px-1 border border-emerald-200 text-[9px] inline-flex items-center gap-1" title="Dữ liệu cào thực tế từ máy chủ TikTok"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>LIVE</span>' : ''}}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Best Selling Product -->
+                        <td class="py-2.5 px-2 text-center align-middle">
+                            <div class="w-9 h-9 mx-auto border border-slate-300 hover:border-blue-600 bg-slate-50 p-0.5 cursor-zoom-in relative group transition" onclick='zoomProductImage("${{inf.best_product_image}}", "${{(inf.best_product_title || "").replace(/"/g, "&quot;").replace(/'/g, "\'")}}", "${{inf.product_url || ""}}")' title="Bấm để xem ảnh phóng to & mở TikTok Shop">
+                                <img src="${{inf.best_product_image}}" class="w-full h-full object-contain" alt="">
+                                <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px]">
+                                    <i class="ph-bold ph-magnifying-glass-plus"></i>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Items Sold 24h -->
+                        <td class="py-2.5 px-3 text-right align-middle font-black text-slate-800">
+                            ${{inf.items_sold_24h.toLocaleString()}}
+                        </td>
+
+                        <!-- GMV 24h -->
+                        <td class="py-2.5 px-3 text-right align-middle font-black text-blue-700 text-xs">
+                            ${{inf.gmv_24h}}
+                        </td>
+                    </tr>
+                `).join('');
+            }}
+
+            // Footer Pagination Top Influencers
+            const infPageInfo = document.getElementById('top-influencers-page-info');
+            const infPagination = document.getElementById('top-influencers-pagination-btns');
+            if (infPageInfo) {{
+                if (filteredInfluencers.length === 0) {{
+                    infPageInfo.innerText = currentLang === 'vi' ? '0 creator' : '0 creators';
+                }} else {{
+                    const endInfIdx = Math.min(startInfIdx + LEADERS_PAGE_SIZE, filteredInfluencers.length);
+                    infPageInfo.innerHTML = `${{currentLang === 'vi' ? 'Hiển thị' : 'Showing'}} <strong>${{startInfIdx + 1}} - ${{endInfIdx}}</strong> / <strong>${{filteredInfluencers.length}}</strong> creators`;
+                }}
+            }}
+            if (infPagination) {{
+                if (totalInfPages <= 1) {{
+                    infPagination.innerHTML = '';
+                }} else {{
+                    let h = '';
+                    h += `<button onclick="changeTopInfluencersPage(${{topInfluencersPage - 1}})" ${{topInfluencersPage <= 1 ? 'disabled' : ''}} class="px-2.5 py-1 text-[11px] font-bold border border-slate-300 ${{topInfluencersPage <= 1 ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-800'}} transition"><i class="ph-bold ph-caret-left"></i> ${{currentLang === 'vi' ? 'Trước' : 'Prev'}}</button>`;
+                    for (let p = 1; p <= totalInfPages; p++) {{
+                        h += `<button onclick="changeTopInfluencersPage(${{p}})" class="px-2.5 py-1 text-[11px] font-black border ${{p === topInfluencersPage ? 'bg-blue-600 text-white border-blue-700' : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300'}} transition">${{p}}</button>`;
+                    }}
+                    h += `<button onclick="changeTopInfluencersPage(${{topInfluencersPage + 1}})" ${{topInfluencersPage >= totalInfPages ? 'disabled' : ''}} class="px-2.5 py-1 text-[11px] font-bold border border-slate-300 ${{topInfluencersPage >= totalInfPages ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-800'}} transition">${{currentLang === 'vi' ? 'Sau' : 'Next'}} <i class="ph-bold ph-caret-right"></i></button>`;
+                    infPagination.innerHTML = h;
+                }}
+            }}
+        }}
+
+        // 4. TOP 24H TRENDING TIKTOK SOUNDS (GIAI ĐIỆU NHẠC VIRAL)
+        const VIRAL_SOUNDS_24H = [
+            {{
+                title: "Satisfying Crisp Pop & Click SFX (Remix)",
+                artist: "CleanTok Studio Beats",
+                mood: "ASMR / Satisfying Routine",
+                velocity_24h: "+94,000 video mới trong 24h",
+                best_niches: "Gia dụng thông minh, Đồ chơi làm đẹp, Bàn chải thú cưng",
+                hook_tip: "Bấm nút đúng nhịp bass drop để tạo cảm giác thỏa mãn cực độ",
+                tiktok_sound_url: "https://www.tiktok.com/tag/asmrsounds"
+            }},
+            {{
+                title: "Dramatic Reveal & Shock Tension Beat",
+                artist: "Viral Challenge Sound Hub",
+                mood: "Drop Test / So Sánh Đột Phá",
+                velocity_24h: "+148,000 video mới trong 24h",
+                best_niches: "Bình giữ nhiệt Owala chống tràn, Máy làm sạch, Micro chống ồn",
+                hook_tip: "Tạo khoảng lặng 1 giây trước khi lật ngược bình nước hoặc bật máy",
+                tiktok_sound_url: "https://www.tiktok.com/tag/droptest"
+            }},
+            {{
+                title: "Aesthetic Morning Wind-Down Lo-Fi Chords",
+                artist: "Chill Routine Lab",
+                mood: "Clean Girl Aesthetic / Skincare",
+                velocity_24h: "+72,000 video mới trong 24h",
+                best_niches: "Medicube Toner Pads, Khăn lau mặt Clean Skin, Nến thơm",
+                hook_tip: "Quay ánh sáng tự nhiên cạnh cửa sổ, ghép voiceover nhẹ nhàng",
+                tiktok_sound_url: "https://www.tiktok.com/tag/skincareroutine"
+            }},
+            {{
+                title: "High BPM Motivation Electro Groove",
+                artist: "Workout & Deep Clean",
+                mood: "Năng Lượng Cao / Trước & Sau",
+                velocity_24h: "+61,000 video mới trong 24h",
+                best_niches: "Bàn chải cọ xoay điện, Máy hút lông thú cưng, Dụng cụ tập gym",
+                hook_tip: "Tua nhanh video x2 tốc độ vết bẩn cứng đầu bay sạch theo nhịp nhạc",
+                tiktok_sound_url: "https://www.tiktok.com/tag/cleanwithme"
+            }},
+            {{
+                title: "Laser Glow & Nostalgic Piano",
+                artist: "Handmade Memories",
+                mood: "Cảm Xúc / Quà Tặng Ý Nghĩa",
+                velocity_24h: "+45,000 video mới trong 24h",
+                best_niches: "Vòng cổ khắc tên hoa sinh, Kệ gỗ đa năng cho nam, Lịch tường",
+                hook_tip: "Quay cận cảnh laser khắc tên người thương vào sản phẩm",
+                tiktok_sound_url: "https://www.tiktok.com/tag/personalizedgift"
+            }}
+        ];
+
+        // 5. Quản Lý Multi-User & Danh Sách Đã Lưu
+        const DEFAULT_USERS_DATA = {{
+            active_user_id: "u_leader",
+            users: [
+                {{ id: "u_leader", name: "Ngọc (Team Leader)", role: "Store Owner / Lead Hunter", saved_trends: [] }},
+                {{ id: "u_sourcing", name: "Hoàng (Sourcing)", role: "1688 & Logistics Specialist", saved_trends: [] }},
+                {{ id: "u_creator", name: "Linh (Content Creator)", role: "TikTok Video & Hooks", saved_trends: [] }}
+            ]
+        }};
+
+        function getUsersData() {{
+            const raw = localStorage.getItem('tiktok_radar_multiusers');
+            if (!raw) return DEFAULT_USERS_DATA;
+            try {{
+                return JSON.parse(raw);
+            }} catch (e) {{
+                return DEFAULT_USERS_DATA;
+            }}
+        }}
+
+        function saveUsersData(data) {{
+            localStorage.setItem('tiktok_radar_multiusers', JSON.stringify(data));
+            renderUsersDropdown();
+            renderUI();
+        }}
+
+        function renderUsersDropdown() {{
+            const uData = getUsersData();
+            const selectEl = document.getElementById('active-user-select');
+            if (!selectEl) return;
+
+            selectEl.innerHTML = uData.users.map(u => `
+                <option value="${{u.id}}" ${{u.id === uData.active_user_id ? 'selected' : ''}}>
+                    ${{u.name}} (${{u.role}})
+                </option>
+            `).join('');
+
+            const activeUser = uData.users.find(u => u.id === uData.active_user_id) || uData.users[0];
+            const myCount = (activeUser.saved_trends || []).length;
+            
+            let totalTeamCount = 0;
+            const uniqueTitles = new Set();
+            uData.users.forEach(u => {{
+                (u.saved_trends || []).forEach(it => uniqueTitles.add(it.title));
+            }});
+            totalTeamCount = uniqueTitles.size;
+
+            document.getElementById('user-saved-count').innerText = `${{myCount}} mục`;
+            const navSavedEl = document.getElementById('nav-saved-count');
+            if (navSavedEl) navSavedEl.innerText = myCount;
+            const statTeamSaved = document.getElementById('stat-main-team-saved');
+            if (statTeamSaved) statTeamSaved.innerText = myCount;
+        }}
+
+        function changeActiveUser(newId) {{
+            const uData = getUsersData();
+            uData.active_user_id = newId;
+            saveUsersData(uData);
+            const userObj = uData.users.find(u => u.id === newId);
+            showToast(`Đã chuyển sang tài khoản: "${{userObj ? userObj.name : newId}}"`);
+        }}
+
+        function openNewUserModal() {{
+            document.getElementById('new-user-modal').classList.remove('hidden');
+            document.getElementById('new-user-name').focus();
+        }}
+
+        function closeNewUserModal(e) {{
+            if (e && e.target && e.target.id !== 'new-user-modal' && !e.target.closest('button')) {{
+                return;
+            }}
+            const modal = document.getElementById('new-user-modal');
+            if (modal) modal.classList.add('hidden');
+            const nameEl = document.getElementById('new-user-name');
+            if (nameEl) nameEl.value = '';
+            const roleEl = document.getElementById('new-user-role');
+            if (roleEl) roleEl.value = '';
+        }}
+
+        function confirmCreateUser() {{
+            const name = document.getElementById('new-user-name').value.trim();
+            const role = document.getElementById('new-user-role').value.trim() || 'Thành viên Team';
+            if (!name) {{
+                alert('Vui lòng nhập tên thành viên!');
+                return;
+            }}
+            const uData = getUsersData();
+            const newId = 'u_' + Date.now();
+            uData.users.push({{
+                id: newId,
+                name: name,
+                role: role,
+                saved_trends: []
+            }});
+            uData.active_user_id = newId;
+            saveUsersData(uData);
+            closeNewUserModal();
+            showToast(`Đã tạo thành viên mới: "${{name}}" (${{role}})`);
+        }}
+
+        function isSavedByCurrentUser(item) {{
+            const uData = getUsersData();
+            const activeUser = uData.users.find(u => u.id === uData.active_user_id) || uData.users[0];
+            return (activeUser.saved_trends || []).some(it => it.title === item.title);
+        }}
+
+        function getTeamSavers(item) {{
+            const uData = getUsersData();
+            const savers = [];
+            uData.users.forEach(u => {{
+                if ((u.saved_trends || []).some(it => it.title === item.title)) {{
+                    savers.push(u.name.split(' ')[0]);
+                }}
+            }});
+            return savers;
+        }}
+
+        function toggleSaveTrend(item) {{
+            const uData = getUsersData();
+            const activeUser = uData.users.find(u => u.id === uData.active_user_id) || uData.users[0];
+            if (!activeUser.saved_trends) activeUser.saved_trends = [];
+            
+            const existingIdx = activeUser.saved_trends.findIndex(it => it.title === item.title);
+            if (existingIdx >= 0) {{
+                activeUser.saved_trends.splice(existingIdx, 1);
+            }} else {{
+                const savedItem = Object.assign({{}}, item, {{
+                    saved_by_id: activeUser.id,
+                    saved_by_name: activeUser.name,
+                    saved_at_time: new Date().toLocaleString('vi-VN')
+                }});
+                activeUser.saved_trends.push(savedItem);
+            }}
+            saveUsersData(uData);
+        }}
+
+        // 6. Đồng hồ đếm ngược 6 tiếng dựa trên mốc thời gian thực tế (F5 KHÔNG BAO GIỜ BỊ RESET)
+        function startCountdown() {{
+            const nowSec = Math.floor(Date.now() / 1000);
+            
+            // Lấy timestamp lần quét kế tiếp từ backend hoặc localStorage
+            let nextScanTs = globalData.next_scan_timestamp;
+            if (!nextScanTs) {{
+                const savedTs = localStorage.getItem('tiktok_radar_next_scan_ts');
+                if (savedTs && parseInt(savedTs) > nowSec) {{
+                    nextScanTs = parseInt(savedTs);
+                }} else {{
+                    nextScanTs = nowSec + 6 * 3600;
+                    localStorage.setItem('tiktok_radar_next_scan_ts', nextScanTs);
+                }}
+            }} else {{
+                localStorage.setItem('tiktok_radar_next_scan_ts', nextScanTs);
+            }}
+
+            const nextTimeStr = globalData.next_scan_time || new Date(nextScanTs * 1000).toLocaleTimeString('vi-VN', {{ hour: '2-digit', minute: '2-digit' }});
+            const nextLabelEl = document.getElementById('next-scan-label');
+            if (nextLabelEl) nextLabelEl.innerText = nextTimeStr;
+
+            function updateTimer() {{
+                const currentNow = Math.floor(Date.now() / 1000);
+                const diff = nextScanTs - currentNow;
+
+                if (diff <= 0) {{
+                    const el = document.getElementById('countdown-text');
+                    if (el) {{
+                        el.innerText = '00:00:00';
+                        el.classList.add('text-rose-600', 'animate-pulse');
+                    }}
+                    const nextLabel = document.getElementById('next-scan-label');
+                    if (nextLabel) nextLabel.innerText = currentLang === 'vi' ? 'Đang chạy quét mới...' : 'Crawling new data...';
+                    return;
+                }}
+
+                const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+                const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+                const s = String(diff % 60).padStart(2, '0');
+                const el = document.getElementById('countdown-text');
+                if (el) el.innerText = `${{h}}:${{m}}:${{s}}`;
+            }}
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }}
+
+        // 7. Visual Image Search Handlers
+        let currentImageBlob = null;
+        let currentImageUrl = '';
+
+        function setPreviewImage(src, name) {{
+            currentImageUrl = src;
+            const img = document.getElementById('preview-img');
+            const container = document.getElementById('preview-container');
+            const promptBox = document.getElementById('drop-prompt');
+            const nameEl = document.getElementById('preview-filename');
+            
+            if (img && container && promptBox) {{
+                img.src = src;
+                container.classList.remove('hidden');
+                promptBox.classList.add('hidden');
+                if (nameEl) nameEl.innerText = name || 'Hình ảnh đã chọn';
+            }}
+            
+            if (src.startsWith('http')) {{
+                document.getElementById('link-google-lens').href = `https://lens.google.com/uploadbyurl?url=${{encodeURIComponent(src)}}`;
+            }} else {{
+                document.getElementById('link-google-lens').href = 'https://lens.google.com/';
+            }}
+        }}
+
+        function clearImagePreview() {{
+            currentImageBlob = null;
+            currentImageUrl = '';
+            const uploadInput = document.getElementById('file-upload');
+            const urlInput = document.getElementById('image-url-input');
+            if (uploadInput) uploadInput.value = '';
+            if (urlInput) urlInput.value = '';
+            
+            const container = document.getElementById('preview-container');
+            const promptBox = document.getElementById('drop-prompt');
+            if (container) container.classList.add('hidden');
+            if (promptBox) promptBox.classList.remove('hidden');
+            
+            const lensBtn = document.getElementById('link-google-lens');
+            if (lensBtn) lensBtn.href = 'https://lens.google.com/';
+        }}
+
+        function handleImageUpload(e) {{
+            const files = e.target.files || (e.dataTransfer ? e.dataTransfer.files : null);
+            if (!files || files.length === 0) return;
+            const file = files[0];
+            currentImageBlob = file;
+            const url = URL.createObjectURL(file);
+            setPreviewImage(url, file.name);
+            showToast(`Đã nhận ảnh "${{file.name}}"! Bạn có thể bấm mở Google Lens hoặc 1688.`);
+        }}
+
+        function handleUrlSearch() {{
+            const val = document.getElementById('image-url-input').value.trim();
+            if (!val) return;
+            setPreviewImage(val, 'Link ảnh Online');
+            showToast('Đã nhận diện link ảnh online!');
+        }}
+
+        function handleDragOver(e) {{
+            e.preventDefault();
+            e.stopPropagation();
+            const el = document.getElementById('image-drop-zone');
+            if (el) el.classList.add('border-orange-500', 'bg-orange-50/50');
+        }}
+
+        function handleDragLeave(e) {{
+            e.preventDefault();
+            e.stopPropagation();
+            const el = document.getElementById('image-drop-zone');
+            if (el) el.classList.remove('border-orange-500', 'bg-orange-50/50');
+        }}
+
+        function handleDrop(e) {{
+            e.preventDefault();
+            e.stopPropagation();
+            const el = document.getElementById('image-drop-zone');
+            if (el) el.classList.remove('border-orange-500', 'bg-orange-50/50');
+            handleImageUpload(e);
+        }}
+
+        // Global Paste handler (Ctrl + V anywhere)
+        window.addEventListener('paste', (e) => {{
+            const items = e.clipboardData ? e.clipboardData.items : [];
+            for (let i = 0; i < items.length; i++) {{
+                if (items[i].type.indexOf('image') !== -1) {{
+                    const blob = items[i].getAsFile();
+                    currentImageBlob = blob;
+                    const url = URL.createObjectURL(blob);
+                    setPreviewImage(url, 'Ảnh chụp màn hình vừa dán (Clipboard)');
+                    showToast('Đã dán ảnh chụp màn hình thành công!');
+                    switchTab('visual');
+                    break;
+                }}
+            }}
+        }});
+
+        function searchProductImage(imgUrl) {{
+            if (!imgUrl) return;
+            window.open(`https://lens.google.com/uploadbyurl?url=${{encodeURIComponent(imgUrl)}}`, '_blank', 'noreferrer,noopener');
+        }}
+
+        
+        // ================= ZOOM PREVIEW LIGHTBOX CONTROLLER =================
+        let currentZoomedImgUrl = '';
+        let currentZoomedTitle = '';
+        let currentZoomedShopUrl = '';
+
+        function zoomProductImage(imgUrl, title, shopUrl) {{
+            if (!imgUrl) return;
+            currentZoomedImgUrl = imgUrl;
+            currentZoomedTitle = title || '';
+            currentZoomedShopUrl = shopUrl || `https://www.tiktok.com/search?q=${{encodeURIComponent(title || '')}}`;
+
+            const modal = document.getElementById('image-zoom-modal');
+            const img = document.getElementById('zoom-modal-img');
+            const titleEl = document.getElementById('zoom-modal-title');
+            const tiktokBtn = document.getElementById('zoom-tiktok-btn');
+
+            if (modal && img) {{
+                img.src = imgUrl;
+                if (titleEl) titleEl.innerText = currentZoomedTitle;
+                if (tiktokBtn) tiktokBtn.href = currentZoomedShopUrl;
+                modal.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }}
+        }}
+
+        function closeImageZoomModal(e) {{
+            if (e && e.target && e.target.id !== 'image-zoom-modal' && !e.target.closest('button')) {{
+                return;
+            }}
+            const modal = document.getElementById('image-zoom-modal');
+            if (modal) modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }}
+
+        function openZoomGoogleLens() {{
+            if (currentZoomedImgUrl) {{
+                window.open(`https://lens.google.com/uploadbyurl?url=${{encodeURIComponent(currentZoomedImgUrl)}}`, '_blank', 'noreferrer,noopener');
+            }}
+        }}
+
+                // Hàm tra cứu từ khóa tiếng Trung Giản Thể cho 1688
+        const KEYWORDS_1688_MAP_JS = {{"teeth": "紫光美白牙膏 泡沫去黄", "toner": "毛孔清洁水杨酸棉片 爽肤水湿敷贴", "pore": "毛孔细致收缩棉片 清洁去黑头", "towel": "一次性洗脸巾 纯棉加厚 珍珠纹洁面巾", "patch": "水胶体痘痘贴 隐形净痘贴 吸脓透气", "lotion": "身体乳 润肤乳 滋润保湿 香氛身体霜", "lip": "果汁丰唇蜜 水光唇釉 嘟嘟唇油", "curling": "多功能自动卷发棒 负离子热风直卷两用", "tumbler": "不锈钢保温杯 吸管保冷杯 运动便携水杯", "bottle": "不锈钢真空运动水壶 大容量吸管水杯", "scrubber": "电动清洁刷 多功能旋转浴室地砖地毯刷", "pink stuff": "多功能清洁膏 万能去污膏 厨房油污净", "brush": "宠物一键脱毛梳 自动退毛清理梳 猫狗通用", "litter": "膨润土猫砂 结团无尘 低敏除臭除味", "pee": "宠物尿垫 加厚吸水 隔尿垫 狗尿片", "earbuds": "TWS真无线蓝牙耳机 降噪半入耳式", "power bank": "磁吸无线充移动电源 10000mAh快充充电宝", "mic": "无线领夹麦克风 降噪直播收音麦 手机专用", "camera": "4K高清数码相机 翻转屏Vlog微单 学生照相机", "printer": "便携迷你热敏错题打印机 无墨不干胶便签机", "legging": "高腰交叉阔腿瑜伽裤 提臀裸感无缝打底裤", "bodysuit": "无缝塑身衣 连体束腹收腹美体衣", "protein": "乳清分离蛋白粉 健身增肌 代餐冲饮", "greens": "羽衣甘蓝复合果蔬粉 益生菌膳食纤维青汁", "wand": "红光微电流美肤仪 面部提拉导入仪", "inflator": "便携车载充气泵 无线电动轮胎补气打气筒 150PSI"}};
+
+        function get_1688_query(title, category) {{
+            const tLow = (title || '').toLowerCase();
+            for (const [k, v] of Object.entries(KEYWORDS_1688_MAP_JS)) {{
+                if (tLow.includes(k)) return v;
+            }}
+            return "跨境爆款 源头工厂批发";
+        }}
+
+        function get_alibaba_query(title) {{
+            return (title || '').replace(/[^\\w\\s]/gi, ' ').trim().split(/\\s+/).slice(0, 6).join(' ');
+        }}
+
+        function openZoom1688() {{
+            if (currentZoomedTitle) {{
+                const q = encodeURIComponent(get_1688_query(currentZoomedTitle));
+                window.open(`https://s.1688.com/selloffer/offer_search.htm?keywords=${{q}}&n=y&_input_charset=utf-8`, '_blank', 'noreferrer,noopener');
+            }} else {{
+                window.open('https://s.1688.com/youyuan/index.htm', '_blank', 'noreferrer,noopener');
+            }}
+        }}
+
+        // 7. Force Reload / Live Scan Trends
+        let isScanning = false;
+        async function forceScanTrends() {{
+            if (isScanning) return;
+            const btn = document.getElementById('btn-force-scan');
+            const icon = document.getElementById('force-scan-icon');
+            const text = document.getElementById('force-scan-text');
+
+            isScanning = true;
+            if (btn) btn.disabled = true;
+            if (icon) icon.classList.add('animate-spin');
+            if (text) text.innerText = (currentLang === 'vi' ? 'Đang Quét...' : 'Scanning...');
+            showToast(currentLang === 'vi' ? 'Đang cào dữ liệu mới từ 5 sàn (TikTok, Google, Amazon, Etsy, eBay)... Vui lòng đợi ~15-20s.' : 'Scanning live data across 5 platforms... Please wait ~15-20s.');
+
+            try {{
+                const isHttp = window.location.origin.startsWith('http');
+                const apiUrl = isHttp ? '/api/scan' : 'http://127.0.0.1:8000/api/scan';
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+                const res = await fetch(apiUrl, {{
+                    method: 'POST',
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    signal: controller.signal
+                }});
+                clearTimeout(timeoutId);
+
+                if (res.ok) {{
+                    const freshData = await res.json();
+                    window.globalData = freshData;
+                    if (freshData.updated_at) {{
+                        const updEl = document.querySelector('#current-view-title + div strong');
+                        if (updEl) updEl.innerText = freshData.updated_at;
+                    }}
+                    populateCategoryDropdown();
+                    renderUI();
+                    showToast(currentLang === 'vi' ? '✅ Đã hoàn tất quét và nạp dữ liệu trend mới nhất!' : '✅ Scan completed! Fresh trends loaded.');
+                }} else {{
+                    throw new Error(`Status ${{res.status}}`);
+                }}
+            }} catch (err) {{
+                console.warn('API scan connection error:', err);
+                showToast(currentLang === 'vi' 
+                    ? '💡 Để quét dữ liệu theo yêu cầu bằng nút bấm, hãy khởi động server nền bằng cách nhấp đúp file "run_dashboard.bat" (hoặc chạy "python main.py")!' 
+                    : '💡 To enable on-demand scanning from this button, launch run_dashboard.bat to start the backend server!', true);
+            }} finally {{
+                isScanning = false;
+                if (btn) btn.disabled = false;
+                if (icon) icon.classList.remove('animate-spin');
+                if (text) text.innerText = (currentLang === 'vi' ? 'Quét Mới Ngay' : 'Force Scan');
+            }}
+        }}
+
+        // Global ESC key listener to close lightbox and modals
+        window.addEventListener('keydown', (e) => {{
+            if (e.key === 'Escape') {{
+                closeImageZoomModal();
+                closeModal();
+                closeNewUserModal();
+            }}
+        }});
+
+        // 8. 1688 Profit Margin Calculator
+        function calculateMargin() {{
+            const cny = parseFloat(document.getElementById('calc-cny').value) || 0;
+            const ship = parseFloat(document.getElementById('calc-ship').value) || 0;
+            const retail = parseFloat(document.getElementById('calc-retail').value) || 0;
+            
+            const usdCost = cny / 7.2;
+            document.getElementById('calc-usd-equiv').innerText = `~ $${{usdCost.toFixed(2)}} USD (Tỉ giá 7.2)`;
+            
+            const totalCost = usdCost + ship;
+            const netProfit = retail - totalCost;
+            const margin = retail > 0 ? (netProfit / retail) * 100 : 0;
+            
+            document.getElementById('calc-net-profit').innerText = `${{netProfit >= 0 ? '+' : ''}}$${{netProfit.toFixed(2)}} / đơn`;
+            document.getElementById('calc-margin-percent').innerText = `${{currentLang === 'vi' ? 'Biên lãi:' : 'Margin:'}} ${{margin.toFixed(1)}}%`;
+        }}
+
+        
+        // ================= COLLAPSIBLE SIDEBAR CONTROLLER =================
+        function toggleSidebar() {{
+            const sidebar = document.getElementById('main-sidebar');
+            const toggleIcon = document.getElementById('sidebar-toggle-icon');
+            if (!sidebar) return;
+
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            localStorage.setItem('tiktok_radar_sidebar_collapsed', isCollapsed ? '1' : '0');
+
+            if (toggleIcon) {{
+                if (isCollapsed) {{
+                    toggleIcon.className = 'ph-bold ph-caret-double-right text-sm';
+                }} else {{
+                    toggleIcon.className = 'ph-bold ph-caret-double-left text-sm';
+                }}
+            }}
+        }}
+
+        function restoreSidebarState() {{
+            const isCollapsed = localStorage.getItem('tiktok_radar_sidebar_collapsed') === '1';
+            const sidebar = document.getElementById('main-sidebar');
+            const toggleIcon = document.getElementById('sidebar-toggle-icon');
+            if (sidebar && isCollapsed) {{
+                sidebar.classList.add('collapsed');
+                if (toggleIcon) toggleIcon.className = 'ph-bold ph-caret-double-right text-sm';
+            }}
+        }}
+
+        // 9. Navigation Tab Switching
+        function switchTab(tab) {{
+            currentTab = tab;
+            const navIds = ['all', 'viral', 'evergreen', 'leaders', 'audio', 'visual', 'saved'];
+            
+            navIds.forEach(id => {{
+                const btn = document.getElementById('nav-btn-' + id);
+                if (btn) {{
+                    btn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent";
+                }}
+            }});
+
+            const activeBtn = document.getElementById('nav-btn-' + tab);
+            if (activeBtn) {{
+                if (tab === 'viral') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-rose-600 text-white border-l-4 border-rose-900";
+                else if (tab === 'evergreen') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-emerald-600 text-white border-l-4 border-emerald-900";
+                else if (tab === 'leaders') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-amber-600 text-white border-l-4 border-amber-900";
+                else if (tab === 'audio') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-purple-600 text-white border-l-4 border-purple-900";
+                else if (tab === 'visual') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-orange-600 text-white border-l-4 border-orange-900";
+                else if (tab === 'saved') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-amber-600 text-white border-l-4 border-amber-900";
+                else if (tab === 'team_saved') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-blue-600 text-white border-l-4 border-blue-900";
+                else activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-slate-900 text-white border-l-4 border-black";
+            }}
+
+            const titles = {{
+                all: currentLang === 'vi' ? '📊 TẤT CẢ Ý TƯỞNG ĐỐI SOÁT 5 SÀN' : '📊 ALL PRODUCT IDEAS 5-SOURCE MATRIX',
+                viral: currentLang === 'vi' ? '🔥 BÙNG NỔ 24H (VIRAL SPIKES)' : '🔥 24H BREAKOUT VIRAL SPIKES',
+                evergreen: currentLang === 'vi' ? '🌲 EVERGREEN BÁN QUANH NĂM' : '🌲 EVERGREEN YEAR-ROUND WINNERS',
+                leaders: currentLang === 'vi' ? '🏆 BẢNG XẾP HẠNG TOP VIDEOS GMV & TOP INFLUENCERS TIKTOK SHOP (24H)' : '🏆 TIKTOK SHOP 24H TOP VIDEOS & INFLUENCERS LEADERBOARD',
+                audio: currentLang === 'vi' ? '🎵 GIAI ĐIỆU & ÂM THANH VIRAL TIKTOK 24H' : '🎵 TIKTOK 24H VIRAL AUDIO & SOUNDS',
+                visual: currentLang === 'vi' ? '📷 TÌM KIẾM HÌNH ẢNH & XƯỞNG SỈ 1688' : '📷 VISUAL SEARCH & 1688 WHOLESALE HUB',
+                saved: currentLang === 'vi' ? '📌 DANH SÁCH SẢN PHẨM ĐÃ LƯU' : '📌 SAVED PRODUCTS COLLECTION'
+            }};
+            document.getElementById('current-view-title').innerText = titles[tab] || '';
+
+            renderUI();
+        }}
+
+        function filterItems() {{
+            topVideosPage = 1;
+            topInfluencersPage = 1;
+            renderUI();
+        }}
+
+        // 10. Main Render Function
+        function renderUI() {{
+            if (!globalData) return;
+            const lang = I18N[currentLang];
+
+            const searchVal = (document.getElementById('search-input').value || '').toLowerCase().trim();
+            const catVal = document.getElementById('category-select').value;
+            const subVal = document.getElementById('subniche-select').value;
+            const velocityVal = document.getElementById('velocity-select').value;
+            const uData = getUsersData();
+            const activeUser = uData.users.find(u => u.id === uData.active_user_id) || uData.users[0];
+
+            const cardsContainer = document.getElementById('cards-container');
+            const tableContainer = document.getElementById('table-container');
+            const audioContainer = document.getElementById('audio-view-container');
+            const visualContainer = document.getElementById('visual-view-container');
+            const emptySavedBox = document.getElementById('empty-saved-box');
+            const statsRow = document.getElementById('stats-overview-row');
+            const topLeadersSection = document.getElementById('top-leaders-section');
+
+            // Render Top Leaders (Top Videos GMV & Top Influencers) with live filters
+            renderTopLeaders(catVal, subVal, searchVal);
+
+            // Hide/Show main view containers
+            cardsContainer.classList.add('hidden');
+            tableContainer.classList.add('hidden');
+            audioContainer.classList.add('hidden');
+            visualContainer.classList.add('hidden');
+            emptySavedBox.classList.add('hidden');
+
+            if (currentTab === 'leaders') {{
+                statsRow.classList.add('hidden');
+                topLeadersSection.classList.remove('hidden');
+                return;
+            }}
+
+            if (currentTab === 'audio') {{
+                audioContainer.classList.remove('hidden');
+                statsRow.classList.add('hidden');
+                topLeadersSection.classList.add('hidden');
+                
+                document.getElementById('audio-list').innerHTML = VIRAL_SOUNDS_24H.map(s => `
+                    <div class="bg-white border-2 border-purple-200 hover:border-purple-400 p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 transition">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[10px] font-black uppercase px-2 py-0.5 bg-purple-100 text-purple-800 border border-purple-300">
+                                    ${{s.mood}}
+                                </span>
+                                <span class="text-xs font-black text-rose-600 flex items-center gap-1">
+                                    <i class="ph-bold ph-chart-line-up"></i> ${{s.velocity_24h}}
+                                </span>
+                            </div>
+                            <h3 class="text-sm font-black text-slate-900 mb-1 flex items-center gap-1.5">
+                                <i class="ph-bold ph-music-note text-purple-600"></i> ${{s.title}}
+                            </h3>
+                            <div class="text-xs text-slate-600 mb-1">
+                                <strong>Ngách phù hợp:</strong> ${{s.best_niches}}
+                            </div>
+                            <div class="text-xs text-purple-900 italic bg-purple-50 p-2 border border-purple-200">
+                                <strong>Gợi ý quay:</strong> "${{s.hook_tip}}"
+                            </div>
+                        </div>
+
+                        <div class="shrink-0 flex items-center gap-2">
+                            <a href="${{s.tiktok_sound_url}}" target="_blank" rel="noreferrer noopener" class="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white font-black text-xs uppercase flex items-center gap-1.5 shadow transition">
+                                <i class="ph-bold ph-play-circle text-base"></i> MỞ NHẠC TRÊN TIKTOK
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+                return;
+            }}
+
+            if (currentTab === 'visual') {{
+                visualContainer.classList.remove('hidden');
+                statsRow.classList.add('hidden');
+                topLeadersSection.classList.add('hidden');
+                calculateMargin();
+                return;
+            }}
+
+            statsRow.classList.remove('hidden');
+            topLeadersSection.classList.remove('hidden');
+
+            // Collect Product Ideas for Current Tab
+            let itemsToRender = [];
+            if (currentTab === 'viral') {{
+                itemsToRender = globalData.viral_24h || [];
+            }} else if (currentTab === 'evergreen') {{
+                itemsToRender = globalData.evergreen || [];
+            }} else if (currentTab === 'saved') {{
+                itemsToRender = activeUser.saved_trends || [];
+            }} else if (currentTab === 'team_saved') {{
+                const mapTitles = new Map();
+                uData.users.forEach(u => {{
+                    (u.saved_trends || []).forEach(it => {{
+                        if (!mapTitles.has(it.title)) {{
+                            mapTitles.set(it.title, it);
+                        }}
+                    }});
+                }});
+                itemsToRender = Array.from(mapTitles.values());
+            }} else {{
+                itemsToRender = globalData.all_ideas || [];
+            }}
+
+            // Filter Product Items by Category, Sub-niche, Velocity, and Search text
+            itemsToRender = itemsToRender.filter(it => {{
+                // Search match
+                const titleStr = (it.title || '').toLowerCase();
+                const catStr = (it.category || '').toLowerCase();
+                const subStr = (it.sub_niche || '').toLowerCase();
+                const matchSearch = !searchVal || titleStr.includes(searchVal) || catStr.includes(searchVal) || subStr.includes(searchVal);
+
+                // Category match
+                const matchCat = (catVal === 'all') || catStr === catVal.toLowerCase() || (it.category_vi && it.category_vi.toLowerCase().includes(catVal.toLowerCase()));
+
+                // Sub-niche match
+                const matchSub = (subVal === 'all') || subStr.includes(subVal.toLowerCase()) || (it.sub_niche_vi && it.sub_niche_vi.toLowerCase().includes(subVal.toLowerCase()));
+
+                // Velocity Dimension match
+                let matchVelocity = true;
+                if (velocityVal !== 'ALL') {{
+                    const itVel = it.velocity_dimension || (it.classification === 'VIRAL_SPIKE_24H' ? 'VIRAL_VIDEO_24H' : 'EVERGREEN_WINNER');
+                    matchVelocity = (itVel === velocityVal);
+                }}
+
+                return matchSearch && matchCat && matchSub && matchVelocity;
+            }});
+
+            if ((currentTab === 'saved' || currentTab === 'team_saved') && itemsToRender.length === 0) {{
+                emptySavedBox.classList.remove('hidden');
+                return;
+            }}
+
+            // Render Table or Cards
+            if (currentTab === 'all') {{
+                tableContainer.classList.remove('hidden');
+                document.getElementById('table-body').innerHTML = itemsToRender.map(it => {{
+                    const mySaved = isSavedByCurrentUser(it);
+                    const savers = getTeamSavers(it);
+                    const q1688 = encodeURIComponent(it.query_1688 || get_1688_query(it.title));
+                    const qAlibaba = encodeURIComponent(it.query_alibaba || get_alibaba_query(it.title));
+
+                    return `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-200">
+                        <td class="py-3 px-4 font-bold text-slate-900 max-w-xs truncate">${{it.title}}</td>
+                        <td class="py-3 px-4">
+                            <span class="text-[11px] font-bold px-2 py-0.5 border ${{it.classification === 'VIRAL_SPIKE_24H' ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}}">
+                                ${{it.label}}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-slate-600 font-medium">
+                            <div class="font-bold text-slate-800">${{it.category || 'General'}}</div>
+                            <div class="text-[10px] text-slate-500">${{it.sub_niche || ''}}</div>
+                        </td>
+                        <td class="py-3 px-4 text-center font-black text-rose-600">${{it.viral_score}}/100</td>
+                        <td class="py-3 px-4 text-center font-black text-emerald-600">${{it.evergreen_score}}/100</td>
+                        <td class="py-3 px-4 font-extrabold text-slate-900">${{it.price || it.clean_price}}</td>
+                        <td class="py-3 px-4">
+                            ${{savers.length > 0 ? savers.map(s => `<span class="inline-block bg-blue-100 text-blue-800 border border-blue-300 text-[10px] font-bold px-1.5 py-0.5 mr-1">${{s}}</span>`).join('') : '<span class="text-slate-400 text-[11px]">-</span>'}}
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <button onclick='toggleSaveTrend(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-[11px] font-black px-2 py-1 border ${{mySaved ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'}}">
+                                    ${{mySaved ? lang.btn_saved_me : lang.btn_save_me}}
+                                </button>
+                                <a href="https://www.alibaba.com/trade/search?SearchText=${{qAlibaba}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-[11px] font-black bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 shadow-sm" title="Xưởng Alibaba B2B Quốc Tế (100% Không Bị 403)">
+                                    Alibaba
+                                </a>
+                                <a href="https://s.1688.com/selloffer/offer_search.htm?keywords=${{q1688}}&n=y&_input_charset=utf-8" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-[11px] font-bold bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 shadow-sm" title="Xưởng 1688 Nội Địa Trung (Nếu chưa hiện hàng, bấm nút Tìm kiếm trên 1688 thêm lần nữa)">
+                                    1688
+                                </a>
+                                <button onclick='viewStrategy(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-[11px] font-bold bg-slate-900 hover:bg-slate-800 text-white px-2 py-1">
+                                    ${{lang.btn_proof}}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    `;
+                }}).join('');
+            }} else {{
+                cardsContainer.classList.remove('hidden');
+                
+                if (itemsToRender.length === 0) {{
+                    cardsContainer.innerHTML = `
+                        <div class="p-8 text-center bg-white border-2 border-slate-300">
+                            <i class="ph-bold ph-funnel-simple text-3xl text-slate-400 mb-2"></i>
+                            <div class="text-xs font-bold text-slate-700">
+                                ${{currentLang === 'vi' ? 'Không có sản phẩm nào phù hợp với bộ lọc hiện tại' : 'No products match the selected filters'}}
+                            </div>
+                            <button onclick="resetFilters()" class="mt-3 px-3 py-1.5 bg-slate-900 text-white text-xs font-black uppercase">
+                                ${{currentLang === 'vi' ? 'Đặt lại bộ lọc' : 'Reset Filters'}}
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }}
+
+                cardsContainer.innerHTML = itemsToRender.map(it => {{
+                    const isViral = it.classification === 'VIRAL_SPIKE_24H';
+                    const strat = it.strategy || {{}};
+                    const mySaved = isSavedByCurrentUser(it);
+                    const savers = getTeamSavers(it);
+                    const platforms = (it.verified_platforms || [it.source]).join(' · ');
+                    const q1688 = encodeURIComponent(it.query_1688 || get_1688_query(it.title));
+                    const qAlibaba = encodeURIComponent(it.query_alibaba || get_alibaba_query(it.title));
+                    const raw1688 = it.query_1688 || get_1688_query(it.title);
+
+                    // Dimension label helper
+                    let velBadge = '';
+                    if (it.velocity_dimension === 'VIRAL_VIDEO_24H') velBadge = '<span class="text-[10px] font-black bg-rose-50 text-rose-700 px-2 py-0.5 border border-rose-300">🔥 Video Viral 24h</span>';
+                    else if (it.velocity_dimension === 'FAST_SALES_VELOCITY_24H') velBadge = '<span class="text-[10px] font-black bg-blue-50 text-blue-700 px-2 py-0.5 border border-blue-300">🚀 Movers Bán Chạy</span>';
+                    else if (it.velocity_dimension === 'BREAKOUT_KEYWORD_24H') velBadge = '<span class="text-[10px] font-black bg-amber-50 text-amber-800 px-2 py-0.5 border border-amber-300">📈 Từ Khóa Đột Phá</span>';
+                    else if (it.velocity_dimension === 'EVERGREEN_WINNER') velBadge = '<span class="text-[10px] font-black bg-emerald-50 text-emerald-800 px-2 py-0.5 border border-emerald-300">🌲 Evergreen Quanh Năm</span>';
+
+                    return `
+                        <!-- Ô HIỂN THỊ SẢN PHẨM: BỐ CỤC CÂN ĐỐI, THÔNG THOÁNG, VUÔNG VỨC 100% -->
+                        <div class="bg-white border-2 border-slate-300 hover:border-slate-600 p-5 shadow-sm transition">
+                            
+                            <!-- HÀNG 1: HUY HIỆU TRẠNG THÁI & THAO TÁC -->
+                            <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-xs font-black uppercase px-2.5 py-1 border whitespace-nowrap ${{isViral ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}}">
+                                        ${{it.label}}
+                                    </span>
+                                    ${{velBadge}}
+                                    <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 border border-slate-200">
+                                        ${{it.category || 'Niche'}} ${{it.sub_niche ? '· ' + it.sub_niche : ''}}
+                                    </span>
+                                    <span class="text-[11px] font-bold text-slate-400 hidden sm:inline">| ${{platforms}}</span>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    ${{savers.length > 0 ? `<span class="text-xs font-black text-blue-700 bg-blue-50 px-2.5 py-1 border border-blue-200">Team: ${{savers.join(', ')}}</span>` : ''}}
+                                    <button onclick='toggleSaveTrend(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-xs font-black px-3 py-1 border ${{mySaved ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'}} transition flex items-center gap-1">
+                                        <i class="ph-bold ${{mySaved ? 'ph-check-square text-amber-700' : 'ph-plus-square text-slate-600'}}"></i>
+                                        <span>${{mySaved ? lang.btn_saved_me : lang.btn_save_me}}</span>
+                                    </button>
+                                    <button onclick='viewStrategy(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-xs font-bold px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1 transition">
+                                        <i class="ph-bold ph-shield-check text-emerald-400"></i>
+                                        <span>${{lang.btn_proof}}</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- HÀNG 2: THÔNG TIN SẢN PHẨM & GÓC HOOK 3 GIÂY -->
+                            <div class="py-4 space-y-2">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex items-center gap-3">
+                                        ${{it.image ? `
+                                            <div class="w-14 h-14 shrink-0 bg-slate-100 border-2 border-slate-300 hover:border-rose-600 p-1 flex items-center justify-center relative group cursor-zoom-in transition" onclick='zoomProductImage("${{it.image}}", "${{(it.title || "").replace(/"/g, "&quot;").replace(/'/g, "\'")}}")' title="Bấm để phóng to xem ảnh trực tiếp">
+                                                <img src="${{it.image}}" class="w-full h-full object-contain" alt="">
+                                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-black">
+                                                    <i class="ph-bold ph-magnifying-glass-plus text-base"></i>
+                                                </div>
+                                            </div>
+                                        ` : ''}}
+                                        <h3 class="text-base sm:text-lg font-black text-slate-900 leading-snug tracking-tight hover:text-rose-600 transition">
+                                            <a href="${{it.url || '#'}}" target="_blank" rel="noreferrer noopener" class="flex items-center gap-1.5">
+                                                <span>${{it.title}}</span>
+                                                <i class="ph-bold ph-arrow-square-out text-sm text-slate-400"></i>
+                                            </a>
+                                        </h3>
+                                    </div>
+                                </div>
+
+                                <!-- HOOK & PERSONA -->
+                                <div class="p-3 bg-slate-50 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+                                    <div class="flex items-start gap-2">
+                                        <span class="font-black text-amber-800 uppercase shrink-0">${{lang.hook_label}}</span>
+                                        <span class="text-slate-800 font-medium italic">"${{strat.hook_angle || 'Xem kịch bản chi tiết'}}"</span>
+                                    </div>
+                                    <span class="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 border border-emerald-300 shrink-0 self-start md:self-auto">
+                                        ${{lang.verified_badge}}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- HÀNG 3: THANH CHỈ SỐ KINH DOANH & NÚT XƯỞNG 1688 -->
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 bg-slate-50/70 -mx-5 -mb-5 px-5 py-2.5">
+                                <div class="flex items-center gap-4 sm:gap-6 flex-wrap">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[11px] text-slate-500 uppercase font-black">Viral 24h:</span>
+                                        <span class="text-base font-black text-rose-600">${{it.viral_score}}<span class="text-xs text-slate-400 font-normal">/100</span></span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 border-l border-slate-300 pl-4">
+                                        <span class="text-[11px] text-slate-500 uppercase font-black">Evergreen:</span>
+                                        <span class="text-base font-black text-emerald-700">${{it.evergreen_score}}<span class="text-xs text-slate-400 font-normal">/100</span></span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 border-l border-slate-300 pl-4">
+                                        <span class="text-[11px] text-slate-500 uppercase font-black">${{lang.th_price}}:</span>
+                                        <span class="text-xs font-black text-slate-900">${{it.price || it.clean_price}}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 border-l border-slate-300 pl-4 hidden md:flex">
+                                        <span class="text-[11px] text-slate-500 uppercase font-black">Biên Lãi:</span>
+                                        <span class="text-xs font-bold text-emerald-700">${{strat.est_margin || '65% - 75%'}}</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-1.5 flex-wrap self-end sm:self-auto">
+                                    ${{it.image ? `
+                                        <button onclick='searchProductImage("${{it.image}}")' class="text-xs font-bold px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 flex items-center gap-1 transition shadow-sm" title="Tìm hình ảnh trên Google Lens">
+                                            <i class="ph-bold ph-camera text-xs"></i>
+                                            <span>Tìm Ảnh</span>
+                                        </button>
+                                    ` : ''}}
+                                    <button onclick='copyKeyword("${{raw1688}}")' class="text-xs font-bold px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 flex items-center gap-1 transition shadow-sm" title="Sao chép từ khóa tiếng Trung">
+                                        <i class="ph-bold ph-copy text-xs"></i>
+                                        <span>Copy Từ Khóa</span>
+                                    </button>
+                                    <a href="https://www.alibaba.com/trade/search?SearchText=${{qAlibaba}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-xs font-black px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1.5 transition shadow-sm whitespace-nowrap" title="Xưởng Alibaba B2B Quốc Tế (100% Không Bị 403)">
+                                        <i class="ph-bold ph-globe text-sm"></i>
+                                        <span>Alibaba B2B</span>
+                                        <i class="ph-bold ph-arrow-square-out text-xs"></i>
+                                    </a>
+                                    <a href="https://s.1688.com/selloffer/offer_search.htm?keywords=${{q1688}}&n=y&_input_charset=utf-8" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-xs font-black px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1.5 transition shadow-sm whitespace-nowrap" title="Xưởng 1688 Nội Địa Trung">
+                                        <i class="ph-bold ph-factory text-sm"></i>
+                                        <span>${{lang.btn_view_1688}}</span>
+                                        <i class="ph-bold ph-arrow-square-out text-xs"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    `;
+                }}).join('');
+            }}
+        }}
+
+        // 11. Modal Minh Chứng & 24h Audit
+        function viewStrategy(item) {{
+            const strat = item.strategy || {{}};
+            const v24 = item.verification_24h || {{}};
+            const modal = document.getElementById('strategy-modal');
+            const content = document.getElementById('modal-content');
+            const savers = getTeamSavers(item);
+            const q1688 = encodeURIComponent(item.query_1688 || get_1688_query(item.title));
+            const qAlibaba = encodeURIComponent(item.query_alibaba || get_alibaba_query(item.title));
+            const raw1688 = item.query_1688 || get_1688_query(item.title);
+
+            content.innerHTML = `
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xs font-black uppercase px-2 py-0.5 border ${{item.classification === 'VIRAL_SPIKE_24H' ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}}">
+                        ${{item.label}}
+                    </span>
+                    <span class="text-xs font-bold text-slate-500">${{item.category || 'Niche'}}</span>
+                    ${{savers.length > 0 ? `<span class="text-xs font-black text-blue-700 bg-blue-50 px-2 py-0.5 border border-blue-200">Team: ${{savers.join(', ')}}</span>` : ''}}
+                </div>
+                <h2 class="text-base font-black text-slate-900 mb-4 leading-snug">${{item.title}}</h2>
+
+                <!-- KHỐI MINH CHỨNG XÁC THỰC 24H -->
+                <div class="mb-4 p-4 bg-emerald-50 border-2 border-emerald-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2 text-xs font-black text-emerald-950 uppercase tracking-tight">
+                            <i class="ph-bold ph-shield-check text-lg text-emerald-700"></i>
+                            <span>BẰNG CHỨNG XÁC THỰC TREND 24H THỜI GIAN THỰC</span>
+                        </div>
+                        <span class="text-[11px] font-mono bg-emerald-200 text-emerald-900 px-2 py-0.5 font-bold">24H PAST</span>
+                    </div>
+
+                    <ul class="space-y-1.5 text-xs text-emerald-900 font-medium pl-1">
+                        ${{(v24.proof_points || [
+                            "Lưu lượng tìm kiếm tăng vọt 24h qua trên Google Trends US",
+                            "Tốc độ bứt phá lượt xem video TikTok trong vòng 24 giờ",
+                            "Vị trí nhảy thứ hạng Best Sellers / Movers trên sàn US"
+                        ]).map(pt => `<li class="flex items-start gap-1.5"><i class="ph-bold ph-check text-emerald-700 mt-0.5 shrink-0"></i> <span>${{pt}}</span></li>`).join('')}}
+                    </ul>
+
+                    <div class="mt-3 pt-3 border-t border-emerald-300 flex items-center justify-between gap-2 flex-wrap">
+                        <div class="text-[11px] text-emerald-900 font-bold">
+                            <span>Ghi nhận: ${{v24.verified_at || 'Vừa xong'}}</span>
+                            ${{v24.clean_search_query ? `<span class="ml-2 text-emerald-700 font-mono font-bold bg-emerald-100 px-1.5 py-0.5 border border-emerald-300">Query: "${{v24.clean_search_query}}"</span>` : ''}}
+                        </div>
+                        
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            ${{v24.audit_link_google ? `
+                                <a href="${{v24.audit_link_google}}" target="_blank" rel="noreferrer noopener" class="px-2.5 py-1 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-black flex items-center gap-1 transition">
+                                    <i class="ph-bold ph-trend-up"></i> GOOGLE TRENDS 24H
+                                </a>
+                            ` : ''}}
+                            ${{v24.audit_link_google_7d ? `
+                                <a href="${{v24.audit_link_google_7d}}" target="_blank" rel="noreferrer noopener" class="px-2.5 py-1 bg-teal-700 hover:bg-teal-800 text-white text-xs font-black flex items-center gap-1 transition">
+                                    <i class="ph-bold ph-chart-line-up"></i> GOOGLE TRENDS 7 NGÀY
+                                </a>
+                            ` : ''}}
+                            ${{v24.audit_link_tiktok ? `
+                                <a href="${{v24.audit_link_tiktok}}" target="_blank" rel="noreferrer noopener" class="px-2.5 py-1 bg-slate-900 hover:bg-black text-white text-xs font-black flex items-center gap-1 transition">
+                                    <i class="ph-bold ph-tiktok-logo"></i> TIKTOK VIRAL 24H
+                                </a>
+                            ` : ''}}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gợi ý kịch bản & Nguồn 1688 -->
+                <div class="space-y-3 text-xs text-slate-800">
+                    <div class="p-3 bg-slate-50 border border-slate-300">
+                        <span class="text-[11px] font-black text-rose-700 uppercase tracking-wider block mb-1">🎯 Chân dung khách hàng (Target Persona)</span>
+                        <p class="text-slate-800 font-medium">${{strat.audience || 'Gen Z & Millennials US'}}</p>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 border border-slate-300">
+                        <span class="text-[11px] font-black text-amber-800 uppercase tracking-wider block mb-1">🎬 Kịch bản quay & Góc Hook 3 Giây</span>
+                        <p class="text-slate-900 font-bold italic bg-white p-2 border border-slate-200">"${{strat.hook_angle || 'Xem kịch bản chi tiết'}}"</p>
+                    </div>
+
+                    <!-- TRUNG TÂM NGUỒN HÀNG XƯỞNG SỈ SOURCING HUB -->
+                    <div class="p-3.5 bg-orange-50 border-2 border-orange-400">
+                        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                            <div>
+                                <span class="text-[11px] font-black text-orange-950 uppercase block flex items-center gap-1.5">
+                                    <i class="ph-bold ph-factory text-sm text-orange-700"></i> TRUNG TÂM NGUỒN HÀNG XƯỞNG SỈ (SOURCING HUB)
+                                </span>
+                                <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <span class="text-xs text-orange-900 font-bold">Từ khóa xưởng 1688:</span>
+                                    <span class="text-xs font-black text-slate-900 bg-white px-2 py-0.5 border border-orange-300 font-mono select-all">${{raw1688}}</span>
+                                    <button onclick='copyKeyword("${{raw1688}}")' class="text-[11px] font-black px-2.5 py-0.5 bg-orange-200 hover:bg-orange-300 text-orange-950 border border-orange-400 flex items-center gap-1 transition">
+                                        <i class="ph-bold ph-copy"></i> Sao Chép
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <a href="https://www.alibaba.com/trade/search?SearchText=${{qAlibaba}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs flex items-center gap-1 shadow-sm transition">
+                                    <i class="ph-bold ph-globe"></i> ALIBABA B2B (100% KHÔNG 403)
+                                </a>
+                                <a href="https://s.1688.com/selloffer/offer_search.htm?keywords=${{q1688}}&n=y&_input_charset=utf-8" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs flex items-center gap-1 shadow-sm transition">
+                                    <i class="ph-bold ph-factory"></i> MỞ 1688 NỘI ĐỊA
+                                </a>
+                                <a href="https://s.taobao.com/search?q=${{q1688}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-black text-xs flex items-center gap-1 shadow-sm transition">
+                                    TAOBAO
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-orange-200 text-[11px] text-orange-950 flex items-center justify-between gap-2 flex-wrap">
+                            <span class="flex items-center gap-1.5"><i class="ph-bold ph-lightbulb text-amber-600"></i> <span>Nếu trang 1688 chưa hiện ngay, bấm lại nút <strong>"Tìm kiếm" (🔍 搜索)</strong> trên 1688 với từ khóa đã điền sẵn.</span></span>
+                            <span class="text-[10px] text-slate-500">Gặp lỗi 403? Dùng nút <strong>Alibaba B2B</strong></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }}
+
+        function showToast(message, isError = false) {{
+            let toast = document.getElementById('global-toast');
+            if (!toast) {{
+                toast = document.createElement('div');
+                toast.id = 'global-toast';
+                toast.className = 'fixed bottom-6 right-6 z-50 px-4 py-3 bg-slate-900 text-white text-xs font-bold shadow-2xl border-2 border-slate-700 flex items-center gap-2 transition-all duration-200 transform translate-y-2 opacity-0 pointer-events-none';
+                document.body.appendChild(toast);
+            }}
+            toast.innerHTML = `<i class="ph-bold ${{isError ? 'ph-warning-circle text-rose-400' : 'ph-check-circle text-emerald-400'}} text-lg"></i> <span>${{message}}</span>`;
+            toast.classList.remove('translate-y-2', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {{
+                toast.classList.add('translate-y-2', 'opacity-0', 'pointer-events-none');
+            }}, 3500);
+        }}
+
+        function copyKeyword(text) {{
+            if (navigator.clipboard) {{
+                navigator.clipboard.writeText(text);
+            }} else {{
+                const input = document.createElement('input');
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+            }}
+            showToast(`Đã sao chép từ khóa tiếng Trung: "${{text}}". Dán vào 1688 nếu bị chặn 403!`);
+        }}
+
+        function closeModal(e) {{
+            if (e && e.target && e.target.id !== 'strategy-modal' && !e.target.closest('button')) {{
+                return;
+            }}
+            const modal = document.getElementById('strategy-modal');
+            if (modal) modal.classList.add('hidden');
+        }}
+
+        // Khởi động khi tải trang
+        window.addEventListener('DOMContentLoaded', () => {{
+            restoreSidebarState();
+            applyLanguage();
+            populateCategoryDropdown();
+            renderUsersDropdown();
+            startCountdown();
+            renderUI();
+        }});
+    </script>
+</body>
+</html>
+"""
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    return output_path

@@ -1,0 +1,26 @@
+{
+  "active_user_id": "user_admin",
+  "users": [
+    {
+      "id": "user_admin",
+      "name": "Ngọc (Quản Trị / Lead)",
+      "role": "Admin & Chiến Lược",
+      "created_at": "12/09/2026",
+      "saved_trends": []
+    },
+    {
+      "id": "user_beauty",
+      "name": "Thành Viên 1 (Mỹ Phẩm & Skincare)",
+      "role": "Product Hunter",
+      "created_at": "12/09/2026",
+      "saved_trends": []
+    },
+    {
+      "id": "user_home",
+      "name": "Thành Viên 2 (Gia Dụng & Gadgets)",
+      "role": "Content Creator",
+      "created_at": "12/09/2026",
+      "saved_trends": []
+    }
+  ]
+}
