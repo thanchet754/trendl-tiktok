@@ -10,7 +10,12 @@ import json
 import re
 import logging
 from typing import List, Dict, Any
-from curl_cffi import requests
+try:
+    from curl_cffi import requests as cffi_requests
+    HAS_CURL_CFFI = True
+except ImportError:
+    import requests as cffi_requests
+    HAS_CURL_CFFI = False
 
 logger = logging.getLogger(__name__)
 
@@ -524,7 +529,10 @@ def scrape_tiktok_creator_profile(handle: str) -> Dict[str, Any]:
     """
     url = f"https://www.tiktok.com/@{handle}"
     try:
-        r = requests.get(url, headers=HEADERS_MOBILE, impersonate="safari15_5", timeout=10)
+        if HAS_CURL_CFFI:
+            r = cffi_requests.get(url, headers=HEADERS_MOBILE, impersonate="safari15_5", timeout=10)
+        else:
+            r = cffi_requests.get(url, headers=HEADERS_MOBILE, timeout=10)
         if r.status_code != 200:
             return None
         match = re.search(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>(.*?)</script>', r.text, re.DOTALL)
