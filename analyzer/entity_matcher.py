@@ -242,12 +242,34 @@ def synthesize_and_rank_ideas(
     viral_24h = [x for x in all_sorted if x.get("classification") == "VIRAL_SPIKE_24H"]
     evergreen = [x for x in all_sorted if x.get("classification") == "EVERGREEN_WINNER"]
     new_listings_24h = [x for x in all_sorted if x.get("is_new_listing_24h", False)]
+    
+    # MerchTrends Executive Command Center Analytics
+    total_eds_daily = sum(x.get("est_daily_sales", 0) for x in all_sorted)
+    total_monthly_rev = sum(x.get("est_monthly_rev", 0.0) for x in all_sorted)
+    rank_surges = [x for x in all_sorted if x.get("surge_type") == "BREAKOUT_V3"]
+    new_listings_7d = [x for x in all_sorted if x.get("is_new_listing_24h") or x.get("listing_age_hours", 999) <= 168]
+
+    # Find leading category & coverage
+    cat_sales = {}
+    for x in all_sorted:
+        c = x.get("category", "General")
+        cat_sales[c] = cat_sales.get(c, 0) + x.get("sales_24h", 0)
+    
+    leading_theme = max(cat_sales, key=cat_sales.get) if cat_sales else "Beauty & Personal Care"
+    theme_coverage_pct = min(100, int(round((len(cat_groups) / 28.0) * 100)))
 
     stats = {
         "total_analyzed": len(all_sorted),
         "total_viral_24h": len(viral_24h),
         "total_evergreen": len(evergreen),
         "total_new_listings_24h": len(new_listings_24h),
+        "total_new_listings_7d": len(new_listings_7d),
+        "theme_coverage_pct": theme_coverage_pct,
+        "leading_theme": leading_theme,
+        "leading_theme_sales": cat_sales.get(leading_theme, 0),
+        "total_rank_surges": len(rank_surges),
+        "total_est_daily_sales": total_eds_daily,
+        "total_est_monthly_rev": total_monthly_rev,
         "google_trends_count": len(google_trends),
         "tiktok_count": len(tiktok_items),
         "amazon_count": len(amazon_items),

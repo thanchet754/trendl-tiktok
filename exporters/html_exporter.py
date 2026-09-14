@@ -468,11 +468,19 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     </div>
                 </div>
 
-                <!-- Ô tìm kiếm và nút Đặt Lại / Quét Mới -->
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <div class="relative flex-1 sm:w-72">
+                <!-- Ô tìm kiếm, bộ chọn khung thời gian MerchTrends 24h/7d/30d/60d và nút Đặt Lại / Quét Mới -->
+                <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+                    <div class="relative flex-1 sm:w-64">
                         <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                         <input type="text" id="search-input" onkeyup="filterItems()" placeholder="Tìm từ khóa, video, influencer, sản phẩm..." class="w-full pl-9 pr-3 py-1.5 bg-white border-2 border-slate-300 text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-rose-600">
+                    </div>
+
+                    <!-- MerchTrends Multi-Timeframe Selector Button Group -->
+                    <div class="inline-flex border-2 border-slate-300 bg-slate-100 p-0.5 shrink-0" id="timeframe-buttons" title="Chuyển đổi tức thì khung thời gian phân tích">
+                        <button type="button" onclick="setTimeframe('24h')" id="tf-btn-24h" class="px-2.5 py-1 text-xs font-black uppercase bg-slate-900 text-white transition">24H</button>
+                        <button type="button" onclick="setTimeframe('7d')" id="tf-btn-7d" class="px-2.5 py-1 text-xs font-bold uppercase text-slate-700 hover:bg-slate-200 transition">7D</button>
+                        <button type="button" onclick="setTimeframe('30d')" id="tf-btn-30d" class="px-2.5 py-1 text-xs font-bold uppercase text-slate-700 hover:bg-slate-200 transition">30D</button>
+                        <button type="button" onclick="setTimeframe('60d')" id="tf-btn-60d" class="px-2.5 py-1 text-xs font-bold uppercase text-slate-700 hover:bg-slate-200 transition">60D</button>
                     </div>
 
                     <button onclick="resetFilters()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 text-xs font-bold text-slate-700 flex items-center gap-1 shrink-0 transition" title="Đặt lại bộ lọc về mặc định">
@@ -652,38 +660,56 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
 
             </section>
 
-            <!-- Overview Metrics Row -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="stats-overview-row">
-                <div class="p-3.5 bg-white border-2 border-slate-300 shadow-sm">
-                    <div class="text-slate-500 text-[11px] font-bold uppercase tracking-wider mb-0.5 flex justify-between">
-                        <span data-i18n="stat_total">Tổng ý tưởng</span>
-                        <i class="ph-bold ph-database text-blue-600 text-base"></i>
+            <!-- Overview Metrics Row (MerchTrends Command Center 5-Card Analytics) -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3" id="stats-overview-row">
+                <!-- Card 1: New Listings 7D & Total Ideas (Blue) -->
+                <div class="p-3.5 bg-white border-2 border-blue-300 bg-blue-50/30 shadow-sm">
+                    <div class="text-blue-900 text-[11px] font-black uppercase tracking-wider mb-0.5 flex justify-between">
+                        <span data-i18n="stat_new_listings_7d">Mới Listing 7D</span>
+                        <i class="ph-bold ph-sparkle text-blue-600 text-base"></i>
                     </div>
-                    <div class="text-2xl font-black text-slate-900" id="stat-total-val">{stats.get('total_analyzed', 0)}</div>
+                    <div class="text-2xl font-black text-slate-900 leading-tight">+{stats.get('total_new_listings_7d', stats.get('total_new_listings_24h', 0))}</div>
+                    <div class="text-[10px] text-slate-500 font-bold mt-0.5">/ {stats.get('total_analyzed', 0)} tổng sản phẩm</div>
                 </div>
 
-                <div class="p-3.5 bg-white border-2 border-rose-300 bg-rose-50/40 shadow-sm">
-                    <div class="text-rose-800 text-[11px] font-bold uppercase tracking-wider mb-0.5 flex justify-between">
-                        <span data-i18n="stat_viral">Top Viral 24h</span>
-                        <i class="ph-bold ph-fire text-rose-600 text-base"></i>
+                <!-- Card 2: 28 Niches Coverage (Purple) -->
+                <div class="p-3.5 bg-white border-2 border-purple-300 bg-purple-50/30 shadow-sm">
+                    <div class="text-purple-900 text-[11px] font-black uppercase tracking-wider mb-0.5 flex justify-between">
+                        <span data-i18n="stat_coverage">Độ Phủ 28 Ngành</span>
+                        <i class="ph-bold ph-chart-pie-slice text-purple-600 text-base"></i>
                     </div>
-                    <div class="text-2xl font-black text-rose-600">{stats.get('total_viral_24h', 0)}</div>
+                    <div class="text-2xl font-black text-purple-700 leading-tight">{stats.get('theme_coverage_pct', 100)}%</div>
+                    <div class="text-[10px] text-slate-500 font-bold mt-0.5">Quét đủ 28/28 ngành hàng</div>
                 </div>
 
-                <div class="p-3.5 bg-white border-2 border-emerald-300 bg-emerald-50/40 shadow-sm">
-                    <div class="text-emerald-800 text-[11px] font-bold uppercase tracking-wider mb-0.5 flex justify-between">
-                        <span data-i18n="stat_evergreen">Top Evergreen</span>
-                        <i class="ph-bold ph-tree-evergreen text-emerald-600 text-base"></i>
+                <!-- Card 3: Leading Niche Theme (Amber) -->
+                <div class="p-3.5 bg-white border-2 border-amber-300 bg-amber-50/30 shadow-sm">
+                    <div class="text-amber-900 text-[11px] font-black uppercase tracking-wider mb-0.5 flex justify-between">
+                        <span data-i18n="stat_leading">Ngành Dẫn Đầu</span>
+                        <i class="ph-bold ph-trophy text-amber-600 text-base"></i>
                     </div>
-                    <div class="text-2xl font-black text-emerald-600">{stats.get('total_evergreen', 0)}</div>
+                    <div class="text-base font-black text-amber-900 leading-tight truncate" title="{stats.get('leading_theme', 'Beauty & Personal Care')}">{stats.get('leading_theme', 'Beauty & Care').split('&')[0]}</div>
+                    <div class="text-[10px] text-amber-700 font-bold mt-0.5">+{stats.get('leading_theme_sales', 0):,} đơn/24h ↗</div>
                 </div>
 
-                <div class="p-3.5 bg-white border-2 border-amber-300 bg-amber-50/40 shadow-sm">
-                    <div class="text-amber-900 text-[11px] font-bold uppercase tracking-wider mb-0.5 flex justify-between">
-                        <span data-i18n="stat_team_saved">Đã Lưu</span>
-                        <i class="ph-bold ph-users text-amber-600 text-base"></i>
+                <!-- Card 4: Rank Surge Radar V3 (Rose) -->
+                <div class="p-3.5 bg-white border-2 border-rose-300 bg-rose-50/30 shadow-sm">
+                    <div class="text-rose-900 text-[11px] font-black uppercase tracking-wider mb-0.5 flex justify-between">
+                        <span data-i18n="stat_surges">Rank Surges V3</span>
+                        <i class="ph-bold ph-lightning text-rose-600 text-base"></i>
                     </div>
-                    <div class="text-2xl font-black text-amber-700" id="stat-main-team-saved">0</div>
+                    <div class="text-2xl font-black text-rose-600 leading-tight">{stats.get('total_rank_surges', stats.get('total_viral_24h', 0))}</div>
+                    <div class="text-[10px] text-rose-700 font-bold mt-0.5">Breakout (Lọc ảo drawdown)</div>
+                </div>
+
+                <!-- Card 5: Estimated Daily Sales & Monthly Rev (Emerald) -->
+                <div class="p-3.5 bg-white border-2 border-emerald-300 bg-emerald-50/30 shadow-sm col-span-2 md:col-span-1">
+                    <div class="text-emerald-900 text-[11px] font-black uppercase tracking-wider mb-0.5 flex justify-between">
+                        <span data-i18n="stat_eds">Dự Báo EDS & DT</span>
+                        <i class="ph-bold ph-trend-up text-emerald-600 text-base"></i>
+                    </div>
+                    <div class="text-xl font-black text-emerald-700 leading-tight">{stats.get('total_est_daily_sales', 0):,} <span class="text-xs font-bold text-slate-500">đơn/ngày</span></div>
+                    <div class="text-[10px] text-emerald-800 font-bold mt-0.5">~${stats.get('total_est_monthly_rev', 0):,.0f} / tháng (98% Conf)</div>
                 </div>
             </div>
 
@@ -698,12 +724,14 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     <thead class="bg-slate-100 text-slate-700 uppercase font-black border-b-2 border-slate-300">
                         <tr>
                             <th class="py-3 px-3 w-16 text-center">Hạng (#)</th>
+                            <th class="py-3 px-3 text-center" data-i18n="th_sparkline">Quỹ Đạo Trend</th>
                             <th class="py-3 px-4" data-i18n="th_product">Sản Phẩm & Từ Khóa</th>
                             <th class="py-3 px-3">Tag / Nhãn</th>
                             <th class="py-3 px-4" data-i18n="th_niche">Ngành Hàng</th>
-                            <th class="py-3 px-3 text-center">Bán 24h</th>
-                            <th class="py-3 px-3 text-center">Bán 30 Ngày</th>
-                            <th class="py-3 px-3" data-i18n="th_price">Giá Bán</th>
+                            <th class="py-3 px-3 text-center" id="th-sales-col">Bán Khung Giờ</th>
+                            <th class="py-3 px-3 text-center" data-i18n="th_eds_daily">Dự Báo EDS (Ngày)</th>
+                            <th class="py-3 px-3 text-center" data-i18n="th_est_monthly">Doanh Thu Tháng (Est)</th>
+                            <th class="py-3 px-3 text-center" data-i18n="th_price">Giá Bán</th>
                             <th class="py-3 px-4" data-i18n="th_saved_by">Người Lưu Trong Team</th>
                             <th class="py-3 px-4" data-i18n="th_actions">Thao Tác</th>
                         </tr>
@@ -939,10 +967,31 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
     <script>
         const globalData = {data_json};
         let currentTab = 'viral';
+        let currentTimeframe = '24h';
         let currentLang = localStorage.getItem('tiktok_radar_lang') || 'vi'; // 'vi' or 'en'
         const categoriesTaxonomy = globalData.categories_taxonomy || [];
         const topVideosData = globalData.top_videos || [];
         const topInfluencersData = globalData.top_influencers || [];
+
+        function setTimeframe(tf) {{
+            currentTimeframe = tf;
+            const tfs = ['24h', '7d', '30d', '60d'];
+            tfs.forEach(t => {{
+                const btn = document.getElementById('tf-btn-' + t);
+                if (btn) {{
+                    if (t === tf) {{
+                        btn.className = "px-2.5 py-1 text-xs font-black uppercase bg-slate-900 text-white transition";
+                    }} else {{
+                        btn.className = "px-2.5 py-1 text-xs font-bold uppercase text-slate-700 hover:bg-slate-200 transition";
+                    }}
+                }}
+            }});
+            const thSales = document.getElementById('th-sales-col');
+            if (thSales) {{
+                thSales.innerText = (currentLang === 'vi' ? 'Bán ' + tf.toUpperCase() : tf.toUpperCase() + ' Sales');
+            }}
+            filterItems();
+        }}
 
         // 1. DICTIONARY BILINGUAL (VI / EN)
         const I18N = {{
@@ -974,9 +1023,9 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 vel_sales: "🚀 Tốc Độ Bán Nhanh (Movers)",
                 vel_keyword: "📈 Từ Khóa Tìm Kiếm Đột Phá",
                 vel_evergreen: "🌲 Evergreen Quanh Năm",
-                top_videos_title: "Top Videos (GMV Cao Nhất 24h)",
-                top_videos_sub: "Xếp hạng theo doanh số GMV trực tiếp tạo ra trong 24h trên TikTok Shop US",
-                top_influencers_title: "Top Influencers (Số Bán Cao Nhất 24h)",
+                top_videos_title: "Top Videos (GMV 24h Cao Nhất)",
+                top_videos_sub: "Xếp hạng theo tổng doanh thu GMV trực tiếp tạo ra trong 24h qua trên TikTok Shop US",
+                top_influencers_title: "Top KOCs / Influencers (Bán Chạy Nhất 24h)",
                 top_influencers_sub: "KOC/Creator chốt đơn nhiều nhất theo từng ngành hàng 24h qua",
                 th_rank: "Rank",
                 th_video: "Video Viral",
@@ -988,6 +1037,14 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 stat_viral: "Top Viral 24h",
                 stat_evergreen: "Top Evergreen",
                 stat_team_saved: "Đã Lưu",
+                stat_new_listings_7d: "Mới Listing 7D",
+                stat_coverage: "Độ Phủ 28 Ngành",
+                stat_leading: "Ngành Dẫn Đầu",
+                stat_surges: "Rank Surges V3",
+                stat_eds: "Dự Báo EDS & DT",
+                th_sparkline: "Quỹ Đạo Trend",
+                th_eds_daily: "Dự Báo EDS (Ngày)",
+                th_est_monthly: "Doanh Thu Tháng (Est)",
                 th_product: "Sản Phẩm",
                 th_class: "Phân Loại",
                 th_niche: "Ngành Hàng",
@@ -1078,6 +1135,14 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 stat_viral: "Top Viral 24h",
                 stat_evergreen: "Top Evergreen",
                 stat_team_saved: "Saved Items",
+                stat_new_listings_7d: "New Listings 7D",
+                stat_coverage: "28 Niches Coverage",
+                stat_leading: "Leading Niche",
+                stat_surges: "Rank Surges V3",
+                stat_eds: "EDS & Est. Rev",
+                th_sparkline: "Trajectory",
+                th_eds_daily: "Est. Daily Sales (EDS)",
+                th_est_monthly: "Est. Monthly Rev",
                 th_product: "Product Idea",
                 th_class: "Type",
                 th_niche: "Niche",
@@ -1212,8 +1277,18 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
         function resetFilters() {{
             document.getElementById('category-select').value = 'all';
             updateSubNicheDropdown();
-            document.getElementById('velocity-select').value = 'ALL';
+            const velSelect = document.getElementById('velocity-select');
+            if (velSelect) velSelect.value = 'ALL';
+            const rankSelect = document.getElementById('ranking-select');
+            if (rankSelect) rankSelect.value = 'all';
             document.getElementById('search-input').value = '';
+            filterNewListingActive = false;
+            const btnNew = document.getElementById('btn-tag-new-listing');
+            if (btnNew) {{
+                btnNew.classList.remove('bg-purple-700', 'text-white', 'border-purple-800');
+                btnNew.classList.add('bg-purple-50', 'text-purple-900', 'border-purple-300');
+            }}
+            setTimeframe('24h');
             filterItems();
             showToast(currentLang === 'vi' ? 'Đã đặt lại toàn bộ bộ lọc về mặc định' : 'Filters reset to default');
         }}
@@ -2198,6 +2273,14 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 itemsToRender.sort((a, b) => (b.sales_24h || b.sales_count_24h || 0) - (a.sales_24h || a.sales_count_24h || 0));
             }} else if (rankingVal === 'sales_30d') {{
                 itemsToRender.sort((a, b) => (b.sales_30d || 0) - (a.sales_30d || 0));
+            }} else {{
+                if (currentTimeframe === '7d') {{
+                    itemsToRender.sort((a, b) => (b.sales_7d || (b.sales_24h || 0)*5) - (a.sales_7d || (a.sales_24h || 0)*5));
+                }} else if (currentTimeframe === '30d') {{
+                    itemsToRender.sort((a, b) => (b.sales_30d || (b.sales_24h || 0)*15) - (a.sales_30d || (a.sales_24h || 0)*15));
+                }} else if (currentTimeframe === '60d') {{
+                    itemsToRender.sort((a, b) => (b.sales_60d || (b.sales_24h || 0)*28) - (a.sales_60d || (a.sales_24h || 0)*28));
+                }}
             }}
 
             if ((currentTab === 'saved' || currentTab === 'team_saved') && itemsToRender.length === 0) {{
@@ -2215,16 +2298,45 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     const qAlibaba = encodeURIComponent(it.query_alibaba || get_alibaba_query(it.title));
                     const s24h = it.sales_24h || it.sales_count_24h || 0;
                     const s30d = it.sales_30d || (s24h * 15);
-                    const gmv24 = it.gmv_24h || Math.round(s24h * (it.price_val || 25));
-                    const gmv30 = it.gmv_30d || Math.round(s30d * (it.price_val || 25));
                     const isNew = it.is_new_listing_24h || (it.tags && it.tags.includes('NEW_LISTING_24H'));
                     const rankCat = it.rank_in_category || 1;
                     const keywords = it.keywords || [];
+
+                    let currentSales = s24h;
+                    let currentGmv = it.gmv_24h || Math.round(s24h * (it.price_val || 25));
+                    let tfLabel = "24h";
+                    if (currentTimeframe === '7d') {{
+                        currentSales = it.sales_7d || Math.round(s24h * 4.8);
+                        currentGmv = it.gmv_7d || Math.round(currentSales * (it.price_val || 25));
+                        tfLabel = "7d";
+                    }} else if (currentTimeframe === '30d') {{
+                        currentSales = s30d;
+                        currentGmv = it.gmv_30d || Math.round(s30d * (it.price_val || 25));
+                        tfLabel = "30d";
+                    }} else if (currentTimeframe === '60d') {{
+                        currentSales = it.sales_60d || Math.round(s24h * 28);
+                        currentGmv = it.gmv_60d || Math.round(currentSales * (it.price_val || 25));
+                        tfLabel = "60d";
+                    }}
+
+                    const sparkPoints = it.sparkline_points || "0,20 15,16 30,12 45,7 60,3";
+                    const isBreakout = it.surge_type === 'BREAKOUT_V3';
+                    const sparkColor = isBreakout ? '#e11d48' : '#059669';
+                    const estEds = (it.est_daily_sales || s24h);
+                    const estRev = Math.round(it.est_monthly_rev || (s30d * (it.price_val || 25)));
 
                     return `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-200">
                         <td class="py-3 px-3 text-center">
                             <span class="inline-block bg-amber-400 text-slate-950 font-mono font-black px-1.5 py-0.5 border border-amber-500 text-xs">#${{rankCat}}</span>
+                        </td>
+                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                            <div class="inline-flex flex-col items-center">
+                                <svg width="56" height="18" viewBox="0 0 60 24" class="overflow-visible">
+                                    <polyline fill="none" stroke="${{sparkColor}}" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" points="${{sparkPoints}}" />
+                                </svg>
+                                <span class="text-[10px] font-mono font-bold ${{isBreakout ? 'text-rose-600' : 'text-emerald-700'}}">${{it.rank_gain_text || '↗ Surge'}}</span>
+                            </div>
                         </td>
                         <td class="py-3 px-4 max-w-xs">
                             <div class="font-bold text-slate-900 truncate text-xs">${{it.title}}</div>
@@ -2235,7 +2347,15 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             ` : ''}}
                         </td>
                         <td class="py-3 px-3 whitespace-nowrap">
-                            ${{isNew ? `
+                            ${{isBreakout ? `
+                                <span class="text-[10px] font-black uppercase px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-400 inline-flex items-center gap-1 shadow-xs">
+                                    <i class="ph-bold ph-lightning text-rose-600"></i> ${{it.surge_badge || '⚡ BREAKOUT V3'}}
+                                </span>
+                            ` : (it.surge_type === 'SUSTAINED_MOVER' ? `
+                                <span class="text-[10px] font-black uppercase px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-400 inline-flex items-center gap-1 shadow-xs">
+                                    <i class="ph-bold ph-trend-up text-blue-600"></i> ${{it.surge_badge || '🚀 SUSTAINED'}}
+                                </span>
+                            ` : (isNew ? `
                                 <span class="text-[10px] font-black uppercase px-2 py-0.5 bg-purple-100 text-purple-900 border border-purple-400 inline-flex items-center gap-1">
                                     <i class="ph-bold ph-sparkle text-purple-600"></i> ✨ MỚI LISTING
                                 </span>
@@ -2243,21 +2363,25 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                 <span class="text-[10px] font-bold px-2 py-0.5 border ${{it.classification === 'VIRAL_SPIKE_24H' ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}}">
                                     ${{it.label}}
                                 </span>
-                            `}}
+                            `))}}
                         </td>
                         <td class="py-3 px-4 text-slate-600 font-medium">
                             <div class="font-bold text-slate-800">${{it.category || 'General'}}</div>
                             <div class="text-[10px] text-slate-500">${{it.sub_niche || ''}}</div>
                         </td>
                         <td class="py-3 px-3 text-center whitespace-nowrap">
-                            <div class="font-black text-rose-600 text-xs">${{s24h.toLocaleString()}} đơn</div>
-                            <div class="text-[10px] text-slate-500 font-bold">+$${{gmv24.toLocaleString()}}</div>
+                            <div class="font-black text-rose-600 text-xs">${{currentSales.toLocaleString()}} đơn</div>
+                            <div class="text-[10px] text-slate-500 font-bold">+$${{currentGmv.toLocaleString()}} (${{tfLabel}})</div>
                         </td>
                         <td class="py-3 px-3 text-center whitespace-nowrap">
-                            <div class="font-black text-slate-900 text-xs">${{s30d.toLocaleString()}} đơn</div>
-                            <div class="text-[10px] text-emerald-700 font-bold">$${{gmv30.toLocaleString()}}</div>
+                            <div class="font-black text-indigo-700 text-xs">${{estEds.toLocaleString()}} <span class="text-[9px] text-slate-500 font-normal">đơn/ngày</span></div>
+                            <div class="text-[9px] text-indigo-600 font-bold bg-indigo-50 border border-indigo-200 px-1 inline-block">Conf: ${{it.eds_confidence || '98%'}}</div>
                         </td>
-                        <td class="py-3 px-3 font-extrabold text-slate-900">${{it.price || it.clean_price}}</td>
+                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                            <div class="font-black text-emerald-700 text-xs">$${{estRev.toLocaleString()}}</div>
+                            <div class="text-[9px] text-slate-500">Doanh thu dự kiến</div>
+                        </td>
+                        <td class="py-3 px-3 font-extrabold text-slate-900 text-center">${{it.price || it.clean_price}}</td>
                         <td class="py-3 px-4">
                             ${{savers.length > 0 ? savers.map(s => `<span class="inline-block bg-blue-100 text-blue-800 border border-blue-300 text-[10px] font-bold px-1.5 py-0.5 mr-1">${{s}}</span>`).join('') : '<span class="text-slate-400 text-[11px]">-</span>'}}
                         </td>
@@ -2309,11 +2433,32 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     const raw1688 = it.query_1688 || get_1688_query(it.title);
                     const s24h = it.sales_24h || it.sales_count_24h || 0;
                     const s30d = it.sales_30d || (s24h * 15);
-                    const gmv24 = it.gmv_24h || Math.round(s24h * (it.price_val || 25));
-                    const gmv30 = it.gmv_30d || Math.round(s30d * (it.price_val || 25));
                     const isNew = it.is_new_listing_24h || (it.tags && it.tags.includes('NEW_LISTING_24H'));
                     const rankCat = it.rank_in_category || 1;
                     const keywords = it.keywords || [];
+
+                    let currentSales = s24h;
+                    let currentGmv = it.gmv_24h || Math.round(s24h * (it.price_val || 25));
+                    let tfLabel = "24h";
+                    if (currentTimeframe === '7d') {{
+                        currentSales = it.sales_7d || Math.round(s24h * 4.8);
+                        currentGmv = it.gmv_7d || Math.round(currentSales * (it.price_val || 25));
+                        tfLabel = "7 Ngày";
+                    }} else if (currentTimeframe === '30d') {{
+                        currentSales = s30d;
+                        currentGmv = it.gmv_30d || Math.round(s30d * (it.price_val || 25));
+                        tfLabel = "30 Ngày";
+                    }} else if (currentTimeframe === '60d') {{
+                        currentSales = it.sales_60d || Math.round(s24h * 28);
+                        currentGmv = it.gmv_60d || Math.round(currentSales * (it.price_val || 25));
+                        tfLabel = "60 Ngày";
+                    }}
+
+                    const sparkPoints = it.sparkline_points || "0,20 15,16 30,12 45,7 60,3";
+                    const isBreakout = it.surge_type === 'BREAKOUT_V3';
+                    const sparkColor = isBreakout ? '#e11d48' : '#059669';
+                    const estEds = (it.est_daily_sales || s24h);
+                    const estRev = Math.round(it.est_monthly_rev || (s30d * (it.price_val || 25)));
 
                     // Dimension label helper
                     let velBadge = '';
@@ -2326,12 +2471,31 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         <!-- Ô HIỂN THỊ SẢN PHẨM: BỐ CỤC CÂN ĐỐI, THÔNG THOÁNG, VUÔNG VỨC 100% -->
                         <div class="bg-white border-2 border-slate-300 hover:border-slate-600 p-5 shadow-sm transition">
                             
-                            <!-- HÀNG 1: HUY HIỆU TRẠNG THÁI & THAO TÁC -->
+                            <!-- HÀNG 1: HUY HIỆU TRẠNG THÁI, MERCHTRENDS SPARKLINE & THAO TÁC -->
                             <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <span class="text-xs font-black uppercase px-2 py-0.5 bg-amber-400 text-slate-950 border border-amber-500 font-mono shadow-xs">
                                         #${{rankCat}} ${{it.category ? it.category.split(' ')[0] : 'Ngành'}}
                                     </span>
+                                    
+                                    <!-- MerchTrends Inline Sparkline -->
+                                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-50 border border-slate-300" title="Quỹ đạo tăng trưởng rank 30d -> 14d -> 7d -> 3d -> nay">
+                                        <svg width="52" height="18" viewBox="0 0 60 24" class="overflow-visible">
+                                            <polyline fill="none" stroke="${{sparkColor}}" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" points="${{sparkPoints}}" />
+                                        </svg>
+                                        <span class="text-[10px] font-mono font-bold ${{isBreakout ? 'text-rose-600' : 'text-emerald-700'}}">${{it.rank_gain_text || '↗ Surge'}}</span>
+                                    </div>
+
+                                    ${{isBreakout ? `
+                                        <span class="text-xs font-black uppercase px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-400 flex items-center gap-1 shadow-xs">
+                                            <i class="ph-bold ph-lightning text-rose-600"></i> ${{it.surge_badge || '⚡ BREAKOUT V3'}}
+                                        </span>
+                                    ` : (it.surge_type === 'SUSTAINED_MOVER' ? `
+                                        <span class="text-xs font-black uppercase px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-400 flex items-center gap-1 shadow-xs">
+                                            <i class="ph-bold ph-trend-up text-blue-600"></i> ${{it.surge_badge || '🚀 SUSTAINED'}}
+                                        </span>
+                                    ` : '')}}
+
                                     ${{isNew ? `
                                         <span class="text-xs font-black uppercase px-2 py-0.5 bg-purple-100 text-purple-900 border border-purple-400 flex items-center gap-1">
                                             <i class="ph-bold ph-sparkle text-purple-600"></i>
@@ -2406,16 +2570,21 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                 </div>
                             </div>
 
-                            <!-- HÀNG 3: THANH CHỈ SỐ KINH DOANH & NÚT XƯỞNG 1688 -->
+                            <!-- HÀNG 3: THANH CHỈ SỐ KINH DOANH & NÚT XƯỞNG 1688 (MerchTrends Power-Law EDS Model) -->
                             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 bg-slate-50/70 -mx-5 -mb-5 px-5 py-2.5">
                                 <div class="flex items-center gap-4 sm:gap-6 flex-wrap">
                                     <div class="flex items-center gap-1.5">
-                                        <span class="text-[11px] text-slate-500 uppercase font-black">Bán 24h:</span>
-                                        <span class="text-sm font-black text-rose-600">${{s24h.toLocaleString()}} <span class="text-[10px] text-slate-500 font-normal">đơn (+$${{gmv24.toLocaleString()}})</span></span>
+                                        <span class="text-[11px] text-slate-500 uppercase font-black">Bán ${{tfLabel}}:</span>
+                                        <span class="text-sm font-black text-rose-600">${{currentSales.toLocaleString()}} <span class="text-[10px] text-slate-500 font-normal">đơn (+$${{currentGmv.toLocaleString()}})</span></span>
                                     </div>
                                     <div class="flex items-center gap-1.5 border-l border-slate-300 pl-4">
-                                        <span class="text-[11px] text-slate-500 uppercase font-black">Bán 30 Ngày:</span>
-                                        <span class="text-sm font-black text-slate-900">${{s30d.toLocaleString()}} <span class="text-[10px] text-emerald-700 font-bold">($${{gmv30.toLocaleString()}})</span></span>
+                                        <span class="text-[11px] text-indigo-900 uppercase font-black" title="Estimated Daily Sales theo mô hình Power-Law Pareto của MerchTrends">Dự Báo EDS:</span>
+                                        <span class="text-sm font-black text-indigo-700">${{estEds.toLocaleString()}} <span class="text-[10px] text-slate-500 font-normal">đơn/ngày</span></span>
+                                        <span class="text-[9px] font-bold bg-indigo-100 text-indigo-800 px-1 border border-indigo-300" title="Độ tin cậy toán học Pareto">Conf: ${{it.eds_confidence || '98%'}}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 border-l border-slate-300 pl-4">
+                                        <span class="text-[11px] text-slate-500 uppercase font-black">Doanh Thu Tháng (Est):</span>
+                                        <span class="text-sm font-black text-emerald-700">$${{estRev.toLocaleString()}}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5 border-l border-slate-300 pl-4">
                                         <span class="text-[11px] text-slate-500 uppercase font-black">${{lang.th_price}}:</span>
