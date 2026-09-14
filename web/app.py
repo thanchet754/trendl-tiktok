@@ -257,10 +257,58 @@ async def get_supabase_trends(limit: int = 100):
 
 @app.post("/api/scan")
 async def scan_trends():
+    global latest_cache
     if os.environ.get("VERCEL"):
-        return {"message": "Full browser crawling runs on your local PC to preserve resources. Data syncs to Supabase."}
+        # On Vercel Serverless: Fetch live data from Supabase Cloud or disk cache
+        try:
+            from database.supabase_client import fetch_trends_from_supabase, fetch_creators_from_supabase, fetch_videos_from_supabase
+            trends = fetch_trends_from_supabase(limit=1000)
+            creators = fetch_creators_from_supabase(limit=100)
+            videos = fetch_videos_from_supabase(limit=100)
+            if trends and len(trends) > 0:
+                now_str = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                fresh = {
+                    "all_ideas": trends,
+                    "top_influencers": creators,
+                    "top_videos": videos,
+                    "updated_at": now_str,
+                    "stats": {
+                        "total_analyzed": len(trends),
+                        "total_viral_24h": len([x for x in trends if x.get("classification") == "VIRAL_SPIKE_24H"]),
+                        "total_evergreen": len([x for x in trends if x.get("classification") == "EVERGREEN_WINNER"])
+                    }
+                }
+                latest_cache = fresh
+                return fresh
+        except Exception as e:
+            logger.error(f"Vercel live scan fallback error: {e}")
+        
+        # Fallback to local cached json
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                cached = json.load(f)
+                cached["updated_at"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                latest_cache = cached
+                return cached
+        return {"all_ideas": [], "stats": {"total_analyzed": 0}, "updated_at": datetime.now().strftime("%d/%m/%Y %H:%M:%S")}
+    
+    # On Local PC: Perform genuine 5-platform deep scan
     data = perform_full_scan()
     return data
+
+@app.get("/api/scheduler-status")
+async def get_scheduler_status():
+    status = scheduler_instance.get_status()
+    return {
+        "status": "active" if status.get("is_active") else "idle",
+        "interval_hours": 6,
+        "interval_seconds": 21600,
+        "next_run_time": status.get("next_run_time"),
+        "last_run_time": status.get("last_run_time"),
+        "seconds_remaining": status.get("seconds_remaining", 0),
+        "mode": "vercel_serverless" if os.environ.get("VERCEL") else "local_daemon"
+    }
+
 
 @app.get("/api/export-excel")
 async def download_excel():

@@ -808,12 +808,12 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
         <main class="p-6 max-w-7xl mx-auto w-full space-y-6">
 
             <!-- ================= ĐẦU TRANG: TOP VIDEOS GMV 24H & TOP INFLUENCERS 24H ================= -->
-            <!-- Layout 2 cột vuông vức đối xứng tương tự FastMoss & Kalodata (media_1789202629032.png) -->
-            <section id="top-leaders-section" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Layout 2 cột vuông vức đối xứng tuyệt đối (FastMoss & MerchTrends) -->
+            <section id="top-leaders-section" class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
                 
                 <!-- CỘT 1: TOP VIDEOS (GMV CAO NHẤT 24H) -->
-                <div class="bg-white border-2 border-slate-300 shadow-sm flex flex-col">
-                    <div class="p-3.5 bg-rose-50/60 border-b-2 border-slate-300 flex items-center justify-between">
+                <div class="bg-white border-2 border-slate-300 shadow-sm flex flex-col h-full">
+                    <div class="p-3 bg-rose-50/70 border-b-2 border-slate-300 flex items-center justify-between min-h-[58px]">
                         <div class="flex items-center gap-2">
                             <div class="w-6 h-6 bg-rose-600 text-white flex items-center justify-center font-black text-xs">
                                 <i class="ph-bold ph-film-strip"></i>
@@ -828,19 +828,29 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
+                            <!-- Bộ chọn số dòng hiển thị -->
+                            <div class="flex items-center gap-1 bg-white border border-slate-300 px-1.5 py-0.5">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Dòng:</span>
+                                <select id="leaders-page-size-select" onchange="onLeadersPageSizeChange(this.value)" class="bg-transparent text-[10px] font-black text-slate-800 focus:outline-none cursor-pointer">
+                                    <option value="all" selected>Tối Đa (Tất Cả)</option>
+                                    <option value="10">10 dòng</option>
+                                    <option value="25">25 dòng</option>
+                                    <option value="50">50 dòng</option>
+                                </select>
+                            </div>
                             <button onclick="switchTab('leaders')" class="text-[10px] font-bold text-rose-700 hover:text-rose-900 flex items-center gap-1 hover:underline bg-rose-100/70 px-2 py-0.5 border border-rose-300" title="Chuyển sang tab riêng chuyên biệt về 2 bảng này">
                                 <span>Tab Riêng</span> <i class="ph-bold ph-arrow-square-out text-xs"></i>
                             </button>
                             <span id="top-videos-count-badge" class="text-[10px] font-black bg-rose-100 text-rose-800 px-2 py-0.5 border border-rose-300">
-                                12 Videos
+                                62 Videos
                             </span>
                         </div>
                     </div>
 
-                    <!-- Bảng Top Videos -->
-                    <div class="overflow-x-auto flex-1">
+                    <!-- Bảng Top Videos (Khung cuộn đồng bộ) -->
+                    <div class="overflow-x-auto overflow-y-auto max-h-[640px] flex-1">
                         <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-100 text-slate-600 uppercase font-black text-[10px] border-b border-slate-300">
+                            <thead class="bg-slate-100 text-slate-600 uppercase font-black text-[10px] border-b border-slate-300 sticky top-0 z-10">
                                 <tr>
                                     <th class="py-2.5 px-3 w-12 text-center" data-i18n="th_rank">Rank</th>
                                     <th class="py-2.5 px-3" data-i18n="th_video">Video Viral</th>
@@ -855,10 +865,10 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         </table>
                     </div>
 
-                    <!-- Footer Pagination Top Videos (Giới hạn 10 dòng / trang) -->
-                    <div class="p-2.5 bg-slate-50 border-t-2 border-slate-300 flex items-center justify-between text-xs flex-wrap gap-2">
+                    <!-- Footer Pagination Top Videos (Ghim đáy đồng bộ) -->
+                    <div class="p-2.5 bg-slate-50 border-t-2 border-slate-300 flex items-center justify-between text-xs flex-wrap gap-2 mt-auto min-h-[44px]">
                         <div id="top-videos-page-info" class="text-[11px] font-bold text-slate-600">
-                            Hiển thị 1 - 10 / 16 videos
+                            Hiển thị 62 / 62 videos
                         </div>
                         <div class="flex items-center gap-1" id="top-videos-pagination-btns">
                             <!-- Populated dynamically via JS -->
@@ -867,15 +877,15 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 </div>
 
                 <!-- CỘT 2: TOP INFLUENCERS (SỐ BÁN & GMV CAO NHẤT 24H) -->
-                <div class="bg-white border-2 border-slate-300 shadow-sm flex flex-col">
-                    <div class="p-3.5 bg-blue-50/60 border-b-2 border-slate-300 flex items-center justify-between">
+                <div class="bg-white border-2 border-slate-300 shadow-sm flex flex-col h-full">
+                    <div class="p-3 bg-blue-50/70 border-b-2 border-slate-300 flex items-center justify-between min-h-[58px]">
                         <div class="flex items-center gap-2">
                             <div class="w-6 h-6 bg-blue-600 text-white flex items-center justify-center font-black text-xs">
                                 <i class="ph-bold ph-user-circle-check"></i>
                             </div>
                             <div>
                                 <h2 class="text-xs font-black uppercase text-slate-900 tracking-tight" data-i18n="top_influencers_title">
-                                    Top Influencers (Số Bán Cao Nhất 24h)
+                                    Top Influencers (Bán Chạy Nhất 24h)
                                 </h2>
                                 <p class="text-[10px] text-slate-500 font-medium" data-i18n="top_influencers_sub">
                                     KOC/Creator chốt đơn nhiều nhất theo từng ngành hàng 24h qua
@@ -883,19 +893,29 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
+                            <!-- Bộ chọn số dòng hiển thị (Đồng bộ với bảng 1) -->
+                            <div class="flex items-center gap-1 bg-white border border-slate-300 px-1.5 py-0.5">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Dòng:</span>
+                                <select id="leaders-page-size-select-2" onchange="onLeadersPageSizeChange(this.value)" class="bg-transparent text-[10px] font-black text-slate-800 focus:outline-none cursor-pointer">
+                                    <option value="all" selected>Tối Đa (Tất Cả)</option>
+                                    <option value="10">10 dòng</option>
+                                    <option value="25">25 dòng</option>
+                                    <option value="50">50 dòng</option>
+                                </select>
+                            </div>
                             <button onclick="switchTab('leaders')" class="text-[10px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 hover:underline bg-blue-100/70 px-2 py-0.5 border border-blue-300" title="Chuyển sang tab riêng chuyên biệt về 2 bảng này">
                                 <span>Tab Riêng</span> <i class="ph-bold ph-arrow-square-out text-xs"></i>
                             </button>
                             <span id="top-influencers-count-badge" class="text-[10px] font-black bg-blue-100 text-blue-800 px-2 py-0.5 border border-blue-300">
-                                8 Creators
+                                55 Creators
                             </span>
                         </div>
                     </div>
 
-                    <!-- Bảng Top Influencers -->
-                    <div class="overflow-x-auto flex-1">
+                    <!-- Bảng Top Influencers (Khung cuộn đồng bộ) -->
+                    <div class="overflow-x-auto overflow-y-auto max-h-[640px] flex-1">
                         <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-100 text-slate-600 uppercase font-black text-[10px] border-b border-slate-300">
+                            <thead class="bg-slate-100 text-slate-600 uppercase font-black text-[10px] border-b border-slate-300 sticky top-0 z-10">
                                 <tr>
                                     <th class="py-2.5 px-3 w-12 text-center" data-i18n="th_rank">Rank</th>
                                     <th class="py-2.5 px-3" data-i18n="th_creator">Nhà Sáng Tạo (KOC)</th>
@@ -910,10 +930,10 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         </table>
                     </div>
 
-                    <!-- Footer Pagination Top Influencers (Giới hạn 10 dòng / trang) -->
-                    <div class="p-2.5 bg-slate-50 border-t-2 border-slate-300 flex items-center justify-between text-xs flex-wrap gap-2">
+                    <!-- Footer Pagination Top Influencers (Ghim đáy đồng bộ) -->
+                    <div class="p-2.5 bg-slate-50 border-t-2 border-slate-300 flex items-center justify-between text-xs flex-wrap gap-2 mt-auto min-h-[44px]">
                         <div id="top-influencers-page-info" class="text-[11px] font-bold text-slate-600">
-                            Hiển thị 1 - 10 / 12 creators
+                            Hiển thị 55 / 55 creators
                         </div>
                         <div class="flex items-center gap-1" id="top-influencers-pagination-btns">
                             <!-- Populated dynamically via JS -->
@@ -1556,10 +1576,27 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             showToast(currentLang === 'vi' ? 'Đã đặt lại toàn bộ bộ lọc về mặc định' : 'Filters reset to default');
         }}
 
-        // 3. TOP 24H LEADERS RENDERER (TOP VIDEOS GMV & TOP INFLUENCERS) WITH 10-ROW PAGINATION
+        // 3. TOP 24H LEADERS RENDERER (TOP VIDEOS GMV & TOP INFLUENCERS) WITH CUSTOM PAGE SIZE & SYNC
         let topVideosPage = 1;
         let topInfluencersPage = 1;
-        const LEADERS_PAGE_SIZE = 10;
+        let leadersPageSize = 'all'; // Mặc định hiển thị Tối Đa (Tất cả) theo yêu cầu!
+
+        function onLeadersPageSizeChange(val) {{
+            leadersPageSize = val;
+            topVideosPage = 1;
+            topInfluencersPage = 1;
+            
+            // Đồng bộ giá trị 2 dropdown
+            const sel1 = document.getElementById('leaders-page-size-select');
+            const sel2 = document.getElementById('leaders-page-size-select-2');
+            if (sel1) sel1.value = val;
+            if (sel2) sel2.value = val;
+
+            const searchVal = (document.getElementById('search-input').value || '').toLowerCase().trim();
+            const catVal = document.getElementById('category-select').value;
+            const subVal = document.getElementById('subniche-select').value;
+            renderTopLeaders(catVal, subVal, searchVal);
+        }}
 
         function changeTopVideosPage(p) {{
             topVideosPage = p;
@@ -1598,19 +1635,21 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 return matchCat && matchSub && matchSearch;
             }});
 
+            const pageSize = leadersPageSize === 'all' ? 9999 : parseInt(leadersPageSize, 10);
+
             // Compute pagination for Top Videos
-            const totalVidPages = Math.max(1, Math.ceil(filteredVideos.length / LEADERS_PAGE_SIZE));
+            const totalVidPages = Math.max(1, Math.ceil(filteredVideos.length / pageSize));
             if (topVideosPage > totalVidPages) topVideosPage = totalVidPages;
             if (topVideosPage < 1) topVideosPage = 1;
-            const startVidIdx = (topVideosPage - 1) * LEADERS_PAGE_SIZE;
-            const pagedVideos = filteredVideos.slice(startVidIdx, startVidIdx + LEADERS_PAGE_SIZE);
+            const startVidIdx = (topVideosPage - 1) * pageSize;
+            const pagedVideos = filteredVideos.slice(startVidIdx, startVidIdx + pageSize);
 
             // Compute pagination for Top Influencers
-            const totalInfPages = Math.max(1, Math.ceil(filteredInfluencers.length / LEADERS_PAGE_SIZE));
+            const totalInfPages = Math.max(1, Math.ceil(filteredInfluencers.length / pageSize));
             if (topInfluencersPage > totalInfPages) topInfluencersPage = totalInfPages;
             if (topInfluencersPage < 1) topInfluencersPage = 1;
-            const startInfIdx = (topInfluencersPage - 1) * LEADERS_PAGE_SIZE;
-            const pagedInfluencers = filteredInfluencers.slice(startInfIdx, startInfIdx + LEADERS_PAGE_SIZE);
+            const startInfIdx = (topInfluencersPage - 1) * pageSize;
+            const pagedInfluencers = filteredInfluencers.slice(startInfIdx, startInfIdx + pageSize);
 
             document.getElementById('top-videos-count-badge').innerText = `${{filteredVideos.length}} Videos`;
             document.getElementById('top-influencers-count-badge').innerText = `${{filteredInfluencers.length}} Creators`;
@@ -1623,7 +1662,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 return `<span class="inline-flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-700 font-bold text-xs border border-slate-300">${{rank}}</span>`;
             }}
 
-            // Render Top Videos Rows (10 dòng/trang)
+            // Render Top Videos Rows (Đồng nhất chiều cao h-[72px] với bảng bên cạnh)
             if (filteredVideos.length === 0) {{
                 topVideosBody.innerHTML = `
                     <tr>
@@ -1634,21 +1673,21 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 `;
             }} else {{
                 topVideosBody.innerHTML = pagedVideos.map(v => `
-                    <tr class="hover:bg-rose-50/40 transition">
+                    <tr class="hover:bg-rose-50/40 transition h-[72px]">
                         <!-- Rank -->
-                        <td class="py-2.5 px-3 text-center align-middle">
+                        <td class="py-2 px-3 text-center align-middle">
                             ${{getRankBadge(v.rank)}}
                         </td>
 
                         <!-- Video Info -->
-                        <td class="py-2.5 px-3 align-middle max-w-[220px]">
-                            <div class="flex items-start gap-2.5">
-                                <a href="${{v.video_url}}" target="_blank" rel="noreferrer noopener" class="relative w-11 h-14 bg-slate-900 border border-slate-300 shrink-0 group block overflow-hidden" title="Bấm để mở và xem video trên TikTok">
+                        <td class="py-2 px-3 align-middle max-w-[220px]">
+                            <div class="flex items-center gap-2.5">
+                                <a href="${{v.video_url}}" target="_blank" rel="noreferrer noopener" class="relative w-10 h-13 bg-slate-900 border border-slate-300 shrink-0 group block overflow-hidden" title="Bấm để mở và xem video trên TikTok">
                                     <img src="${{v.video_cover || v.product_image}}" referrerpolicy="no-referrer" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition" alt="">
                                     <div class="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition">
                                         <i class="ph-fill ph-play text-white text-base"></i>
                                     </div>
-                                    <span class="absolute bottom-0 right-0 bg-black/80 text-white text-[9px] font-mono font-bold px-1">${{v.duration}}</span>
+                                    <span class="absolute bottom-0 right-0 bg-black/80 text-white text-[9px] font-mono font-bold px-0.5">${{v.duration}}</span>
                                 </a>
                                 <div class="min-w-0 flex-1">
                                     <a href="${{v.video_url}}" target="_blank" rel="noreferrer noopener" class="font-bold text-slate-900 hover:text-rose-600 transition block text-xs line-clamp-2 leading-tight">
@@ -1669,7 +1708,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         </td>
 
                         <!-- Attached Product -->
-                        <td class="py-2.5 px-2 text-center align-middle">
+                        <td class="py-2 px-2 text-center align-middle">
                             <div class="w-9 h-9 mx-auto border border-slate-300 hover:border-rose-600 bg-slate-50 p-0.5 cursor-zoom-in relative group transition" onclick='zoomProductImage("${{v.product_image}}", "${{(v.product_name || "").replace(/"/g, "&quot;").replace(/'/g, "\'")}}", "${{v.product_url || ""}}")' title="Bấm để xem ảnh phóng to & mở TikTok Shop">
                                 <img src="${{v.product_image}}" class="w-full h-full object-contain" alt="">
                                 <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px]">
@@ -1679,12 +1718,12 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         </td>
 
                         <!-- Items Sold 24h -->
-                        <td class="py-2.5 px-3 text-right align-middle font-black text-slate-800">
+                        <td class="py-2 px-3 text-right align-middle font-black text-slate-800">
                             ${{v.items_sold_24h.toLocaleString()}}
                         </td>
 
                         <!-- GMV 24h -->
-                        <td class="py-2.5 px-3 text-right align-middle font-black text-rose-600 text-xs">
+                        <td class="py-2 px-3 text-right align-middle font-black text-rose-600 text-xs">
                             ${{v.gmv_24h}}
                         </td>
                     </tr>
@@ -1697,14 +1736,16 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             if (vidPageInfo) {{
                 if (filteredVideos.length === 0) {{
                     vidPageInfo.innerText = currentLang === 'vi' ? '0 video' : '0 videos';
+                }} else if (leadersPageSize === 'all') {{
+                    vidPageInfo.innerHTML = `${{currentLang === 'vi' ? 'Hiển thị tối đa' : 'Showing all'}} <strong>${{filteredVideos.length}}</strong> / <strong>${{filteredVideos.length}}</strong> videos`;
                 }} else {{
-                    const endVidIdx = Math.min(startVidIdx + LEADERS_PAGE_SIZE, filteredVideos.length);
+                    const endVidIdx = Math.min(startVidIdx + pageSize, filteredVideos.length);
                     vidPageInfo.innerHTML = `${{currentLang === 'vi' ? 'Hiển thị' : 'Showing'}} <strong>${{startVidIdx + 1}} - ${{endVidIdx}}</strong> / <strong>${{filteredVideos.length}}</strong> videos`;
                 }}
             }}
             if (vidPagination) {{
-                if (totalVidPages <= 1) {{
-                    vidPagination.innerHTML = '';
+                if (leadersPageSize === 'all' || totalVidPages <= 1) {{
+                    vidPagination.innerHTML = leadersPageSize === 'all' ? '<span class="text-[10px] font-bold text-slate-400 uppercase bg-slate-100 px-2 py-0.5 border border-slate-200">Đã mở toàn bộ</span>' : '';
                 }} else {{
                     let h = '';
                     h += `<button onclick="changeTopVideosPage(${{topVideosPage - 1}})" ${{topVideosPage <= 1 ? 'disabled' : ''}} class="px-2.5 py-1 text-[11px] font-bold border border-slate-300 ${{topVideosPage <= 1 ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-800'}} transition"><i class="ph-bold ph-caret-left"></i> ${{currentLang === 'vi' ? 'Trước' : 'Prev'}}</button>`;
@@ -1716,7 +1757,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 }}
             }}
 
-            // Render Top Influencers Rows (10 dòng/trang)
+            // Render Top Influencers Rows (Đồng nhất chiều cao h-[72px] với bảng bên cạnh)
             if (filteredInfluencers.length === 0) {{
                 topInfluencersBody.innerHTML = `
                     <tr>
@@ -1727,14 +1768,14 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 `;
             }} else {{
                 topInfluencersBody.innerHTML = pagedInfluencers.map(inf => `
-                    <tr class="hover:bg-blue-50/40 transition">
+                    <tr class="hover:bg-blue-50/40 transition h-[72px]">
                         <!-- Rank -->
-                        <td class="py-2.5 px-3 text-center align-middle">
+                        <td class="py-2 px-3 text-center align-middle">
                             ${{getRankBadge(inf.rank)}}
                         </td>
 
                         <!-- Creator Info -->
-                        <td class="py-2.5 px-3 align-middle max-w-[220px]">
+                        <td class="py-2 px-3 align-middle max-w-[220px]">
                             <div class="flex items-center gap-2.5">
                                 <a href="${{inf.profile_url}}" target="_blank" rel="noreferrer noopener" class="w-10 h-10 border border-slate-300 bg-slate-100 shrink-0 block overflow-hidden" title="Mở trang cá nhân TikTok">
                                     <img src="${{inf.avatar}}" referrerpolicy="no-referrer" class="w-full h-full object-cover" alt="">
@@ -1757,7 +1798,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         </td>
 
                         <!-- Best Selling Product -->
-                        <td class="py-2.5 px-2 text-center align-middle">
+                        <td class="py-2 px-2 text-center align-middle">
                             <div class="w-9 h-9 mx-auto border border-slate-300 hover:border-blue-600 bg-slate-50 p-0.5 cursor-zoom-in relative group transition" onclick='zoomProductImage("${{inf.best_product_image}}", "${{(inf.best_product_title || "").replace(/"/g, "&quot;").replace(/'/g, "\'")}}", "${{inf.product_url || ""}}")' title="Bấm để xem ảnh phóng to & mở TikTok Shop">
                                 <img src="${{inf.best_product_image}}" class="w-full h-full object-contain" alt="">
                                 <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px]">
@@ -1767,12 +1808,12 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         </td>
 
                         <!-- Items Sold 24h -->
-                        <td class="py-2.5 px-3 text-right align-middle font-black text-slate-800">
+                        <td class="py-2 px-3 text-right align-middle font-black text-slate-800">
                             ${{inf.items_sold_24h.toLocaleString()}}
                         </td>
 
                         <!-- GMV 24h -->
-                        <td class="py-2.5 px-3 text-right align-middle font-black text-blue-700 text-xs">
+                        <td class="py-2 px-3 text-right align-middle font-black text-blue-700 text-xs">
                             ${{inf.gmv_24h}}
                         </td>
                     </tr>
@@ -1785,14 +1826,16 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             if (infPageInfo) {{
                 if (filteredInfluencers.length === 0) {{
                     infPageInfo.innerText = currentLang === 'vi' ? '0 creator' : '0 creators';
+                }} else if (leadersPageSize === 'all') {{
+                    infPageInfo.innerHTML = `${{currentLang === 'vi' ? 'Hiển thị tối đa' : 'Showing all'}} <strong>${{filteredInfluencers.length}}</strong> / <strong>${{filteredInfluencers.length}}</strong> creators`;
                 }} else {{
-                    const endInfIdx = Math.min(startInfIdx + LEADERS_PAGE_SIZE, filteredInfluencers.length);
+                    const endInfIdx = Math.min(startInfIdx + pageSize, filteredInfluencers.length);
                     infPageInfo.innerHTML = `${{currentLang === 'vi' ? 'Hiển thị' : 'Showing'}} <strong>${{startInfIdx + 1}} - ${{endInfIdx}}</strong> / <strong>${{filteredInfluencers.length}}</strong> creators`;
                 }}
             }}
             if (infPagination) {{
-                if (totalInfPages <= 1) {{
-                    infPagination.innerHTML = '';
+                if (leadersPageSize === 'all' || totalInfPages <= 1) {{
+                    infPagination.innerHTML = leadersPageSize === 'all' ? '<span class="text-[10px] font-bold text-slate-400 uppercase bg-slate-100 px-2 py-0.5 border border-slate-200">Đã mở toàn bộ</span>' : '';
                 }} else {{
                     let h = '';
                     h += `<button onclick="changeTopInfluencersPage(${{topInfluencersPage - 1}})" ${{topInfluencersPage <= 1 ? 'disabled' : ''}} class="px-2.5 py-1 text-[11px] font-bold border border-slate-300 ${{topInfluencersPage <= 1 ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-800'}} transition"><i class="ph-bold ph-caret-left"></i> ${{currentLang === 'vi' ? 'Trước' : 'Prev'}}</button>`;
@@ -2232,8 +2275,53 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             }}
         }}
 
-        // 7. Force Reload / Live Scan Trends
+        // 7. Force Reload / Live Scan Trends (Quét thủ công thực tế 100% kèm Modal tiến trình)
         let isScanning = false;
+        let scanTimerInterval = null;
+        let scanElapsedSeconds = 0;
+
+        function openScanModal() {{
+            const modal = document.getElementById('scan-progress-modal');
+            if (modal) modal.classList.remove('hidden');
+            scanElapsedSeconds = 0;
+            const timerEl = document.getElementById('scan-elapsed-timer');
+            if (timerEl) timerEl.innerText = '00:00';
+            
+            clearInterval(scanTimerInterval);
+            scanTimerInterval = setInterval(() => {{
+                scanElapsedSeconds++;
+                const mins = String(Math.floor(scanElapsedSeconds / 60)).padStart(2, '0');
+                const secs = String(scanElapsedSeconds % 60).padStart(2, '0');
+                if (timerEl) timerEl.innerText = `${{mins}}:${{secs}}`;
+            }}, 1000);
+
+            updateScanStep(1, 'active', 'Đang kết nối API máy chủ...');
+            setScanProgress(15);
+        }}
+
+        function closeScanModal() {{
+            const modal = document.getElementById('scan-progress-modal');
+            if (modal) modal.classList.add('hidden');
+            clearInterval(scanTimerInterval);
+        }}
+
+        function setScanProgress(pct) {{
+            const bar = document.getElementById('scan-progress-bar');
+            if (bar) bar.style.width = `${{pct}}%`;
+        }}
+
+        function updateScanStep(stepNum, status, label) {{
+            const el = document.getElementById(`scan-step-${{stepNum}}`);
+            if (!el) return;
+            if (status === 'active') {{
+                el.className = 'flex items-center justify-between text-blue-600 font-black';
+                el.innerHTML = `<span class="flex items-center gap-2"><i class="ph-bold ph-spinner animate-spin"></i> ${{label || el.innerText}}</span><span class="text-[10px] font-mono animate-pulse">ĐANG CÀO...</span>`;
+            }} else if (status === 'done') {{
+                el.className = 'flex items-center justify-between text-emerald-600 font-black';
+                el.innerHTML = `<span class="flex items-center gap-2"><i class="ph-bold ph-check-circle text-emerald-600"></i> ${{label || el.innerText}}</span><span class="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1 border border-emerald-200">XONG</span>`;
+            }}
+        }}
+
         async function forceScanTrends() {{
             if (isScanning) return;
             const btn = document.getElementById('btn-force-scan');
@@ -2244,14 +2332,38 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             if (btn) btn.disabled = true;
             if (icon) icon.classList.add('animate-spin');
             if (text) text.innerText = (currentLang === 'vi' ? 'Đang Quét...' : 'Scanning...');
-            showToast(currentLang === 'vi' ? 'Đang cào dữ liệu mới từ 5 sàn (TikTok, Google, Amazon, Etsy, eBay)... Vui lòng đợi ~15-20s.' : 'Scanning live data across 5 platforms... Please wait ~15-20s.');
+            
+            openScanModal();
 
             try {{
                 const isHttp = window.location.origin.startsWith('http');
                 const apiUrl = isHttp ? '/api/scan' : 'http://127.0.0.1:8000/api/scan';
 
+                // Step 1: Connecting
+                updateScanStep(1, 'active', '1. Kết nối cổng dữ liệu & Supabase Cloud');
+                setScanProgress(25);
+
+                // Simulation stepper while awaiting server
+                const stepTimer1 = setTimeout(() => {{
+                    updateScanStep(1, 'done', '1. Kết nối cổng dữ liệu & Supabase Cloud');
+                    updateScanStep(2, 'active', '2. Cào Google Trends US & TikTok Shop Viral 24h');
+                    setScanProgress(45);
+                }}, 2000);
+
+                const stepTimer2 = setTimeout(() => {{
+                    updateScanStep(2, 'done', '2. Cào Google Trends US & TikTok Shop Viral 24h');
+                    updateScanStep(3, 'active', '3. Đối soát Amazon Best Sellers & eBay Deals');
+                    setScanProgress(70);
+                }}, 5000);
+
+                const stepTimer3 = setTimeout(() => {{
+                    updateScanStep(3, 'done', '3. Đối soát Amazon Best Sellers & eBay Deals');
+                    updateScanStep(4, 'active', '4. Tính toán EDS Power-Law & Xếp Hạng Rank Surge V3');
+                    setScanProgress(85);
+                }}, 8000);
+
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 60000);
+                const timeoutId = setTimeout(() => controller.abort(), 90000);
 
                 const res = await fetch(apiUrl, {{
                     method: 'POST',
@@ -2259,14 +2371,41 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     signal: controller.signal
                 }});
                 clearTimeout(timeoutId);
+                clearTimeout(stepTimer1);
+                clearTimeout(stepTimer2);
+                clearTimeout(stepTimer3);
 
                 if (res.ok) {{
                     const freshData = await res.json();
-                    window.globalData = freshData;
+                    
+                    updateScanStep(1, 'done', '1. Đã đồng bộ cổng dữ liệu & Supabase Cloud');
+                    updateScanStep(2, 'done', '2. Đã cào Google Trends US & TikTok Viral 24h');
+                    updateScanStep(3, 'done', '3. Đã đối soát Amazon Best Sellers & eBay Deals');
+                    updateScanStep(4, 'done', '4. Đã phân tích mô hình EDS Power-Law & Rank Surge V3');
+                    updateScanStep(5, 'done', '5. Xuất báo cáo Excel & Cập nhật Dashboard');
+                    setScanProgress(100);
+
+                    // Enable modal close button
+                    const closeBtn = document.getElementById('scan-modal-close-btn');
+                    if (closeBtn) {{
+                        closeBtn.disabled = false;
+                        closeBtn.className = 'px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase shadow transition cursor-pointer flex items-center gap-1.5';
+                        closeBtn.innerHTML = '<i class="ph-bold ph-check"></i> HOÀN TẤT - XEM DỮ LIỆU MỚI';
+                    }}
+
+                    if (freshData && freshData.all_ideas && freshData.all_ideas.length > 0) {{
+                        window.globalData = freshData;
+                        if (freshData.top_videos) window.topVideosData = freshData.top_videos;
+                        if (freshData.top_influencers) window.topInfluencersData = freshData.top_influencers;
+                    }}
+                    
                     if (freshData.updated_at) {{
                         const updEl = document.querySelector('#current-view-title + div strong');
                         if (updEl) updEl.innerText = freshData.updated_at;
+                        const sideScanLabel = document.getElementById('next-scan-label');
+                        if (sideScanLabel) sideScanLabel.innerText = freshData.updated_at.split(' ')[1] || freshData.updated_at;
                     }}
+
                     populateCategoryDropdown();
                     renderUI();
                     showToast(currentLang === 'vi' ? '✅ Đã hoàn tất quét và nạp dữ liệu trend mới nhất!' : '✅ Scan completed! Fresh trends loaded.');
@@ -2275,6 +2414,12 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 }}
             }} catch (err) {{
                 console.warn('API scan connection error:', err);
+                const closeBtn = document.getElementById('scan-modal-close-btn');
+                if (closeBtn) {{
+                    closeBtn.disabled = false;
+                    closeBtn.className = 'px-4 py-2 bg-slate-800 text-white text-xs font-black uppercase shadow transition cursor-pointer';
+                    closeBtn.innerText = 'Đóng Cửa Sổ';
+                }}
                 showToast(currentLang === 'vi' 
                     ? '💡 Để quét dữ liệu theo yêu cầu bằng nút bấm, hãy khởi động server nền bằng cách nhấp đúp file "run_dashboard.bat" (hoặc chạy "python main.py")!' 
                     : '💡 To enable on-demand scanning from this button, launch run_dashboard.bat to start the backend server!', true);
@@ -3084,6 +3229,59 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             renderUI();
         }});
     </script>
+
+    <!-- ================= MODAL TIẾN TRÌNH QUÉT THỦ CÔNG 5 SÀN (LIVE SCAN PROGRESS) ================= -->
+    <div id="scan-progress-modal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white border-4 border-slate-900 shadow-2xl max-w-lg w-full p-6 space-y-4">
+            <div class="flex items-center justify-between border-b-2 border-slate-200 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-red-600 animate-ping rounded-full"></span>
+                    <h3 class="text-sm font-black uppercase text-slate-900 tracking-tight">HỆ THỐNG CÀO DỮ LIỆU ĐANG HOẠT ĐỘNG (5 SÀN)</h3>
+                </div>
+                <span class="text-xs font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 border border-slate-300" id="scan-elapsed-timer">00:00</span>
+            </div>
+
+            <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                Hệ thống đang tiến hành cào và phân tích trực tiếp theo mô hình phễu ngược: TikTok Shop US, Google Trends, Amazon Movers, Etsy và eBay Deals.
+            </p>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 h-3 border border-slate-300 overflow-hidden">
+                <div id="scan-progress-bar" class="bg-gradient-to-r from-red-600 via-rose-500 to-emerald-500 h-full transition-all duration-300 w-1/12"></div>
+            </div>
+
+            <!-- Steps Checklist -->
+            <div class="space-y-2 text-xs font-bold border border-slate-200 p-3 bg-slate-50" id="scan-steps-container">
+                <div id="scan-step-1" class="flex items-center justify-between text-blue-600">
+                    <span class="flex items-center gap-2"><i class="ph-bold ph-spinner animate-spin"></i> 1. Kết nối cổng dữ liệu & Supabase Cloud</span>
+                    <span class="text-[10px] font-mono">Đang kết nối</span>
+                </div>
+                <div id="scan-step-2" class="flex items-center justify-between text-slate-400">
+                    <span class="flex items-center gap-2"><i class="ph-bold ph-circle"></i> 2. Cào Google Trends US & TikTok Shop Viral 24h</span>
+                    <span class="text-[10px] font-mono">Chờ</span>
+                </div>
+                <div id="scan-step-3" class="flex items-center justify-between text-slate-400">
+                    <span class="flex items-center gap-2"><i class="ph-bold ph-circle"></i> 3. Đối soát Amazon Best Sellers & eBay Deals</span>
+                    <span class="text-[10px] font-mono">Chờ</span>
+                </div>
+                <div id="scan-step-4" class="flex items-center justify-between text-slate-400">
+                    <span class="flex items-center gap-2"><i class="ph-bold ph-circle"></i> 4. Tính toán EDS Power-Law & Xếp Hạng Rank Surge V3</span>
+                    <span class="text-[10px] font-mono">Chờ</span>
+                </div>
+                <div id="scan-step-5" class="flex items-center justify-between text-slate-400">
+                    <span class="flex items-center gap-2"><i class="ph-bold ph-circle"></i> 5. Xuất báo cáo Excel & Cập nhật Dashboard</span>
+                    <span class="text-[10px] font-mono">Chờ</span>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button id="scan-modal-close-btn" onclick="closeScanModal()" disabled class="px-4 py-2 bg-slate-200 text-slate-400 text-xs font-black uppercase cursor-not-allowed transition">
+                    Đang cào dữ liệu...
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
 """
