@@ -1683,7 +1683,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         <td class="py-2 px-3 align-middle max-w-[220px]">
                             <div class="flex items-center gap-2.5">
                                 <a href="${{v.video_url}}" target="_blank" rel="noreferrer noopener" class="relative w-10 h-13 bg-slate-900 border border-slate-300 shrink-0 group block overflow-hidden" title="Bấm để mở và xem video trên TikTok">
-                                    <img src="${{v.video_cover || v.product_image}}" referrerpolicy="no-referrer" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition" alt="">
+                                    <img src="${{v.video_cover || v.product_image}}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format&fit=crop&q=60';" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition" alt="">
                                     <div class="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition">
                                         <i class="ph-fill ph-play text-white text-base"></i>
                                     </div>
@@ -1710,7 +1710,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         <!-- Attached Product -->
                         <td class="py-2 px-2 text-center align-middle">
                             <div class="w-9 h-9 mx-auto border border-slate-300 hover:border-rose-600 bg-slate-50 p-0.5 cursor-zoom-in relative group transition" onclick='zoomProductImage("${{v.product_image}}", "${{(v.product_name || "").replace(/"/g, "&quot;").replace(/'/g, "\'")}}", "${{v.product_url || ""}}")' title="Bấm để xem ảnh phóng to & mở TikTok Shop">
-                                <img src="${{v.product_image}}" class="w-full h-full object-contain" alt="">
+                                <img src="${{v.product_image}}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format&fit=crop&q=60';" class="w-full h-full object-contain" alt="">
                                 <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px]">
                                     <i class="ph-bold ph-magnifying-glass-plus"></i>
                                 </div>
@@ -1778,7 +1778,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         <td class="py-2 px-3 align-middle max-w-[220px]">
                             <div class="flex items-center gap-2.5">
                                 <a href="${{inf.profile_url}}" target="_blank" rel="noreferrer noopener" class="w-10 h-10 border border-slate-300 bg-slate-100 shrink-0 block overflow-hidden" title="Mở trang cá nhân TikTok">
-                                    <img src="${{inf.avatar}}" referrerpolicy="no-referrer" class="w-full h-full object-cover" alt="">
+                                    <img src="${{inf.avatar}}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent('${{(inf.name || inf.handle).replace(/[^a-zA-Z0-9]/g, '')}}') + '&background=0D8ABC&color=fff&size=160&bold=true';" class="w-full h-full object-cover" alt="">
                                 </a>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-1">
@@ -1800,7 +1800,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         <!-- Best Selling Product -->
                         <td class="py-2 px-2 text-center align-middle">
                             <div class="w-9 h-9 mx-auto border border-slate-300 hover:border-blue-600 bg-slate-50 p-0.5 cursor-zoom-in relative group transition" onclick='zoomProductImage("${{inf.best_product_image}}", "${{(inf.best_product_title || "").replace(/"/g, "&quot;").replace(/'/g, "\'")}}", "${{inf.product_url || ""}}")' title="Bấm để xem ảnh phóng to & mở TikTok Shop">
-                                <img src="${{inf.best_product_image}}" class="w-full h-full object-contain" alt="">
+                                <img src="${{inf.best_product_image}}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format&fit=crop&q=60';" class="w-full h-full object-contain" alt="">
                                 <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px]">
                                     <i class="ph-bold ph-magnifying-glass-plus"></i>
                                 </div>
@@ -1857,7 +1857,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 velocity_24h: "+94,000 video mới trong 24h",
                 best_niches: "Gia dụng thông minh, Đồ chơi làm đẹp, Bàn chải thú cưng",
                 hook_tip: "Bấm nút đúng nhịp bass drop để tạo cảm giác thỏa mãn cực độ",
-                tiktok_sound_url: "https://www.tiktok.com/tag/asmrsounds"
+                tiktok_sound_url: "https://www.tiktok.com/search?q=%23asmrsounds"
             }},
             {{
                 title: "Dramatic Reveal & Shock Tension Beat",
@@ -1866,7 +1866,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 velocity_24h: "+148,000 video mới trong 24h",
                 best_niches: "Bình giữ nhiệt Owala chống tràn, Máy làm sạch, Micro chống ồn",
                 hook_tip: "Tạo khoảng lặng 1 giây trước khi lật ngược bình nước hoặc bật máy",
-                tiktok_sound_url: "https://www.tiktok.com/tag/droptest"
+                tiktok_sound_url: "https://www.tiktok.com/search?q=%23droptest"
             }},
             {{
                 title: "Aesthetic Morning Wind-Down Lo-Fi Chords",
@@ -1875,7 +1875,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 velocity_24h: "+72,000 video mới trong 24h",
                 best_niches: "Medicube Toner Pads, Khăn lau mặt Clean Skin, Nến thơm",
                 hook_tip: "Quay ánh sáng tự nhiên cạnh cửa sổ, ghép voiceover nhẹ nhàng",
-                tiktok_sound_url: "https://www.tiktok.com/tag/skincareroutine"
+                tiktok_sound_url: "https://www.tiktok.com/search?q=%23skincareroutine"
             }},
             {{
                 title: "High BPM Motivation Electro Groove",
@@ -1884,7 +1884,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 velocity_24h: "+61,000 video mới trong 24h",
                 best_niches: "Bàn chải cọ xoay điện, Máy hút lông thú cưng, Dụng cụ tập gym",
                 hook_tip: "Tua nhanh video x2 tốc độ vết bẩn cứng đầu bay sạch theo nhịp nhạc",
-                tiktok_sound_url: "https://www.tiktok.com/tag/cleanwithme"
+                tiktok_sound_url: "https://www.tiktok.com/search?q=%23cleanwithme"
             }},
             {{
                 title: "Laser Glow & Nostalgic Piano",
@@ -1893,7 +1893,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 velocity_24h: "+45,000 video mới trong 24h",
                 best_niches: "Vòng cổ khắc tên hoa sinh, Kệ gỗ đa năng cho nam, Lịch tường",
                 hook_tip: "Quay cận cảnh laser khắc tên người thương vào sản phẩm",
-                tiktok_sound_url: "https://www.tiktok.com/tag/personalizedgift"
+                tiktok_sound_url: "https://www.tiktok.com/search?q=%23personalizedgift"
             }}
         ];
 
@@ -2542,12 +2542,27 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             renderUI();
         }}
 
-        function searchByKeyword(kw) {{
+        function searchByKeyword(kw, event) {{
+            if (event) {{
+                try {{
+                    event.preventDefault();
+                    event.stopPropagation();
+                }} catch(e) {{}}
+            }}
             const searchInput = document.getElementById('search-input');
             if (searchInput) {{
                 searchInput.value = kw;
-                renderUI();
             }}
+            const catSelect = document.getElementById('category-select');
+            if (catSelect) catSelect.value = 'all';
+            const subSelect = document.getElementById('subniche-select');
+            if (subSelect) subSelect.value = 'all';
+            filterItems();
+            const targetEl = document.getElementById('search-input') || document.getElementById('table-container') || document.getElementById('cards-container');
+            if (targetEl) {{
+                targetEl.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+            }}
+            showToast(currentLang === 'vi' ? `🔍 Đang lọc theo từ khóa: #${{kw}}` : `🔍 Filtering by keyword: #${{kw}}`);
         }}
 
         function filterItems() {{
@@ -2699,11 +2714,11 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
 
             // Apply Ranking Sort & Filters
             if (rankingVal === 'top_10') {{
-                itemsToRender = itemsToRender.filter(it => (it.rank_in_category || 999) <= 10);
+                itemsToRender = itemsToRender.filter(it => (it.rank_overall || it.rank_in_category || 999) <= 10);
             }} else if (rankingVal === 'top_50') {{
-                itemsToRender = itemsToRender.filter(it => (it.rank_in_category || 999) <= 50);
+                itemsToRender = itemsToRender.filter(it => (it.rank_overall || it.rank_in_category || 999) <= 50);
             }} else if (rankingVal === 'top_100') {{
-                itemsToRender = itemsToRender.filter(it => (it.rank_in_category || 999) <= 100);
+                itemsToRender = itemsToRender.filter(it => (it.rank_overall || it.rank_in_category || 999) <= 100);
             }} else if (rankingVal === 'sales_24h') {{
                 itemsToRender.sort((a, b) => (b.sales_24h || b.sales_count_24h || 0) - (a.sales_24h || a.sales_count_24h || 0));
             }} else if (rankingVal === 'sales_30d') {{
@@ -2730,6 +2745,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     const mySaved = isSavedByCurrentUser(it);
                     const savers = getTeamSavers(it);
                     const q1688 = encodeURIComponent(it.query_1688 || get_1688_query(it.title));
+                    const raw1688 = it.query_1688 || get_1688_query(it.title);
                     const qAlibaba = encodeURIComponent(it.query_alibaba || get_alibaba_query(it.title));
                     const s24h = it.sales_24h || it.sales_count_24h || 0;
                     const s30d = it.sales_30d || (s24h * 15);
@@ -2763,7 +2779,10 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     return `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-200">
                         <td class="py-3 px-3 text-center">
-                            <span class="inline-block bg-amber-400 text-slate-950 font-mono font-black px-1.5 py-0.5 border border-amber-500 text-xs">#${{rankCat}}</span>
+                            <div class="flex flex-col items-center">
+                                <span class="inline-block bg-amber-400 text-slate-950 font-mono font-black px-2 py-0.5 border border-amber-500 text-xs shadow-xs" title="Hạng #${{it.rank_overall || rankCat}} toàn sàn">#${{it.rank_overall || rankCat}}</span>
+                                <span class="text-[9px] text-slate-500 font-semibold mt-0.5 whitespace-nowrap">Top #${{rankCat}} ${{it.category ? it.category.split(' ')[0] : ''}}</span>
+                            </div>
                         </td>
                         <td class="py-3 px-3 text-center whitespace-nowrap">
                             <div class="inline-flex flex-col items-center">
@@ -2774,10 +2793,10 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             </div>
                         </td>
                         <td class="py-3 px-4 max-w-xs">
-                            <div class="font-bold text-slate-900 truncate text-xs">${{it.title}}</div>
+                            <a href="${{it.url && it.url !== '#' ? it.url : ('https://www.tiktok.com/search?q=' + encodeURIComponent(it.title))}}" target="_blank" rel="noreferrer noopener" class="font-bold text-slate-900 hover:text-rose-600 transition truncate text-xs block" title="${{it.title}}">${{it.title}}</a>
                             ${{keywords.length > 0 ? `
                                 <div class="flex items-center gap-1 flex-wrap mt-1">
-                                    ${{keywords.slice(0, 3).map(kw => `<button onclick="searchByKeyword('${{kw}}')" class="text-[10px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 px-1.5 py-0.2 border border-slate-300">#${{kw}}</button>`).join('')}}
+                                    ${{keywords.slice(0, 3).map(kw => `<button type="button" onclick="searchByKeyword('${{kw}}', event)" class="text-[10px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 px-1.5 py-0.2 border border-slate-300" title="Lọc theo #${{kw}}">#${{kw}}</button>`).join('')}}
                                 </div>
                             ` : ''}}
                         </td>
@@ -2912,8 +2931,11 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             <!-- HÀNG 1: HUY HIỆU TRẠNG THÁI, MERCHTRENDS SPARKLINE & THAO TÁC -->
                             <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="text-xs font-black uppercase px-2 py-0.5 bg-amber-400 text-slate-950 border border-amber-500 font-mono shadow-xs">
-                                        #${{rankCat}} ${{it.category ? it.category.split(' ')[0] : 'Ngành'}}
+                                    <span class="text-xs font-black uppercase px-2 py-0.5 bg-amber-400 text-slate-950 border border-amber-500 font-mono shadow-xs" title="Thứ hạng #${{it.rank_overall || rankCat}} toàn sàn">
+                                        HẠNG #${{it.rank_overall || rankCat}} TOÀN SÀN
+                                    </span>
+                                    <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 border border-slate-300">
+                                        Top #${{rankCat}} ${{it.category ? it.category.split(' ')[0] : 'Ngành'}}
                                     </span>
                                     
                                     <!-- MerchTrends Inline Sparkline -->
@@ -2969,7 +2991,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                     <div class="flex items-center gap-3">
                                         ${{it.image ? `
                                             <div class="w-14 h-14 shrink-0 bg-slate-100 border-2 border-slate-300 hover:border-rose-600 p-1 flex items-center justify-center relative group cursor-zoom-in transition" onclick='zoomProductImage("${{it.image}}", "${{(it.title || "").replace(/"/g, "&quot;").replace(/'/g, "\'")}}")' title="Bấm để phóng to xem ảnh trực tiếp">
-                                                <img src="${{it.image}}" class="w-full h-full object-contain" alt="">
+                                                <img src="${{it.image}}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format&fit=crop&q=60';" class="w-full h-full object-contain" alt="">
                                                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-black">
                                                     <i class="ph-bold ph-magnifying-glass-plus text-base"></i>
                                                 </div>
@@ -2977,7 +2999,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                         ` : ''}}
                                         <div>
                                             <h3 class="text-base sm:text-lg font-black text-slate-900 leading-snug tracking-tight hover:text-rose-600 transition">
-                                                <a href="${{it.url || '#'}}" target="_blank" rel="noreferrer noopener" class="flex items-center gap-1.5">
+                                                <a href="${{it.url && it.url !== '#' ? it.url : ('https://www.tiktok.com/search?q=' + encodeURIComponent(it.title))}}" target="_blank" rel="noreferrer noopener" class="flex items-center gap-1.5">
                                                     <span>${{it.title}}</span>
                                                     <i class="ph-bold ph-arrow-square-out text-sm text-slate-400"></i>
                                                 </a>
@@ -2986,9 +3008,14 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                                 <div class="flex items-center gap-1.5 flex-wrap pt-1">
                                                     <span class="text-[10px] font-black uppercase text-slate-400">Từ khóa:</span>
                                                     ${{keywords.map(kw => `
-                                                        <button onclick="searchByKeyword('${{kw}}')" class="text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 border border-slate-200 transition">
-                                                            #${{kw}}
-                                                        </button>
+                                                        <div class="inline-flex items-center border border-slate-200 bg-slate-100 hover:bg-slate-200 transition">
+                                                            <button type="button" onclick="searchByKeyword('${{kw}}', event)" class="text-[11px] font-semibold text-slate-700 px-2 py-0.5">
+                                                                #${{kw}}
+                                                            </button>
+                                                            <a href="https://www.tiktok.com/search?q=${{encodeURIComponent(kw)}}" target="_blank" rel="noreferrer noopener" class="px-1 text-slate-400 hover:text-rose-600 border-l border-slate-200" title="Mở tìm kiếm #${{kw}} trên TikTok">
+                                                                <i class="ph-bold ph-magnifying-glass text-[10px]"></i>
+                                                            </a>
+                                                        </div>
                                                     `).join('')}}
                                                 </div>
                                             ` : ''}}

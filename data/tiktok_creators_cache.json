@@ -141,5 +141,16 @@
     "avatar": "https://p16-common-sign.tiktokcdn.com/tos-alisg-avt-0068/459ea0212def173677aa032b9edeb40c~tplv-tiktokx-cropcenter:720:720.jpeg?dr=14579&refresh_token=142f562c&x-expires=1789552800&x-signature=ErRxxZtkriOQj%2BYNxgidErQBZ3M%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my",
     "signature": "",
     "live_scraped": true
+  },
+  "owalalife": {
+    "nickname": "Owala’s life",
+    "unique_id": "owalalife",
+    "followers": 1000,
+    "hearts": 516,
+    "videos": 10,
+    "verified": false,
+    "avatar": "https://p19-common-sign.tiktokcdn.com/tos-maliva-avt-0068/d195eef3f64f11ce3e91386a288819bd~tplv-tiktokx-cropcenter:720:720.jpeg?dr=14579&refresh_token=e8aa502b&x-expires=1789556400&x-signature=iBGB7AuwpYQsFrjGVfUVacZtphc%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my",
+    "signature": "I am Owala and this is my life🐶🦴🐾",
+    "live_scraped": true
   }
 }

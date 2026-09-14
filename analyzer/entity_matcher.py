@@ -233,7 +233,7 @@ BENCHMARK_28_CATEGORIES_IDEAS = [
         "surge_type": "BREAKOUT_V3", "surge_badge": "⚡ BREAKOUT V3", "sparkline_points": "0,18 15,15 30,11 45,6 60,2",
         "rank_gain_text": "+290 Ranks", "est_daily_sales": 680, "est_monthly_rev": 265179, "eds_confidence": "97%",
         "keywords": ["ergonomic chair", "office chair", "mesh chair", "lumbar support"],
-        "source": "TikTok Shop US Verified Leaders", "image": "https://images.unsplash.com/photo-1580481077195-c9f28dcfba85?w=300"
+        "source": "TikTok Shop US Verified Leaders", "image": "https://images.unsplash.com/photo-1589578527966-fdac0f44566c?w=300"
     },
     {
         "title": "Magnesium Glycinate Deep Sleep Relax Gummies 60ct High Absorption",
@@ -350,7 +350,7 @@ BENCHMARK_28_CATEGORIES_IDEAS = [
         "surge_type": "BREAKOUT_V3", "surge_badge": "⚡ BREAKOUT V3", "sparkline_points": "0,25 15,20 30,14 45,8 60,2",
         "rank_gain_text": "+560 Ranks", "est_daily_sales": 4800, "est_monthly_rev": 143856, "eds_confidence": "99%",
         "keywords": ["squishy toy", "dumpling squishy", "fidget toy", "stress relief"],
-        "source": "TikTok Shop US Verified Leaders", "image": "https://images.unsplash.com/photo-1566576912321-d58ddd743088?w=300"
+        "source": "TikTok Shop US Verified Leaders", "image": "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=300"
     },
     {
         "title": "Ultimate Life OS All-in-One Notion Template 2026 Daily Habit Tracker",
