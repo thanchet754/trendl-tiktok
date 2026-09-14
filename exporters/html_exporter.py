@@ -20,11 +20,245 @@ import json
 from datetime import datetime
 from typing import Dict, Any
 
+CATEGORY_SPECIFIC_1688 = {
+    "Pet Supplies": {
+        "brush": "宠物一键脱毛梳 自动退毛清理梳 猫狗通用",
+        "clean": "宠物一键脱毛梳 自动退毛梳 猫狗去浮毛刷",
+        "slicker": "宠物针梳 自动脱毛清理刷 猫狗通用",
+        "deshedding": "宠物去浮毛梳 脱毛开结梳",
+        "grooming": "宠物美容清理梳 猫狗去浮毛刷",
+        "litter": "膨润土矿石猫砂 结团无尘 低敏除臭",
+        "clay": "高效除臭膨润土矿石猫砂",
+        "pee": "宠物尿垫 加厚吸水 隔尿垫 狗尿片",
+        "pad": "加厚吸水宠物除臭尿垫 狗尿片",
+        "treat": "猫条肉泥 营养猫零食 冻干生骨肉",
+        "churu": "流质肉泥猫条 鲜肉营养膏猫零食",
+        "feast": "猫罐头 湿粮 肉泥浓汤 宠物主粮",
+        "poop": "可降解宠物拾便袋 拾便盒 狗便便袋",
+        "leash": "防爆冲宠物牵引绳 狗胸背带",
+        "collar": "反光宠物项圈 狗牌定制",
+        "toy": "逗猫玩具 猫抓板 磨爪益智玩具",
+        "dog": "宠物狗狗用品 训练牵引绳 拾便袋",
+        "cat": "猫咪用品 磨爪猫抓板 逗猫玩具"
+    },
+    "Beauty & Personal Care": {
+        "teeth": "紫光美白牙膏 泡沫去黄 炫白牙贴",
+        "tooth": "电动牙刷 牙齿美白仪 便携冲牙器",
+        "pulling oil": "椰子油漱口水 口腔清洁除口臭",
+        "cocomint": "椰子薄荷漱口水 亮白牙齿",
+        "toner": "毛孔清洁水杨酸棉片 积雪草爽肤水湿敷贴",
+        "pore": "毛孔细致收缩棉片 清洁去黑头",
+        "towel": "一次性洗脸巾 纯棉加厚 珍珠纹洁面巾",
+        "patch": "水胶体痘痘贴 隐形净痘贴 吸脓透气",
+        "serum": "玻尿酸面部精华液 抗衰紧致",
+        "lotion": "身体乳 润肤乳 滋润保湿 香氛身体霜",
+        "shea": "乳木果香氛润肤乳 高保湿身体乳",
+        "lip": "果汁丰唇蜜 水光唇釉 嘟嘟唇油",
+        "plump": "丰唇膏 滋润保湿变色唇油",
+        "wand": "红光微电流美肤仪 面部提拉导入仪",
+        "red light": "LED红光嫩肤美容仪 面部微电流",
+        "curling": "多功能自动卷发棒 负离子热风直卷两用",
+        "beachwaver": "全自动旋转卷发棒 陶瓷不伤发",
+        "thermal brush": "热风直发梳 电热卷发圆筒梳 蓬松高颅顶",
+        "blowout": "多功能电吹风造型梳 热风梳",
+        "hair": "负离子无叶高速吹风机 造型美发梳"
+    },
+    "Kitchenware": {
+        "tumbler": "不锈钢保温杯 吸管保冷杯 运动便携水杯",
+        "bottle": "不锈钢真空运动水壶 大容量吸管水杯",
+        "owala": "双饮吸管不锈钢保温杯 户外运动水壶",
+        "stanley": "汽车杯 手柄吸管大容量保温杯",
+        "cup": "不锈钢咖啡随行杯 保温保冷吸管杯",
+        "scale": "高精度厨房电子秤 烘焙烘培称 重食品秤",
+        "cutting board": "实木牛排餐盘 刻字砧板 菜板",
+        "charcuterie": "天然竹木奶酪拼盘 熟食切板",
+        "peeler": "多功能不锈钢削皮器 刨丝刀"
+    },
+    "Home Supplies": {
+        "scrubber": "电动清洁刷 多功能旋转浴室地砖地毯刷",
+        "pink stuff": "多功能清洁膏 万能去污膏 厨房油污净",
+        "paste": "万能清洁去污膏 抛光清洁剂",
+        "clean": "家用清洁剂 去污除垢多功能刷",
+        "calendar": "亚克力磁吸冰箱周计划留言板",
+        "candle": "天然大豆香薰蜡烛 琥珀玻璃罐",
+        "sheet": "亲肤磨毛四件套 床单被套 纯色水洗棉",
+        "bed": "加厚床单四件套 纯棉床上用品",
+        "insect": "果蝇诱捕器 物理灭蚊灯 粘捕灯",
+        "trap": "室内捕虫诱捕器 苍蝇小飞虫粘板",
+        "ant": "灭蚁饵剂 室内除蚁胶饵 诱杀蚂蚁全窝端"
+    },
+    "Phones & Electronics": {
+        "earbuds": "TWS真无线蓝牙耳机 降噪半入耳式",
+        "airpods": "无线降噪蓝牙耳机 空间音频",
+        "earphone": "Type-C有线耳机 半入耳式 通话降噪",
+        "headphone": "头戴式无线蓝牙耳机 重低音主动降噪",
+        "airtag": "防丢定位器 智能寻物器 蓝牙防丢器",
+        "tracker": "GPS智能定位防丢器 钥匙寻物器",
+        "power bank": "磁吸无线充移动电源 10000mAh快充充电宝",
+        "charger": "GaN氮化镓快速充电器 快充排插",
+        "cable": "PD快充数据线 编织耐用快充线",
+        "mic": "无线领夹麦克风 降噪直播收音麦 手机专用",
+        "camera": "4K高清数码相机 翻转屏Vlog微单 学生照相机",
+        "printer": "便携迷你热敏错题打印机 无墨不干胶便签机",
+        "docking": "实木多功能桌面手机支架收纳盒 充电底座",
+        "case": "防摔气囊手机壳 磁吸支架保护套"
+    },
+    "Womenswear & Underwear": {
+        "legging": "高腰交叉阔腿瑜伽裤 提臀裸感无缝打底裤",
+        "halara": "交叉腰运动阔腿裤 休闲弹力女裤",
+        "bodysuit": "无缝塑身衣 连体束腹收腹美体衣",
+        "shapewear": "高腰收腹提臀裤 紧身无痕塑形衣",
+        "dress": "法式复古收腰连衣裙 显瘦长裙",
+        "romper": "休闲高弹连体裤 运动连体衣",
+        "pajama": "真丝感仿真丝睡衣两件套 家居服"
+    },
+    "Menswear & Underwear": {
+        "hoodie": "重磅纯棉连帽卫衣 潮牌落肩外套",
+        "vest": "复古机车皮马甲 骑士皮背心",
+        "jacket": "男士机车真皮皮衣 防风夹克",
+        "pants": "工装战术长裤 多口袋休闲阔腿裤",
+        "cargo": "美式复古多口袋工装裤 宽松束脚裤",
+        "boxer": "莫代尔男士平角内裤 透气无痕四角裤"
+    },
+    "Automotive & Motorcycle": {
+        "inflator": "便携车载充气泵 无线电动轮胎补气打气筒 150PSI",
+        "tire": "车载智能数显电动充气泵 轮胎打气筒",
+        "mount": "车载手机支架 出风口中控台重力磁吸支架",
+        "holder": "车载无线充手机支架 自动感应夹紧",
+        "cleaner": "车载内饰清洁软胶 汽车出风口除尘泥",
+        "diffuser": "车载香薰太阳能旋转香氛 汽车出风口香水",
+        "dash cam": "4K高清行车记录仪 双镜头夜视倒车影像"
+    },
+    "Baby & Maternity": {
+        "teething": "婴儿硅胶磨牙棒 曼哈顿手抓球 咬咬胶",
+        "sensory": "婴儿早教抽抽乐 蒙氏感官拉拉乐玩具",
+        "baby clothes": "纯棉新生儿连体衣 婴儿哈衣爬服",
+        "feeding": "婴儿硅胶吸盘碗 辅食勺防摔餐具",
+        "diaper": "加厚干爽透气纸尿裤 拉拉裤批发"
+    },
+    "Books, Magazines & Audio": {
+        "journal": "复古加厚皮质手账本 密码锁日记本",
+        "planner": "时间轴日程本日计划 自律打卡手账",
+        "stationery": "彩色莫兰迪双头荧光笔 刷题速干笔",
+        "marker": "速干彩色标记笔 学生手账高光笔"
+    },
+    "Collectibles": {
+        "card": "球星卡PTCG卡牌收纳册 磁吸卡砖卡夹",
+        "blind box": "潮玩盲盒收纳展示盒 亚克力防尘手办架",
+        "figurine": "动漫PVC手办模型 机甲潮玩摆件"
+    },
+    "Computers & Office Equipment": {
+        "keyboard": "客制化机械键盘 无线三模热插拔轴体",
+        "mouse": "人体工学垂直静音鼠标 双模无线充电",
+        "desk pad": "超大皮质办公桌垫 防水防滑鼠标垫",
+        "stand": "铝合金折叠笔记本支架 升降散热底座"
+    },
+    "Fashion Accessories": {
+        "sunglasses": "Y2K复古墨镜 欧美个性太阳镜 防紫外线",
+        "hat": "复古刺绣棒球帽 弯檐遮阳鸭舌帽",
+        "cap": "潮牌水洗做旧鸭舌帽 户外防晒帽子",
+        "belt": "复古双扣真皮皮带 时尚百搭牛仔裤腰带",
+        "scarf": "仿羊绒纯色加厚保暖围巾 冬季披肩"
+    },
+    "Food & Beverages": {
+        "candy": "彩虹糖脆皮水果软糖 爆浆夹心硬糖",
+        "freeze dried": "冻干草莓脆 水果干无添加 冻干棉花糖",
+        "snack": "网红休闲零食大礼包 办公室解馋小吃",
+        "tea": "花果茶三角茶包 养生排毒玫瑰荷叶茶",
+        "coffee": "冷萃黑咖啡粉 挂耳滤挂原产地咖啡"
+    },
+    "Furniture": {
+        "chair": "人体工学办公电脑椅 电竞椅透气网椅",
+        "desk": "电动升降桌 站立办公桌 简约电脑桌",
+        "table": "简约现代床头小茶几 沙发边几移动角几",
+        "rack": "落地多层置物架 卧室简易衣帽架"
+    },
+    "Health": {
+        "supplement": "高纯度深海鱼油软胶囊 Omega-3 膳食补充剂",
+        "gummy": "褪黑素助眠软糖 晚安睡眠糖",
+        "vitamin": "复合维生素软糖 成人多种维生素矿物质",
+        "magnesium": "甘氨酸镁胶囊 舒缓神经肌肉放松",
+        "posture": "智能感应背部矫正器 防驼背隐形矫正带"
+    },
+    "Home Improvement": {
+        "led": "RGB智能幻彩灯带 音乐律动氛围灯条",
+        "strip": "自粘COB高亮柔性线性灯条 房间吊顶背景墙",
+        "wallpaper": "自粘加厚防水防潮墙纸 3D立体墙贴",
+        "hook": "强力免打孔透明无痕粘钩 门后衣服挂钩"
+    },
+    "Household Appliances": {
+        "steamer": "便携手持挂烫机 家用折叠小型电熨斗",
+        "blender": "便携多功能无线榨汁杯 小型辅食随行搅拌杯",
+        "heater": "桌面小型暖风机 陶瓷PTC快速制热取暖器",
+        "diffuser": "火焰香薰机 超声波加湿器 卧室香氛机",
+        "vacuum": "无线手持车载吸尘器 家用大吸力除螨吸尘机"
+    },
+    "Jewelry Accessories & Derivatives": {
+        "necklace": "定制出生花姓名吊坠项链 18K不锈钢锁骨链",
+        "bracelet": "欧美古巴链手链 钛钢粗链保色手饰",
+        "ring": "莫比乌斯环情侣对戒 S925银微镶开口戒指",
+        "earrings": "法式复古珍珠耳环 纯银耳钉防过敏"
+    },
+    "Kids' Fashion": {
+        "outfit": "儿童纯棉运动两件套 童装韩版卫衣长裤",
+        "pajamas": "儿童竹纤维无骨睡衣 春秋长袖家居服",
+        "dress": "女童公主裙 蓬蓬纱裙 生日礼服裙"
+    },
+    "Luggage & Bags": {
+        "crossbody": "多功能斜挎包 运动防水腰包 胸包",
+        "belt bag": "尼龙纯色腰包 经典百搭胸包 杜邦纸包",
+        "backpack": "大容量干湿分离旅行背包 登机电脑包",
+        "tote": "加厚纯棉帆布托特包 大容量单肩购物袋"
+    },
+    "Modest Fashion": {
+        "abaya": "中东穆斯林长袍 Abaya 时尚开衫迪拜礼拜袍",
+        "hijab": "莫代尔高弹头巾 Hijab 透气防滑围巾",
+        "maxi": "优雅宽松大摆纯色长裙 垂感显瘦长款连衣裙"
+    },
+    "Pre-Owned": {
+        "vintage": "Vintage美式复古水洗做旧牛仔外套",
+        "leather": "古着复古翻领皮夹克 骑士重磅机车服"
+    },
+    "Shoes": {
+        "clog": "EVA厚底洞洞鞋 踩屎感防滑沙滩外穿拖鞋",
+        "slide": "软底防滑浴室凉拖鞋 室内厚底静音拖鞋",
+        "sneaker": "轻便透气飞织运动鞋 软底减震跑步鞋",
+        "boot": "真皮英伦风切尔西短靴 粗跟厚底马丁靴"
+    },
+    "Sports & Outdoor": {
+        "mat": "TPE加厚无味防滑瑜伽垫 健身垫跳绳垫",
+        "band": "高弹力乳胶阻力带 臀圈健身拉力带",
+        "bottle": "户外大容量Tritan运动水杯 防摔带刻度太空杯",
+        "tent": "全自动速开户外露营帐篷 防雨防晒野营装备"
+    },
+    "Textiles & Soft Furnishings": {
+        "rug": "法兰绒吸水印花地垫 浴室门口防滑地毯",
+        "blanket": "加厚双层云毯 羊羔绒保暖午睡毯 沙发盖毯",
+        "pillow": "慢回弹记忆棉护颈枕 蝶形人体工学睡眠枕",
+        "curtain": "高精密全遮光窗帘 隔热降噪成品窗帘"
+    },
+    "Tools and equipment": {
+        "screwdriver": "4V便携电动螺丝刀套装 家用迷你充电式起子",
+        "tool set": "家用多功能五金工具箱 维修电工工具套装",
+        "multitool": "户外不锈钢多功能折叠钳 随身野营多用工具"
+    },
+    "Toys & Hobbies": {
+        "squishy": "慢回弹减压捏捏乐 仿真包子软胶解压玩具",
+        "fidget": "磁力滑块推牌 EDC减压推推乐玩具",
+        "puzzle": "3D立体木质拼图 机械传动拼装模型",
+        "plush": "可爱毛绒公仔 玩偶抱枕 闺蜜生日礼物"
+    },
+    "Virtual Products": {
+        "template": "Notion自律打卡人生管理模板 电子手账",
+        "preset": "Lightroom复古胶片调色预设 摄影滤镜"
+    }
+}
+
 KEYWORDS_1688_MAP = {
     # Oral Care & Whitening
-    "teeth": "紫光美白牙膏 泡沫去黄",
-    "tooth": "电动牙刷 牙齿美白仪",
-    "pulling oil": "椰子油漱口水 口腔清洁",
+    "teeth": "紫光美白牙膏 泡沫去黄 炫白牙贴",
+    "tooth": "电动牙刷 牙齿美白仪 便携冲牙器",
+    "pulling oil": "椰子油漱口水 口腔清洁除口臭",
     "cocomint": "椰子薄荷漱口水 亮白牙齿",
     # Skincare & Beauty
     "toner": "毛孔清洁水杨酸棉片 积雪草爽肤水湿敷贴",
@@ -122,23 +356,61 @@ KEYWORDS_1688_MAP = {
 }
 
 CATEGORY_FALLBACK_1688 = {
+    "Automotive & Motorcycle": "汽车用品 车载内饰 汽摩配件工厂",
+    "Baby & Maternity": "母婴用品 婴儿早教玩具 孕婴童源头工厂",
     "Beauty & Personal Care": "美妆护肤 日化个护 爆款源头工厂",
+    "Books, Magazines & Audio": "文具手账 本册文教 办公文化用品批发",
+    "Collectibles": "潮玩盲盒 手办模型 收藏卡牌货源工厂",
+    "Computers & Office Equipment": "电脑周边 3C数码配件 办公外设源头厂家",
+    "Fashion Accessories": "时尚配饰 潮流帽子 墨镜腰带工厂直供",
+    "Food & Beverages": "休闲零食 网红食品 冻干果干源头工厂",
+    "Furniture": "现代简约家具 电脑椅 电动升降桌源头直供",
+    "Health": "营养保健品 膳食补充剂 康复保健源头工厂",
+    "Home Improvement": "家装建材 氛围灯带 装饰五金源头工厂",
+    "Home Supplies": "居家日用 收纳整理 清洁日化工厂货源",
+    "Household Appliances": "生活小家电 厨房小电器 便携家电源头厂家",
+    "Jewelry Accessories & Derivatives": "流行饰品 钛钢项链手链 饰品源头工厂",
+    "Kids' Fashion": "童装童鞋 儿童家居服 婴幼儿服饰源头直供",
+    "Kitchenware": "厨具餐具 不锈钢保温杯 厨房小工具工厂",
+    "Luggage & Bags": "箱包皮具 时尚双肩包 斜挎腰包工厂直供",
+    "Menswear & Underwear": "男装潮牌 工装裤连帽衫 男士内衣批发",
+    "Modest Fashion": "穆斯林服饰 长袍头巾 优雅长裙工厂货源",
+    "Pet Supplies": "宠物用品 猫狗玩具 美容清洁用品工厂",
+    "Phones & Electronics": "3C数码 手机配件 蓝牙音频源头厂家",
+    "Pre-Owned": "Vintage复古服饰 古着牛仔外套货源",
+    "Shoes": "流行鞋靴 踩屎感拖鞋 运动休闲鞋源头工厂",
+    "Sports & Outdoor": "户外运动 健身器材 露营装备源头工厂",
+    "Textiles & Soft Furnishings": "家纺布艺 地毯地垫 保暖盖毯源头工厂",
+    "Tools and equipment": "五金工具 电动螺丝刀 手动工具套装工厂",
+    "Toys & Hobbies": "解压玩具 潮玩益智 减压积木盲盒货源",
+    "Virtual Products": "数字产品 模板设计 虚拟素材货源",
+    # Legacy alias support:
     "Beauty & Skincare": "护肤美妆 面部护理 源头工厂货源",
-    "Kitchenware": "厨具餐具 厨房日用 不锈钢保温制品",
-    "Home Supplies": "居家日用 收纳整理 清洁日化货源",
     "Home & Kitchen": "家居百货 厨房收纳 源头工厂直供",
     "Home Gadgets": "创意家居 实用日用百货 工厂批发",
-    "Womenswear & Underwear": "女装爆款 瑜伽塑身内衣 运动服饰",
-    "Menswear & Underwear": "男装潮牌 休闲工装 男士内衣批发",
-    "Pet Supplies": "宠物用品 猫狗玩具 美容清洁用品工厂",
-    "Phones & Electronics": "3C数码 数码配件 手机周边 源头厂家",
     "Tech Gadgets": "创意数码 3C数码配件 跨境热销货源",
-    "Jewelry & Accessories": "流行饰品 钛钢项链手链 饰品工厂",
-    "Health & Wellness": "健康养生 营养保健品 代餐膳食",
-    "Automotive & Motorcycle": "汽车用品 车载内饰 汽摩配件工厂",
-    "Sports & Outdoors": "户外运动 健身器材 运动防护用品",
-    "Toys & Hobbies": "解压减压玩具 益智潮玩 盲盒玩具"
+    "Health & Wellness": "健康养生 营养保健品 代餐膳食"
 }
+
+def get_1688_query(title: str, category: str = "", sub_niche: str = "") -> str:
+    t_low = (title or "").lower()
+    
+    # 1. Category-specific precision matching first (prevents "clean" in pet brush matching household detergent)
+    if category in CATEGORY_SPECIFIC_1688:
+        for k, v in CATEGORY_SPECIFIC_1688[category].items():
+            if k in t_low:
+                return v
+
+    # 2. Match longest keyword from global map
+    for k in sorted(KEYWORDS_1688_MAP.keys(), key=len, reverse=True):
+        if k in t_low:
+            return KEYWORDS_1688_MAP[k]
+
+    # 3. Category fallback
+    if category in CATEGORY_FALLBACK_1688:
+        return CATEGORY_FALLBACK_1688[category]
+
+    return "跨境热销 爆款源头工厂直供"
 
 KEYWORDS_ALIBABA_MAP = {
     "toner": "toner pads exfoliating face",
@@ -163,15 +435,6 @@ KEYWORDS_ALIBABA_MAP = {
     "squishy": "steamed bun squishy stress relief toy",
     "curling": "5 in 1 hair styler airwrap curling wand"
 }
-
-def get_1688_query(title: str, category: str = "") -> str:
-    t_low = title.lower()
-    for k, v in KEYWORDS_1688_MAP.items():
-        if k in t_low:
-            return v
-    if category in CATEGORY_FALLBACK_1688:
-        return CATEGORY_FALLBACK_1688[category]
-    return "跨境热销 爆款源头工厂批发"
 
 def get_alibaba_query(title: str) -> str:
     t_low = title.lower()
@@ -1919,14 +2182,41 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
         }}
 
                 // Hàm tra cứu từ khóa tiếng Trung Giản Thể cho 1688
-        const KEYWORDS_1688_MAP_JS = {{"teeth": "紫光美白牙膏 泡沫去黄", "toner": "毛孔清洁水杨酸棉片 爽肤水湿敷贴", "pore": "毛孔细致收缩棉片 清洁去黑头", "towel": "一次性洗脸巾 纯棉加厚 珍珠纹洁面巾", "patch": "水胶体痘痘贴 隐形净痘贴 吸脓透气", "lotion": "身体乳 润肤乳 滋润保湿 香氛身体霜", "lip": "果汁丰唇蜜 水光唇釉 嘟嘟唇油", "curling": "多功能自动卷发棒 负离子热风直卷两用", "tumbler": "不锈钢保温杯 吸管保冷杯 运动便携水杯", "bottle": "不锈钢真空运动水壶 大容量吸管水杯", "scrubber": "电动清洁刷 多功能旋转浴室地砖地毯刷", "pink stuff": "多功能清洁膏 万能去污膏 厨房油污净", "brush": "宠物一键脱毛梳 自动退毛清理梳 猫狗通用", "litter": "膨润土猫砂 结团无尘 低敏除臭除味", "pee": "宠物尿垫 加厚吸水 隔尿垫 狗尿片", "earbuds": "TWS真无线蓝牙耳机 降噪半入耳式", "power bank": "磁吸无线充移动电源 10000mAh快充充电宝", "mic": "无线领夹麦克风 降噪直播收音麦 手机专用", "camera": "4K高清数码相机 翻转屏Vlog微单 学生照相机", "printer": "便携迷你热敏错题打印机 无墨不干胶便签机", "legging": "高腰交叉阔腿瑜伽裤 提臀裸感无缝打底裤", "bodysuit": "无缝塑身衣 连体束腹收腹美体衣", "protein": "乳清分离蛋白粉 健身增肌 代餐冲饮", "greens": "羽衣甘蓝复合果蔬粉 益生菌膳食纤维青汁", "wand": "红光微电流美肤仪 面部提拉导入仪", "inflator": "便携车载充气泵 无线电动轮胎补气打气筒 150PSI"}};
+        // Tra cứu từ khóa tiếng Trung Giản Thể chuẩn xác theo ngành cho 1688
+        const CATEGORY_SPECIFIC_1688_JS = {json.dumps(CATEGORY_SPECIFIC_1688, ensure_ascii=False)};
+        const CATEGORY_FALLBACK_1688_JS = {json.dumps(CATEGORY_FALLBACK_1688, ensure_ascii=False)};
+        const KEYWORDS_1688_MAP_JS = {json.dumps(KEYWORDS_1688_MAP, ensure_ascii=False)};
 
         function get_1688_query(title, category) {{
             const tLow = (title || '').toLowerCase();
-            for (const [k, v] of Object.entries(KEYWORDS_1688_MAP_JS)) {{
-                if (tLow.includes(k)) return v;
+            const cat = category || '';
+            
+            // 1. Kiểm tra chính xác theo từng ngành hàng (tránh trùng từ khóa tổng quát như 'clean')
+            if (cat && CATEGORY_SPECIFIC_1688_JS[cat]) {{
+                for (const [k, v] of Object.entries(CATEGORY_SPECIFIC_1688_JS[cat])) {{
+                    if (tLow.includes(k.toLowerCase())) return v;
+                }}
             }}
-            return "跨境爆款 源头工厂批发";
+            
+            // 2. Tra cứu theo cụm từ dài nhất trước
+            const sortedKeys = Object.keys(KEYWORDS_1688_MAP_JS).sort((a, b) => b.length - a.length);
+            for (const k of sortedKeys) {{
+                if (tLow.includes(k.toLowerCase())) return KEYWORDS_1688_MAP_JS[k];
+            }}
+            
+            // 3. Fallback theo ngành
+            if (cat && CATEGORY_FALLBACK_1688_JS[cat]) {{
+                return CATEGORY_FALLBACK_1688_JS[cat];
+            }}
+            
+            return "跨境爆款 源头工厂直供";
+        }}
+
+        function open1688Search(keyword) {{
+            const qRaw = keyword || '跨境爆款 源头工厂直供';
+            copyKeyword(qRaw, false);
+            const qEnc = encodeURIComponent(qRaw);
+            window.open(`https://www.1688.com/pages/offerlist/search/search.html?keywords=${{qEnc}}`, '_blank', 'noreferrer,noopener');
         }}
 
         function get_alibaba_query(title) {{
@@ -1935,8 +2225,8 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
 
         function openZoom1688() {{
             if (currentZoomedTitle) {{
-                const q = encodeURIComponent(get_1688_query(currentZoomedTitle));
-                window.open(`https://s.1688.com/selloffer/offer_search.htm?keywords=${{q}}&n=y&_input_charset=utf-8`, '_blank', 'noreferrer,noopener');
+                const q = get_1688_query(currentZoomedTitle);
+                open1688Search(q);
             }} else {{
                 window.open('https://s.1688.com/youyuan/index.htm', '_blank', 'noreferrer,noopener');
             }}
@@ -2393,9 +2683,12 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                 <a href="https://www.alibaba.com/trade/search?SearchText=${{qAlibaba}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-[11px] font-black bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 shadow-sm" title="Xưởng Alibaba B2B Quốc Tế (100% Không Bị 403)">
                                     Alibaba
                                 </a>
-                                <a href="https://s.1688.com/selloffer/offer_search.htm?keywords=${{q1688}}&n=y&_input_charset=utf-8" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-[11px] font-bold bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 shadow-sm" title="Xưởng 1688 Nội Địa Trung">
-                                    1688
-                                </a>
+                                <button onclick='open1688Search("${{raw1688}}")' class="text-[11px] font-black bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 shadow-sm flex items-center gap-1 transition" title="Mở Xưởng 1688 (Tự động copy từ khóa)">
+                                    <span>1688</span>
+                                </button>
+                                <button onclick='copyKeyword("${{raw1688}}", true)' class="text-[10px] font-mono text-orange-950 bg-orange-100 hover:bg-orange-200 border border-orange-300 px-1.5 py-0.5 max-w-[130px] truncate" title="Bấm để copy từ khóa tiếng Trung: ${{raw1688}}">
+                                    🇨🇳 ${{raw1688}}
+                                </button>
                                 <button onclick='viewStrategy(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-[11px] font-bold bg-slate-900 hover:bg-slate-800 text-white px-2 py-1">
                                     ${{lang.btn_proof}}
                                 </button>
@@ -2603,6 +2896,9 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                             <span>Tìm Ảnh</span>
                                         </button>
                                     ` : ''}}
+                                    <button onclick='copyKeyword("${{raw1688}}", true)' class="text-xs font-mono text-orange-950 bg-orange-100 hover:bg-orange-200 border border-orange-300 px-2 py-1.5 flex items-center gap-1 transition shadow-sm max-w-[190px] truncate" title="Bấm để copy từ khóa tiếng Trung: ${{raw1688}}">
+                                        <span>🇨🇳 ${{raw1688}}</span>
+                                    </button>
                                     <button onclick='copyKeyword("${{raw1688}}")' class="text-xs font-bold px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 flex items-center gap-1 transition shadow-sm" title="Sao chép từ khóa tiếng Trung">
                                         <i class="ph-bold ph-copy text-xs"></i>
                                         <span>Copy Từ Khóa</span>
@@ -2612,11 +2908,11 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                         <span>Alibaba B2B</span>
                                         <i class="ph-bold ph-arrow-square-out text-xs"></i>
                                     </a>
-                                    <a href="https://s.1688.com/selloffer/offer_search.htm?keywords=${{q1688}}&n=y&_input_charset=utf-8" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-xs font-black px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1.5 transition shadow-sm whitespace-nowrap" title="Xưởng 1688 Nội Địa Trung">
+                                    <button onclick='open1688Search("${{raw1688}}")' class="text-xs font-black px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-1.5 transition shadow-sm whitespace-nowrap" title="Mở Xưởng 1688 (Tự động sao chép từ khóa tiếng Trung)">
                                         <i class="ph-bold ph-factory text-sm"></i>
                                         <span>${{lang.btn_view_1688}}</span>
                                         <i class="ph-bold ph-arrow-square-out text-xs"></i>
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
 
@@ -2723,9 +3019,9 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                 <a href="https://www.alibaba.com/trade/search?SearchText=${{qAlibaba}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs flex items-center gap-1 shadow-sm transition">
                                     <i class="ph-bold ph-globe"></i> ALIBABA B2B (100% KHÔNG 403)
                                 </a>
-                                <a href="https://s.1688.com/selloffer/offer_search.htm?keywords=${{q1688}}&n=y&_input_charset=utf-8" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs flex items-center gap-1 shadow-sm transition">
+                                <button onclick='open1688Search("${{raw1688}}")' class="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs flex items-center gap-1 shadow-sm transition">
                                     <i class="ph-bold ph-factory"></i> MỞ 1688 NỘI ĐỊA
-                                </a>
+                                </button>
                                 <a href="https://s.taobao.com/search?q=${{q1688}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-black text-xs flex items-center gap-1 shadow-sm transition">
                                     TAOBAO
                                 </a>
