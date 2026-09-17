@@ -459,6 +459,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
     data_json = json.dumps(analyzed_data, ensure_ascii=False)
     updated_at = analyzed_data.get("updated_at", datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     stats = analyzed_data.get("stats", {})
+    all_ideas = analyzed_data.get("all_ideas", [])
 
     html_content = f"""<!DOCTYPE html>
 <html lang="vi">
@@ -630,7 +631,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         <i class="ph-bold ph-table text-base text-slate-600 shrink-0"></i>
                         <span data-i18n="tab_all" class="sidebar-text">📊 Tất Cả Ý Tưởng</span>
                     </span>
-                    <span class="sidebar-badge text-[10px] font-black bg-slate-100 text-slate-800 px-1.5 py-0.2 border border-slate-300">{stats.get('total_analyzed', 0)}</span>
+                    <span class="sidebar-badge text-[10px] font-black bg-slate-100 text-slate-800 px-1.5 py-0.2 border border-slate-300">{max(stats.get('total_analyzed', 0), len(all_ideas))}</span>
                 </button>
 
                 <button onclick="switchTab('viral')" id="nav-btn-viral" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-rose-600 text-white border-l-4 border-rose-900" title="🔥 Bùng Nổ 24h">
@@ -832,13 +833,13 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             <div class="flex items-center gap-1 bg-white border border-slate-300 px-1.5 py-0.5">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Dòng:</span>
                                 <select id="leaders-page-size-select" onchange="onLeadersPageSizeChange(this.value)" class="bg-transparent text-[10px] font-black text-slate-800 focus:outline-none cursor-pointer">
-                                    <option value="all" selected>Tối Đa (1000+ Tất Cả)</option>
+                                    <option value="100" selected>100 dòng (Mặc định)</option>
                                     <option value="10">10 dòng</option>
                                     <option value="25">25 dòng</option>
                                     <option value="50">50 dòng</option>
-                                    <option value="100">100 dòng</option>
                                     <option value="250">250 dòng</option>
                                     <option value="500">500 dòng</option>
+                                    <option value="all">Tất Cả (1000+)</option>
                                 </select>
                             </div>
                             <button onclick="switchTab('leaders')" class="text-[10px] font-bold text-rose-700 hover:text-rose-900 flex items-center gap-1 hover:underline bg-rose-100/70 px-2 py-0.5 border border-rose-300" title="Chuyển sang tab riêng chuyên biệt về 2 bảng này">
@@ -900,13 +901,13 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             <div class="flex items-center gap-1 bg-white border border-slate-300 px-1.5 py-0.5">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Dòng:</span>
                                 <select id="leaders-page-size-select-2" onchange="onLeadersPageSizeChange(this.value)" class="bg-transparent text-[10px] font-black text-slate-800 focus:outline-none cursor-pointer">
-                                    <option value="all" selected>Tối Đa (1000+ Tất Cả)</option>
+                                    <option value="100" selected>100 dòng (Mặc định)</option>
                                     <option value="10">10 dòng</option>
                                     <option value="25">25 dòng</option>
                                     <option value="50">50 dòng</option>
-                                    <option value="100">100 dòng</option>
                                     <option value="250">250 dòng</option>
                                     <option value="500">500 dòng</option>
+                                    <option value="all">Tất Cả (1000+)</option>
                                 </select>
                             </div>
                             <button onclick="switchTab('leaders')" class="text-[10px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 hover:underline bg-blue-100/70 px-2 py-0.5 border border-blue-300" title="Chuyển sang tab riêng chuyên biệt về 2 bảng này">
@@ -958,7 +959,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         <i class="ph-bold ph-sparkle text-blue-600 text-base"></i>
                     </div>
                     <div class="text-2xl font-black text-slate-900 leading-tight">+{stats.get('total_new_listings_7d', stats.get('total_new_listings_24h', 0))}</div>
-                    <div class="text-[10px] text-slate-500 font-bold mt-0.5">/ {stats.get('total_analyzed', 0)} tổng sản phẩm</div>
+                    <div class="text-[10px] text-slate-500 font-bold mt-0.5">/ {max(stats.get('total_analyzed', 0), len(all_ideas))} tổng sản phẩm</div>
                 </div>
 
                 <!-- Card 2: 28 Niches Coverage (Purple) -->
@@ -1002,9 +1003,58 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 </div>
             </div>
 
+            <!-- ================= TOOLBAR SẢN PHẨM: BỘ CHỌN SỐ DÒNG (MẶC ĐỊNH 100 DÒNG TOÀN TRANG) & CHUYỂN DẠNG XEM ================= -->
+            <div class="bg-white border-2 border-slate-300 p-2.5 flex items-center justify-between flex-wrap gap-2 shadow-xs mb-3" id="ideas-toolbar">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs font-black uppercase text-slate-900 flex items-center gap-1.5">
+                        <i class="ph-bold ph-chart-line-up text-rose-600 text-sm"></i>
+                        <span id="ideas-toolbar-title">Tất Cả Sản Phẩm Xu Hướng</span>
+                    </span>
+                    <span id="ideas-count-badge" class="text-[10px] font-black bg-rose-100 text-rose-800 px-2 py-0.5 border border-rose-300">
+                        {len(all_ideas)} Sản Phẩm
+                    </span>
+                </div>
+                
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <!-- Bộ chọn số dòng mặc định 100 cho toàn bộ bảng ý tưởng -->
+                    <div class="flex items-center gap-1 bg-white border border-slate-300 px-2 py-1 shadow-2xs">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Dòng:</span>
+                        <select id="main-ideas-page-size-select" onchange="onMainIdeasPageSizeChange(this.value)" class="bg-transparent text-[11px] font-black text-slate-800 focus:outline-none cursor-pointer">
+                            <option value="100" selected>100 dòng (Mặc định)</option>
+                            <option value="10">10 dòng</option>
+                            <option value="25">25 dòng</option>
+                            <option value="50">50 dòng</option>
+                            <option value="250">250 dòng</option>
+                            <option value="500">500 dòng</option>
+                            <option value="all">Tất Cả (1000+)</option>
+                        </select>
+                    </div>
+
+                    <!-- Nút chuyển chế độ xem: Dạng Bảng (Table) vs Dạng Thẻ (Cards) -->
+                    <div class="inline-flex border border-slate-300 bg-slate-100 p-0.5">
+                        <button type="button" onclick="setIdeasViewMode('table')" id="vm-btn-table" class="px-2.5 py-1 text-xs font-black uppercase bg-slate-900 text-white transition flex items-center gap-1" title="Xem dạng bảng ma trận chi tiết">
+                            <i class="ph-bold ph-table"></i> Bảng
+                        </button>
+                        <button type="button" onclick="setIdeasViewMode('cards')" id="vm-btn-cards" class="px-2.5 py-1 text-xs font-bold uppercase text-slate-700 hover:bg-slate-200 transition flex items-center gap-1" title="Xem dạng danh sách thẻ trực quan">
+                            <i class="ph-bold ph-cards"></i> Thẻ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- ================= VIEW 1: HORIZONTAL ROWS LIST ================= -->
             <div id="cards-container" class="flex flex-col gap-3">
                 <!-- Populated via JS -->
+            </div>
+
+            <!-- Pagination footer for Cards View -->
+            <div id="ideas-cards-pagination" class="p-2.5 bg-slate-50 border-2 border-slate-300 flex items-center justify-between text-xs flex-wrap gap-2 mt-2 hidden">
+                <div id="ideas-cards-page-info" class="text-[11px] font-bold text-slate-600">
+                    Hiển thị 1 - 100 / {len(all_ideas)} sản phẩm
+                </div>
+                <div class="flex items-center gap-1" id="ideas-cards-pagination-btns">
+                    <!-- Populated dynamically via JS -->
+                </div>
             </div>
 
             <!-- ================= VIEW 2: TABLE MATRIX ================= -->
@@ -1012,23 +1062,32 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 <table class="w-full text-left border-collapse text-xs">
                     <thead class="bg-slate-100 text-slate-700 uppercase font-black border-b-2 border-slate-300">
                         <tr>
-                            <th class="py-3 px-3 w-16 text-center">Hạng (#)</th>
-                            <th class="py-3 px-3 text-center" data-i18n="th_sparkline">Quỹ Đạo Trend</th>
-                            <th class="py-3 px-4" data-i18n="th_product">Sản Phẩm & Từ Khóa</th>
-                            <th class="py-3 px-3">Tag / Nhãn</th>
-                            <th class="py-3 px-4" data-i18n="th_niche">Ngành Hàng</th>
-                            <th class="py-3 px-3 text-center" id="th-sales-col">Bán Khung Giờ</th>
-                            <th class="py-3 px-3 text-center" data-i18n="th_eds_daily">Dự Báo EDS (Ngày)</th>
-                            <th class="py-3 px-3 text-center" data-i18n="th_est_monthly">Doanh Thu Tháng (Est)</th>
-                            <th class="py-3 px-3 text-center" data-i18n="th_price">Giá Bán</th>
-                            <th class="py-3 px-4" data-i18n="th_saved_by">Người Lưu Trong Team</th>
-                            <th class="py-3 px-4" data-i18n="th_actions">Thao Tác</th>
+                            <th class="py-3 px-3 w-16 text-center whitespace-nowrap">Hạng (#)</th>
+                            <th class="py-3 px-3 text-center whitespace-nowrap min-w-[80px]" data-i18n="th_sparkline">Quỹ Đạo Trend</th>
+                            <th class="py-3 px-4 min-w-[260px]" data-i18n="th_product">Sản Phẩm & Từ Khóa</th>
+                            <th class="py-3 px-3 whitespace-nowrap min-w-[120px]">Tag / Nhãn</th>
+                            <th class="py-3 px-4 min-w-[160px]" data-i18n="th_niche">Ngành Hàng</th>
+                            <th class="py-3 px-3 text-center whitespace-nowrap min-w-[110px]" id="th-sales-col">Bán Khung Giờ</th>
+                            <th class="py-3 px-3 text-center whitespace-nowrap min-w-[120px]" data-i18n="th_eds_daily">Dự Báo EDS (Ngày)</th>
+                            <th class="py-3 px-3 text-center whitespace-nowrap min-w-[120px]" data-i18n="th_est_monthly">Doanh Thu Tháng (Est)</th>
+                            <th class="py-3 px-3 text-center whitespace-nowrap min-w-[80px]" data-i18n="th_price">Giá Bán</th>
+                            <th class="py-3 px-4 min-w-[140px]" data-i18n="th_saved_by">Người Lưu Trong Team</th>
+                            <th class="py-3 px-4 min-w-[240px] whitespace-nowrap text-center" data-i18n="th_actions">Thao Tác</th>
                         </tr>
                     </thead>
                     <tbody id="table-body" class="divide-y divide-slate-200">
                         <!-- Populated via JS -->
                     </tbody>
                 </table>
+                <!-- Pagination footer for Table View -->
+                <div class="p-2.5 bg-slate-50 border-t-2 border-slate-300 flex items-center justify-between text-xs flex-wrap gap-2">
+                    <div id="ideas-table-page-info" class="text-[11px] font-bold text-slate-600">
+                        Hiển thị 1 - 100 / {len(all_ideas)} sản phẩm
+                    </div>
+                    <div class="flex items-center gap-1" id="ideas-table-pagination-btns">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
             </div>
 
             <!-- ================= VIEW 3: TIKTOK VIRAL SOUNDS RADAR ================= -->
@@ -1585,7 +1644,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
         // 3. TOP 24H LEADERS RENDERER (TOP VIDEOS GMV & TOP INFLUENCERS) WITH CUSTOM PAGE SIZE & SYNC
         let topVideosPage = 1;
         let topInfluencersPage = 1;
-        let leadersPageSize = 'all'; // Mặc định hiển thị Tối Đa (Tất cả) theo yêu cầu!
+        let leadersPageSize = 100; // Mặc định hiển thị tối đa 100 dòng ở tất cả các bảng!
 
         function onLeadersPageSizeChange(val) {{
             leadersPageSize = val;
@@ -1618,6 +1677,81 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             const catVal = document.getElementById('category-select').value;
             const subVal = document.getElementById('subniche-select').value;
             renderTopLeaders(catVal, subVal, searchVal);
+        }}
+
+
+        // --- SPARKLING SVG GENERATOR & 100-ROW PAGINATION SYSTEM ---
+        function generateSparklineSvg(sparklineData, isBreakout, width = 64, height = 22) {{
+            let pts = [];
+            if (Array.isArray(sparklineData) && sparklineData.length > 0) {{
+                pts = sparklineData.map(Number).filter(n => !isNaN(n));
+            }} else if (typeof sparklineData === 'string' && sparklineData.includes(' ')) {{
+                pts = sparklineData.trim().split(/\\s+/).map(p => {{
+                    const parts = p.split(',');
+                    return parts.length > 1 ? Number(parts[1]) : 10;
+                }}).filter(n => !isNaN(n));
+            }}
+            if (!pts || pts.length < 2) {{
+                pts = isBreakout ? [20, 16, 12, 6, 2] : [18, 15, 14, 8, 4];
+            }}
+            
+            const minVal = Math.min(...pts);
+            const maxVal = Math.max(...pts);
+            const range = (maxVal - minVal) || 1;
+            const stepX = (width - 8) / (pts.length - 1);
+            
+            const coords = pts.map((val, idx) => {{
+                const x = Math.round(4 + idx * stepX);
+                const norm = (val - minVal) / range;
+                const y = Math.round(height - 4 - norm * (height - 8));
+                return {{ x, y }};
+            }});
+            
+            const pointsStr = coords.map(c => `${{c.x}},${{c.y}}`).join(' ');
+            const lastCoord = coords[coords.length - 1];
+            const strokeColor = isBreakout ? '#e11d48' : '#059669';
+            const fillColor = isBreakout ? 'rgba(225,29,72,0.14)' : 'rgba(5,150,105,0.14)';
+            const areaPoints = `${{coords[0].x}},${{height - 1}} ` + pointsStr + ` ${{lastCoord.x}},${{height - 1}}`;
+            
+            return `
+            <svg width="${{width}}" height="${{height}}" viewBox="0 0 ${{width}} ${{height}}" class="overflow-visible inline-block">
+                <polygon fill="${{fillColor}}" points="${{areaPoints}}" />
+                <polyline fill="none" stroke="${{strokeColor}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${{pointsStr}}" />
+                <circle cx="${{lastCoord.x}}" cy="${{lastCoord.y}}" r="2.5" fill="${{strokeColor}}" />
+            </svg>`;
+        }}
+
+        let mainIdeasPageSize = 100; // Mặc định hiển thị tối đa 100 dòng ở tất cả các bảng
+        let mainIdeasCurrentPage = 1;
+        let ideasViewMode = 'table'; // Mặc định dạng Bảng (Table) ở tab tất cả ý tưởng
+
+        function onMainIdeasPageSizeChange(val) {{
+            mainIdeasPageSize = val;
+            mainIdeasCurrentPage = 1;
+            filterItems();
+        }}
+
+        function changeMainIdeasPage(p) {{
+            mainIdeasCurrentPage = p;
+            filterItems();
+            const targetEl = document.getElementById('ideas-toolbar') || document.getElementById('table-container');
+            if (targetEl) targetEl.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+        }}
+
+        function setIdeasViewMode(mode) {{
+            ideasViewMode = mode;
+            const btnTable = document.getElementById('vm-btn-table');
+            const btnCards = document.getElementById('vm-btn-cards');
+            if (btnTable && btnCards) {{
+                if (mode === 'table') {{
+                    btnTable.className = "px-2.5 py-1 text-xs font-black uppercase bg-slate-900 text-white transition flex items-center gap-1";
+                    btnCards.className = "px-2.5 py-1 text-xs font-bold uppercase text-slate-700 hover:bg-slate-200 transition flex items-center gap-1";
+                }} else {{
+                    btnCards.className = "px-2.5 py-1 text-xs font-black uppercase bg-slate-900 text-white transition flex items-center gap-1";
+                    btnTable.className = "px-2.5 py-1 text-xs font-bold uppercase text-slate-700 hover:bg-slate-200 transition flex items-center gap-1";
+                }}
+            }}
+            filterItems();
         }}
 
         function renderTopLeaders(catFilter, subFilter, searchVal) {{
@@ -2833,10 +2967,79 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 return;
             }}
 
+            // Compute pagination for ideas (default 100 items per page across all tables)
+            const ideaPageSize = mainIdeasPageSize === 'all' ? 99999 : parseInt(mainIdeasPageSize, 10);
+            const totalIdeaPages = Math.max(1, Math.ceil(itemsToRender.length / ideaPageSize));
+            if (mainIdeasCurrentPage > totalIdeaPages) mainIdeasCurrentPage = totalIdeaPages;
+            if (mainIdeasCurrentPage < 1) mainIdeasCurrentPage = 1;
+            const startIdeaIdx = (mainIdeasCurrentPage - 1) * ideaPageSize;
+            const pagedItems = itemsToRender.slice(startIdeaIdx, startIdeaIdx + ideaPageSize);
+
+            const ideasCountBadge = document.getElementById('ideas-count-badge');
+            if (ideasCountBadge) ideasCountBadge.innerText = `${{itemsToRender.length.toLocaleString()}} Sản Phẩm`;
+
+            const cardsPagination = document.getElementById('ideas-cards-pagination');
+
+            function renderIdeaPagination(infoId, btnsId, totalCount, start, pSize, curPage, totalPgs) {{
+                const infoEl = document.getElementById(infoId);
+                const btnsEl = document.getElementById(btnsId);
+                if (!infoEl || !btnsEl) return;
+                const end = Math.min(start + pSize, totalCount);
+                if (totalCount === 0) {{
+                    infoEl.innerText = currentLang === 'vi' ? '0 sản phẩm' : '0 products';
+                    btnsEl.innerHTML = '';
+                    return;
+                }}
+                if (mainIdeasPageSize === 'all' || totalPgs <= 1) {{
+                    infoEl.innerText = currentLang === 'vi' 
+                        ? `Hiển thị toàn bộ ${{totalCount.toLocaleString()}} / ${{totalCount.toLocaleString()}} sản phẩm`
+                        : `Showing all ${{totalCount.toLocaleString()}} products`;
+                    btnsEl.innerHTML = `<span class="px-2 py-0.5 bg-slate-100 text-slate-400 text-[10px] font-bold border border-slate-200 uppercase">${{currentLang === 'vi' ? 'Đã mở toàn bộ' : 'All Rows Shown'}}</span>`;
+                }} else {{
+                    infoEl.innerText = currentLang === 'vi'
+                        ? `Hiển thị ${{(start + 1).toLocaleString()}} - ${{end.toLocaleString()}} / ${{totalCount.toLocaleString()}} sản phẩm (Trang ${{curPage}}/${{totalPgs}})`
+                        : `Showing ${{(start + 1).toLocaleString()}} - ${{end.toLocaleString()}} of ${{totalCount.toLocaleString()}} products (Page ${{curPage}}/${{totalPgs}})`;
+                    btnsEl.innerHTML = `
+                        <button onclick="changeMainIdeasPage(1)" ${{curPage <= 1 ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang đầu">
+                            &laquo;
+                        </button>
+                        <button onclick="changeMainIdeasPage(${{curPage - 1}})" ${{curPage <= 1 ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang trước">
+                            &lsaquo;
+                        </button>
+                        <span class="px-2.5 py-0.5 bg-slate-100 border border-slate-300 text-[10px] font-bold font-mono">
+                            ${{curPage}} / ${{totalPgs}}
+                        </span>
+                        <button onclick="changeMainIdeasPage(${{curPage + 1}})" ${{curPage >= totalPgs ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang sau">
+                            &rsaquo;
+                        </button>
+                        <button onclick="changeMainIdeasPage(${{totalPgs}})" ${{curPage >= totalPgs ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang cuối">
+                            &raquo;
+                        </button>
+                    `;
+                }}
+            }}
+
+            const showAsTable = (currentTab === 'all') || (ideasViewMode === 'table');
+
             // Render Table or Cards
-            if (currentTab === 'all') {{
+            if (showAsTable) {{
                 tableContainer.classList.remove('hidden');
-                document.getElementById('table-body').innerHTML = itemsToRender.map(it => {{
+                cardsContainer.classList.add('hidden');
+                if (cardsPagination) cardsPagination.classList.add('hidden');
+
+                if (itemsToRender.length === 0) {{
+                    document.getElementById('table-body').innerHTML = `
+                        <tr>
+                            <td colspan="11" class="py-12 text-center text-slate-400 font-bold text-xs">
+                                ${{currentLang === 'vi' ? 'Không có sản phẩm nào phù hợp với bộ lọc hiện tại' : 'No products match the selected filters'}}
+                            </td>
+                        </tr>
+                    `;
+                    renderIdeaPagination('ideas-table-page-info', 'ideas-table-pagination-btns', 0, 0, ideaPageSize, 1, 1);
+                    return;
+                }}
+
+                document.getElementById('table-body').innerHTML = pagedItems.map((it, idx) => {{
                     const mySaved = isSavedByCurrentUser(it);
                     const savers = getTeamSavers(it);
                     const q1688 = encodeURIComponent(it.query_1688 || get_1688_query(it.title));
@@ -2846,6 +3049,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     const s30d = it.sales_30d || (s24h * 15);
                     const isNew = it.is_new_listing_24h || (it.tags && it.tags.includes('NEW_LISTING_24H'));
                     const rankCat = it.rank_in_category || 1;
+                    const rankOverall = it.rank_overall || (startIdeaIdx + idx + 1);
                     const keywords = it.keywords || [];
 
                     let currentSales = s24h;
@@ -2865,35 +3069,26 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         tfLabel = "60d";
                     }}
 
-                    let sparkPoints = "0,20 15,16 30,12 45,7 60,3";
-                    if (Array.isArray(it.sparkline_points)) {{
-                        const xs = [0, 15, 30, 45, 60];
-                        sparkPoints = it.sparkline_points.map((y, i) => `${{xs[i] || i*15}},${{Math.max(2, 28 - (Number(y) || 10))}}`).join(' ');
-                    }} else if (typeof it.sparkline_points === 'string' && it.sparkline_points.includes(' ')) {{
-                        sparkPoints = it.sparkline_points;
-                    }}
                     const isBreakout = it.surge_type === 'BREAKOUT_V3';
-                    const sparkColor = isBreakout ? '#e11d48' : '#059669';
+                    const sparkSvg = generateSparklineSvg(it.sparkline_points, isBreakout, 64, 22);
                     const estEds = (it.est_daily_sales || s24h);
                     const estRev = Math.round(it.est_monthly_rev || (s30d * (it.price_val || 25)));
 
                     return `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-200">
-                        <td class="py-3 px-3 text-center">
+                        <td class="py-3 px-3 text-center whitespace-nowrap">
                             <div class="flex flex-col items-center">
-                                <span class="inline-block bg-amber-400 text-slate-950 font-mono font-black px-2 py-0.5 border border-amber-500 text-xs shadow-xs" title="Hạng #${{it.rank_overall || rankCat}} toàn sàn">#${{it.rank_overall || rankCat}}</span>
+                                <span class="inline-block bg-amber-400 text-slate-950 font-mono font-black px-2 py-0.5 border border-amber-500 text-xs shadow-xs" title="Hạng #${{rankOverall}} toàn sàn">#${{rankOverall}}</span>
                                 <span class="text-[9px] text-slate-500 font-semibold mt-0.5 whitespace-nowrap">Top #${{rankCat}} ${{it.category ? it.category.split(' ')[0] : ''}}</span>
                             </div>
                         </td>
-                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                        <td class="py-3 px-3 text-center whitespace-nowrap min-w-[80px]">
                             <div class="inline-flex flex-col items-center">
-                                <svg width="56" height="18" viewBox="0 0 60 24" class="overflow-visible">
-                                    <polyline fill="none" stroke="${{sparkColor}}" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" points="${{sparkPoints}}" />
-                                </svg>
+                                ${{sparkSvg}}
                                 <span class="text-[10px] font-mono font-bold ${{isBreakout ? 'text-rose-600' : 'text-emerald-700'}}">${{it.rank_gain_text || '↗ Surge'}}</span>
                             </div>
                         </td>
-                        <td class="py-3 px-4 max-w-xs">
+                        <td class="py-3 px-4 min-w-[260px] max-w-sm">
                             <a href="${{it.url && it.url !== '#' ? it.url : ('https://www.tiktok.com/search?q=' + encodeURIComponent(it.title))}}" target="_blank" rel="noreferrer noopener" class="font-bold text-slate-900 hover:text-rose-600 transition truncate text-xs block" title="${{it.title}}">${{it.title}}</a>
                             ${{keywords.length > 0 ? `
                                 <div class="flex items-center gap-1 flex-wrap mt-1">
@@ -2901,7 +3096,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                 </div>
                             ` : ''}}
                         </td>
-                        <td class="py-3 px-3 whitespace-nowrap">
+                        <td class="py-3 px-3 whitespace-nowrap min-w-[120px]">
                             ${{isBreakout ? `
                                 <span class="text-[10px] font-black uppercase px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-400 inline-flex items-center gap-1 shadow-xs">
                                     <i class="ph-bold ph-lightning text-rose-600"></i> ${{it.surge_badge || '⚡ BREAKOUT V3'}}
@@ -2920,41 +3115,41 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                 </span>
                             `))}}
                         </td>
-                        <td class="py-3 px-4 text-slate-600 font-medium">
+                        <td class="py-3 px-4 min-w-[160px] text-slate-600 font-medium">
                             <div class="font-bold text-slate-800">${{it.category || 'General'}}</div>
                             <div class="text-[10px] text-slate-500">${{it.sub_niche || ''}}</div>
                         </td>
-                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                        <td class="py-3 px-3 text-center whitespace-nowrap min-w-[110px]">
                             <div class="font-black text-rose-600 text-xs">${{currentSales.toLocaleString()}} đơn</div>
                             <div class="text-[10px] text-slate-500 font-bold">+$${{currentGmv.toLocaleString()}} (${{tfLabel}})</div>
                         </td>
-                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                        <td class="py-3 px-3 text-center whitespace-nowrap min-w-[120px]">
                             <div class="font-black text-indigo-700 text-xs">${{estEds.toLocaleString()}} <span class="text-[9px] text-slate-500 font-normal">đơn/ngày</span></div>
                             <div class="text-[9px] text-indigo-600 font-bold bg-indigo-50 border border-indigo-200 px-1 inline-block">Conf: ${{it.eds_confidence || '98%'}}</div>
                         </td>
-                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                        <td class="py-3 px-3 text-center whitespace-nowrap min-w-[120px]">
                             <div class="font-black text-emerald-700 text-xs">$${{estRev.toLocaleString()}}</div>
                             <div class="text-[9px] text-slate-500">Doanh thu dự kiến</div>
                         </td>
-                        <td class="py-3 px-3 font-extrabold text-slate-900 text-center">${{it.price || it.clean_price}}</td>
-                        <td class="py-3 px-4">
+                        <td class="py-3 px-3 font-extrabold text-slate-900 text-center whitespace-nowrap min-w-[80px]">${{it.price || it.clean_price}}</td>
+                        <td class="py-3 px-4 min-w-[140px]">
                             ${{savers.length > 0 ? savers.map(s => `<span class="inline-block bg-blue-100 text-blue-800 border border-blue-300 text-[10px] font-bold px-1.5 py-0.5 mr-1">${{s}}</span>`).join('') : '<span class="text-slate-400 text-[11px]">-</span>'}}
                         </td>
-                        <td class="py-3 px-4">
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <button onclick='toggleSaveTrend(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-[11px] font-black px-2 py-1 border ${{mySaved ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'}}">
+                        <td class="py-3 px-4 min-w-[240px] whitespace-nowrap text-center">
+                            <div class="flex items-center justify-center gap-1.5 flex-nowrap">
+                                <button onclick='toggleSaveTrend(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-[11px] font-black px-2 py-1 border whitespace-nowrap ${{mySaved ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'}}">
                                     ${{mySaved ? lang.btn_saved_me : lang.btn_save_me}}
                                 </button>
-                                <a href="https://www.alibaba.com/trade/search?SearchText=${{qAlibaba}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-[11px] font-black bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 shadow-sm" title="Xưởng Alibaba B2B Quốc Tế (100% Không Bị 403)">
+                                <a href="https://www.alibaba.com/trade/search?SearchText=${{qAlibaba}}" target="_blank" rel="noreferrer noopener" referrerpolicy="no-referrer" class="text-[11px] font-black bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 shadow-sm whitespace-nowrap" title="Xưởng Alibaba B2B Quốc Tế (100% Không Bị 403)">
                                     Alibaba
                                 </a>
-                                <button onclick='open1688Search("${{raw1688}}")' class="text-[11px] font-black bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 shadow-sm flex items-center gap-1 transition" title="Mở Xưởng 1688 (Tự động copy từ khóa)">
+                                <button onclick='open1688Search("${{raw1688}}")' class="text-[11px] font-black bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 shadow-sm flex items-center gap-1 whitespace-nowrap" title="Mở Xưởng 1688 (Tự động copy từ khóa)">
                                     <span>1688</span>
                                 </button>
-                                <button onclick='copyKeyword("${{raw1688}}", true)' class="text-[10px] font-mono text-orange-950 bg-orange-100 hover:bg-orange-200 border border-orange-300 px-1.5 py-0.5 max-w-[130px] truncate" title="Bấm để copy từ khóa tiếng Trung: ${{raw1688}}">
+                                <button onclick='copyKeyword("${{raw1688}}", true)' class="text-[10px] font-mono text-orange-950 bg-orange-100 hover:bg-orange-200 border border-orange-300 px-1.5 py-0.5 max-w-[110px] truncate whitespace-nowrap" title="Bấm để copy từ khóa tiếng Trung: ${{raw1688}}">
                                     🇨🇳 ${{raw1688}}
                                 </button>
-                                <button onclick='viewStrategy(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-[11px] font-bold bg-slate-900 hover:bg-slate-800 text-white px-2 py-1">
+                                <button onclick='viewStrategy(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-[11px] font-bold bg-slate-900 hover:bg-slate-800 text-white px-2 py-1 whitespace-nowrap">
                                     ${{lang.btn_proof}}
                                 </button>
                             </div>
@@ -2962,8 +3157,12 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     </tr>
                     `;
                 }}).join('');
+
+                renderIdeaPagination('ideas-table-page-info', 'ideas-table-pagination-btns', itemsToRender.length, startIdeaIdx, ideaPageSize, mainIdeasCurrentPage, totalIdeaPages);
             }} else {{
                 cardsContainer.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+                if (cardsPagination) cardsPagination.classList.remove('hidden');
                 
                 if (itemsToRender.length === 0) {{
                     cardsContainer.innerHTML = `
@@ -2977,10 +3176,11 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             </button>
                         </div>
                     `;
+                    renderIdeaPagination('ideas-cards-page-info', 'ideas-cards-pagination-btns', 0, 0, ideaPageSize, 1, 1);
                     return;
                 }}
 
-                cardsContainer.innerHTML = itemsToRender.map(it => {{
+                cardsContainer.innerHTML = pagedItems.map(it => {{
                     const isViral = it.classification === 'VIRAL_SPIKE_24H';
                     const strat = it.strategy || {{}};
                     const mySaved = isSavedByCurrentUser(it);
@@ -3012,15 +3212,8 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         tfLabel = "60 Ngày";
                     }}
 
-                    let sparkPoints = "0,20 15,16 30,12 45,7 60,3";
-                    if (Array.isArray(it.sparkline_points)) {{
-                        const xs = [0, 15, 30, 45, 60];
-                        sparkPoints = it.sparkline_points.map((y, i) => `${{xs[i] || i*15}},${{Math.max(2, 28 - (Number(y) || 10))}}`).join(' ');
-                    }} else if (typeof it.sparkline_points === 'string' && it.sparkline_points.includes(' ')) {{
-                        sparkPoints = it.sparkline_points;
-                    }}
                     const isBreakout = it.surge_type === 'BREAKOUT_V3';
-                    const sparkColor = isBreakout ? '#e11d48' : '#059669';
+                    const sparkSvg = generateSparklineSvg(it.sparkline_points, isBreakout, 72, 24);
                     const estEds = (it.est_daily_sales || s24h);
                     const estRev = Math.round(it.est_monthly_rev || (s30d * (it.price_val || 25)));
 
@@ -3038,105 +3231,79 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                             <!-- HÀNG 1: HUY HIỆU TRẠNG THÁI, MERCHTRENDS SPARKLINE & THAO TÁC -->
                             <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="text-xs font-black uppercase px-2 py-0.5 bg-amber-400 text-slate-950 border border-amber-500 font-mono shadow-xs" title="Thứ hạng #${{it.rank_overall || rankCat}} toàn sàn">
-                                        HẠNG #${{it.rank_overall || rankCat}} TOÀN SÀN
+                                    <span class="inline-block bg-amber-400 text-slate-950 font-mono font-black px-2 py-0.5 border border-amber-500 text-xs shadow-xs" title="Hạng #${{it.rank_overall || rankCat}} toàn sàn">
+                                        #${{it.rank_overall || rankCat}}
                                     </span>
-                                    <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 border border-slate-300">
-                                        Top #${{rankCat}} ${{it.category ? it.category.split(' ')[0] : 'Ngành'}}
-                                    </span>
-                                    
-                                    <!-- MerchTrends Inline Sparkline -->
-                                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-50 border border-slate-300" title="Quỹ đạo tăng trưởng rank 30d -> 14d -> 7d -> 3d -> nay">
-                                        <svg width="52" height="18" viewBox="0 0 60 24" class="overflow-visible">
-                                            <polyline fill="none" stroke="${{sparkColor}}" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" points="${{sparkPoints}}" />
-                                        </svg>
-                                        <span class="text-[10px] font-mono font-bold ${{isBreakout ? 'text-rose-600' : 'text-emerald-700'}}">${{it.rank_gain_text || '↗ Surge'}}</span>
-                                    </div>
-
-                                    ${{isBreakout ? `
-                                        <span class="text-xs font-black uppercase px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-400 flex items-center gap-1 shadow-xs">
-                                            <i class="ph-bold ph-lightning text-rose-600"></i> ${{it.surge_badge || '⚡ BREAKOUT V3'}}
-                                        </span>
-                                    ` : (it.surge_type === 'SUSTAINED_MOVER' ? `
-                                        <span class="text-xs font-black uppercase px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-400 flex items-center gap-1 shadow-xs">
-                                            <i class="ph-bold ph-trend-up text-blue-600"></i> ${{it.surge_badge || '🚀 SUSTAINED'}}
-                                        </span>
-                                    ` : '')}}
-
-                                    ${{isNew ? `
-                                        <span class="text-xs font-black uppercase px-2 py-0.5 bg-purple-100 text-purple-900 border border-purple-400 flex items-center gap-1">
-                                            <i class="ph-bold ph-sparkle text-purple-600"></i>
-                                            <span>✨ MỚI LISTING &lt;24H</span>
-                                        </span>
-                                    ` : ''}}
-                                    <span class="text-xs font-black uppercase px-2.5 py-1 border whitespace-nowrap ${{isViral ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}}">
+                                    <span class="text-xs font-black uppercase px-2.5 py-1 border ${{isViral ? 'bg-rose-600 text-white border-rose-700' : 'bg-emerald-600 text-white border-emerald-700'}}">
                                         ${{it.label}}
                                     </span>
+                                    ${{isNew ? `
+                                        <span class="text-xs font-black uppercase px-2.5 py-1 bg-purple-600 text-white border border-purple-700 inline-flex items-center gap-1 shadow-xs">
+                                            <i class="ph-bold ph-sparkle text-white"></i> ✨ MỚI LISTING <24H
+                                        </span>
+                                    ` : ''}}
                                     ${{velBadge}}
-                                    <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 border border-slate-200">
-                                        ${{it.category || 'Niche'}} ${{it.sub_niche ? '· ' + it.sub_niche : ''}}
+                                    <span class="text-xs font-bold text-slate-500 border-l border-slate-300 pl-2">
+                                        ${{it.category}} ${{it.sub_niche ? `&bull; ${{it.sub_niche}}` : ''}}
                                     </span>
-                                    <span class="text-[11px] font-bold text-slate-400 hidden sm:inline">| Toàn Sàn #${{it.rank_overall || 1}}</span>
                                 </div>
 
-                                <div class="flex items-center gap-2">
-                                    ${{savers.length > 0 ? `<span class="text-xs font-black text-blue-700 bg-blue-50 px-2.5 py-1 border border-blue-200">Team: ${{savers.join(', ')}}</span>` : ''}}
-                                    <button onclick='toggleSaveTrend(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-xs font-black px-3 py-1 border ${{mySaved ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'}} transition flex items-center gap-1">
-                                        <i class="ph-bold ${{mySaved ? 'ph-check-square text-amber-700' : 'ph-plus-square text-slate-600'}}"></i>
-                                        <span>${{mySaved ? lang.btn_saved_me : lang.btn_save_me}}</span>
-                                    </button>
-                                    <button onclick='viewStrategy(${{JSON.stringify(it).replace(/'/g, "&apos;") }})' class="text-xs font-bold px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1 transition">
-                                        <i class="ph-bold ph-shield-check text-emerald-400"></i>
+                                <div class="flex items-center gap-3">
+                                    <!-- Sparkline Trendline V3 -->
+                                    <div class="hidden sm:flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2 py-1">
+                                        ${{sparkSvg}}
+                                        <span class="text-xs font-mono font-bold ${{isBreakout ? 'text-rose-600' : 'text-emerald-700'}}">${{it.rank_gain_text || '↗ Surge'}}</span>
+                                    </div>
+
+                                    <!-- Nút Lưu Đơn / Multi-user Team Savers -->
+                                    <div class="flex items-center gap-1">
+                                        <button onclick='toggleSaveTrend(${{JSON.stringify(it).replace(/'/g, "&apos;")}})' class="text-xs font-bold px-3 py-1.5 border flex items-center gap-1 transition shadow-sm ${{mySaved ? 'bg-amber-100 border-amber-400 text-amber-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'}}">
+                                            <i class="ph-bold ph-bookmark-simple"></i>
+                                            <span>${{mySaved ? lang.btn_saved_me : lang.btn_save_me}}</span>
+                                        </button>
+                                        ${{savers.length > 0 ? `
+                                            <span class="text-[11px] font-bold text-slate-500 bg-slate-100 border border-slate-300 px-2 py-1" title="Những người trong team đã lưu xu hướng này">
+                                                <i class="ph-bold ph-users text-xs mr-0.5"></i> ${{savers.join(', ')}}
+                                            </span>
+                                        ` : ''}}
+                                    </div>
+
+                                    <button onclick='viewStrategy(${{JSON.stringify(it).replace(/'/g, "&apos;")}})' class="text-xs font-black uppercase px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1 shadow-sm transition">
+                                        <i class="ph-bold ph-shield-check text-sm text-emerald-400"></i>
                                         <span>${{lang.btn_proof}}</span>
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- HÀNG 2: THÔNG TIN SẢN PHẨM & GÓC HOOK 3 GIÂY -->
-                            <div class="py-4 space-y-2">
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="flex items-center gap-3">
-                                        ${{it.image ? `
-                                            <div class="w-14 h-14 shrink-0 bg-slate-100 border-2 border-slate-300 hover:border-rose-600 p-1 flex items-center justify-center relative group cursor-zoom-in transition" onclick='zoomProductImage("${{it.image}}", "${{(it.title || "").replace(/"/g, "&quot;").replace(/'/g, "\'")}}")' title="Bấm để phóng to xem ảnh trực tiếp">
-                                                <img src="${{it.image}}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format&fit=crop&q=60';" class="w-full h-full object-contain" alt="">
-                                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-black">
-                                                    <i class="ph-bold ph-magnifying-glass-plus text-base"></i>
-                                                </div>
-                                            </div>
-                                        ` : ''}}
-                                        <div>
-                                            <h3 class="text-base sm:text-lg font-black text-slate-900 leading-snug tracking-tight hover:text-rose-600 transition">
-                                                <a href="${{it.url && it.url !== '#' ? it.url : ('https://www.tiktok.com/search?q=' + encodeURIComponent(it.title))}}" target="_blank" rel="noreferrer noopener" class="flex items-center gap-1.5">
-                                                    <span>${{it.title}}</span>
-                                                    <i class="ph-bold ph-arrow-square-out text-sm text-slate-400"></i>
-                                                </a>
-                                            </h3>
-                                            ${{keywords.length > 0 ? `
-                                                <div class="flex items-center gap-1.5 flex-wrap pt-1">
-                                                    <span class="text-[10px] font-black uppercase text-slate-400">Từ khóa:</span>
-                                                    ${{keywords.map(kw => `
-                                                        <div class="inline-flex items-center border border-slate-200 bg-slate-100 hover:bg-slate-200 transition">
-                                                            <button type="button" onclick="searchByKeyword('${{kw}}', event)" class="text-[11px] font-semibold text-slate-700 px-2 py-0.5">
-                                                                #${{kw}}
-                                                            </button>
-                                                            <a href="https://www.tiktok.com/search?q=${{encodeURIComponent(kw)}}" target="_blank" rel="noreferrer noopener" class="px-1 text-slate-400 hover:text-rose-600 border-l border-slate-200" title="Mở tìm kiếm #${{kw}} trên TikTok">
-                                                                <i class="ph-bold ph-magnifying-glass text-[10px]"></i>
-                                                            </a>
-                                                        </div>
-                                                    `).join('')}}
-                                                </div>
-                                            ` : ''}}
+                            <!-- HÀNG 2: TIÊU ĐỀ, NGUỒN CÀO & TỪ KHÓA TIKTOK HOT -->
+                            <div class="py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                <div class="flex-1">
+                                    <h3 class="text-base font-black text-slate-900 leading-snug">
+                                        <a href="${{it.url && it.url !== '#' ? it.url : ('https://www.tiktok.com/search?q=' + encodeURIComponent(it.title))}}" target="_blank" rel="noreferrer noopener" class="hover:text-rose-600 transition flex items-center gap-1.5" title="${{it.title}}">
+                                            <span>${{it.title}}</span>
+                                            <i class="ph-bold ph-arrow-square-out text-sm text-slate-400"></i>
+                                        </a>
+                                    </h3>
+                                    
+                                    ${{keywords.length > 0 ? `
+                                        <div class="flex items-center gap-1.5 flex-wrap mt-2">
+                                            <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Từ khóa Hot:</span>
+                                            ${{keywords.map(kw => `
+                                                <button type="button" onclick="searchByKeyword('${{kw}}', event)" class="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 border border-slate-300 flex items-center gap-1 transition" title="Bấm để lọc toàn bộ bảng theo #${{kw}}">
+                                                    <i class="ph-bold ph-hash text-slate-400 text-[10px]"></i>
+                                                    <span>${{kw}}</span>
+                                                </button>
+                                            `).join('')}}
                                         </div>
-                                    </div>
+                                    ` : ''}}
                                 </div>
 
-                                <!-- HOOK & PERSONA -->
-                                <div class="p-3 bg-slate-50 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
-                                    <div class="flex items-start gap-2">
-                                        <span class="font-black text-amber-800 uppercase shrink-0">${{lang.hook_label}}</span>
-                                        <span class="text-slate-800 font-medium italic">"${{strat.hook_angle || 'Xem kịch bản chi tiết'}}"</span>
-                                    </div>
-                                    <span class="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 border border-emerald-300 shrink-0 self-start md:self-auto">
+                                <div class="shrink-0 flex items-center gap-2">
+                                    <span class="text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1">
+                                        <i class="ph-bold ph-database mr-1 text-slate-400"></i> ${{platforms}}
+                                    </span>
+                                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-2.5 py-1 flex items-center gap-1">
+                                        <i class="ph-bold ph-check-circle"></i>
                                         ${{lang.verified_badge}}
                                     </span>
                                 </div>
@@ -3198,6 +3365,8 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                         </div>
                     `;
                 }}).join('');
+
+                renderIdeaPagination('ideas-cards-page-info', 'ideas-cards-pagination-btns', itemsToRender.length, startIdeaIdx, ideaPageSize, mainIdeasCurrentPage, totalIdeaPages);
             }}
         }}
 
