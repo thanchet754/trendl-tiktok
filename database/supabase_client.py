@@ -212,7 +212,7 @@ def sync_trends_to_supabase(analyzed_data: Dict[str, Any]) -> bool:
 
     return success
 
-def fetch_trends_from_supabase(limit: int = 1000) -> List[Dict[str, Any]]:
+def fetch_trends_from_supabase(limit: int = 5000) -> List[Dict[str, Any]]:
     """Lấy danh sách sản phẩm xu hướng từ Supabase xếp hạng theo GMV / Sales 24h"""
     try:
         url = f"{SUPABASE_URL}/rest/v1/tiktok_trends?select=*&order=sales_24h.desc&limit={limit}"

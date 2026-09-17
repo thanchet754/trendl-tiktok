@@ -225,7 +225,7 @@ async def get_data():
     if os.environ.get("VERCEL"):
         try:
             from database.supabase_client import fetch_trends_from_supabase, fetch_creators_from_supabase, fetch_videos_from_supabase
-            trends = fetch_trends_from_supabase(limit=1000)
+            trends = fetch_trends_from_supabase(limit=5000)
             creators = fetch_creators_from_supabase(limit=1000)
             videos = fetch_videos_from_supabase(limit=1000)
             if trends:
@@ -262,7 +262,7 @@ async def scan_trends():
         # On Vercel Serverless: Fetch live data from Supabase Cloud or disk cache
         try:
             from database.supabase_client import fetch_trends_from_supabase, fetch_creators_from_supabase, fetch_videos_from_supabase
-            trends = fetch_trends_from_supabase(limit=1000)
+            trends = fetch_trends_from_supabase(limit=5000)
             creators = fetch_creators_from_supabase(limit=1000)
             videos = fetch_videos_from_supabase(limit=1000)
             if trends and len(trends) > 0:
