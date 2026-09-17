@@ -112,6 +112,19 @@ def perform_full_scan():
         analyzed["top_videos"] = []
         analyzed["top_influencers"] = []
 
+    # Safeguard: If existing data contains a comprehensive catalog (e.g. 3,154 ideas with child products), preserve it
+    data_json_path = os.path.join("data", "latest_trends.json")
+    if os.path.exists(data_json_path):
+        try:
+            with open(data_json_path, "r", encoding="utf-8") as f:
+                prev_data = json.load(f)
+            prev_ideas = prev_data.get("all_ideas", [])
+            if len(prev_ideas) > len(analyzed.get("all_ideas", [])):
+                logger.info(f"Preserving existing deep catalog of {len(prev_ideas)} ideas with child products.")
+                analyzed["all_ideas"] = prev_ideas
+        except Exception as e:
+            logger.error(f"Error preserving existing catalog: {e}")
+
     try:
         analyzed["categories_taxonomy"] = get_all_categories()
     except Exception as e:

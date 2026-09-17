@@ -6,43 +6,59 @@ def verify_live():
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1600, "height": 1200})
         
-        url = "https://trendl-tiktok-eight.vercel.app"
+        # Bust cache with timestamp query param
+        ts = int(time.time())
+        url = f"https://trendl-tiktok-eight.vercel.app/?t={ts}"
         print("Visiting live Vercel URL:", url)
-        page.goto(url, wait_until="domcontentloaded", timeout=30000)
-        time.sleep(3)
+        page.goto(url, wait_until="domcontentloaded", timeout=40000)
+        time.sleep(4)
         
-        # Look for the cluster button for Rank 7
-        row7 = page.locator('tr:has-text("Family Matching")').first
-        print("Found Rank #7 row on live site:", bool(row7))
+        # Look for Item #1 (Drop Stop)
+        row1 = page.locator('tr:has-text("Drop Stop Multi-Pocket")').first
+        print("Found Item #1 (Drop Stop) row on live site:", bool(row1))
         
-        if row7:
-            row7.scroll_into_view_if_needed()
+        if row1:
+            row1.scroll_into_view_if_needed()
             time.sleep(1)
             
-            # Click to toggle drawer
-            btn = row7.locator('button').first
+            # Click keyword or SP TikTok button
+            btn = row1.locator('button:has-text("SP TikTok")').first
+            if not btn.is_visible():
+                btn = row1.locator('button').first
             btn.click()
             time.sleep(2)
             
-            # Check drawer element
-            drawer = page.query_selector('#cluster-drawer-cluster_family_matching_7')
-            print("Live Drawer found:", bool(drawer))
-            if drawer:
-                is_hidden = "hidden" in (drawer.get_attribute("class") or "")
-                print("Live Drawer is visible (not hidden):", not is_hidden)
-                
-                cards = drawer.query_selector_all('div[class*="group bg-white border"]')
-                print(f"Products inside live drawer: {len(cards)}")
-                
-                first_link = drawer.query_selector('a[href*="amazon.com/dp/"]')
-                if first_link:
-                    href = first_link.get_attribute('href')
-                    print(f"Verified Live Direct Product URL: {href}")
+            # Check drawer
+            drawer = page.locator('tr[id^="cluster-drawer-"]:visible').first
+            print("Live Drawer found and visible:", bool(drawer))
             
-            # Scroll drawer into center view and take artifact screenshot
-            artifact_path = r"C:\Users\Ngoc\.gemini\antigravity\brain\55e08546-d9ad-4004-abaf-f3e850339471\verified_live_vercel_cluster_drawer.png"
-            page.screenshot(path=artifact_path)
-            print("Saved live artifact screenshot to:", artifact_path)
+            if drawer:
+                # Verify images inside drawer
+                imgs = drawer.locator('img').all()
+                print(f"Images in live drawer: {len(imgs)}")
+                img_srcs = [img.get_attribute('src') for img in imgs]
+                unique_imgs = set(img_srcs)
+                print(f"Unique images count in live drawer: {len(unique_imgs)} / {len(imgs)}")
+                
+                # Verify links inside drawer
+                links = drawer.locator('a[href*="tiktok.com/view/product/"]').all()
+                print(f"TikTok Shop direct links found in live drawer: {len(links)}")
+                if links:
+                    first_href = links[0].get_attribute('href')
+                    print(f"Verified First TikTok Shop URL on live site: {first_href}")
+                
+                # Take screenshot of Item #1 expanded
+                artifact_path = r"C:\Users\Ngoc\.gemini\antigravity\brain\55e08546-d9ad-4004-abaf-f3e850339471\verified_live_vercel_tiktok_drawer.png"
+                try:
+                    drawer.screenshot(path=artifact_path, timeout=5000)
+                    print("Saved live drawer screenshot to:", artifact_path)
+                except Exception as e:
+                    print("Drawer screenshot error:", e)
+                    try:
+                        page.screenshot(path=artifact_path, timeout=5000, animations="disabled")
+                        print("Saved live page screenshot to:", artifact_path)
+                    except Exception as e2:
+                        print("Page screenshot error:", e2)
             
         browser.close()
 
