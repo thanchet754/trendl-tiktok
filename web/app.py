@@ -309,6 +309,24 @@ async def get_scheduler_status():
         "mode": "vercel_serverless" if os.environ.get("VERCEL") else "local_daemon"
     }
 
+@app.get("/api/tiktok-breakout-48h")
+async def get_tiktok_breakout():
+    try:
+        from collectors.tiktok_breakout_48h import get_tiktok_breakout_48h
+        return get_tiktok_breakout_48h()
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/amazon-movers")
+async def get_amazon_movers():
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data.get("amazon_movers", [])
+        return []
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/api/export-excel")
 async def download_excel():

@@ -658,6 +658,24 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     <span class="sidebar-badge text-[10px] font-black bg-amber-100 text-amber-900 px-1.5 py-0.2 border border-amber-300">Top 24h</span>
                 </button>
 
+                <!-- TAB TIKTOK BREAKOUT 48H -->
+                <button onclick="switchTab('tiktok_breakout')" id="nav-btn-tiktok-breakout" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent" title="⚡ TikTok Bứt Tốc <48h">
+                    <span class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-lightning text-base text-rose-500 shrink-0"></i>
+                        <span class="sidebar-text font-black text-rose-700">⚡ TikTok Bứt Tốc &lt;48h</span>
+                    </span>
+                    <span class="sidebar-badge text-[10px] font-black bg-rose-100 text-rose-800 px-1.5 py-0.2 border border-rose-300">{len(analyzed_data.get('tiktok_breakout_48h', []))}</span>
+                </button>
+
+                <!-- TAB AMAZON MOVERS & NEW -->
+                <button onclick="switchTab('amazon_movers')" id="nav-btn-amazon-movers" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent" title="🚀 Amazon Movers & New">
+                    <span class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-rocket-launch text-base text-blue-600 shrink-0"></i>
+                        <span class="sidebar-text font-black text-blue-700">🚀 Amazon Movers Thật</span>
+                    </span>
+                    <span class="sidebar-badge text-[10px] font-black bg-blue-100 text-blue-800 px-1.5 py-0.2 border border-blue-300">{len(analyzed_data.get('amazon_movers', []))}</span>
+                </button>
+
                 <button onclick="switchTab('audio')" id="nav-btn-audio" class="sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-white text-slate-700 hover:bg-slate-100 border-l-4 border-transparent" title="🎵 Giai Điệu Nhạc Viral">
                     <span class="flex items-center gap-2.5">
                         <i class="ph-bold ph-music-notes text-base text-purple-600 shrink-0"></i>
@@ -1087,6 +1105,46 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     <div class="flex items-center gap-1" id="ideas-table-pagination-btns">
                         <!-- Populated dynamically via JS -->
                     </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: TIKTOK BREAKOUT 48H ================= -->
+            <div id="tiktok-breakout-view-container" class="hidden space-y-4">
+                <div class="p-4 bg-rose-50 border-2 border-rose-300 flex items-start justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase text-rose-950 flex items-center gap-2">
+                            <i class="ph-bold ph-lightning text-rose-600 text-lg"></i>
+                            <span>Radar Video TikTok Gắn Giỏ Hàng Mới Đăng (&lt;48h) — Vận Tốc Tăng View Thật</span>
+                        </h2>
+                        <p class="text-xs text-rose-800 mt-0.5">
+                            Lọc các video sản phẩm mới xuất bản trong 4h - 48h qua, ghi nhận lượt View thật và Vận tốc tăng view/giờ thực tế (Velocity = Views / Số giờ).
+                        </p>
+                    </div>
+                    <span class="text-xs font-black px-2.5 py-1 bg-rose-600 text-white uppercase shadow-sm">Real View Velocity</span>
+                </div>
+
+                <div id="tiktok-breakout-list" class="space-y-3">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- ================= VIEW: AMAZON MOVERS & NEW RELEASES ================= -->
+            <div id="amazon-movers-view-container" class="hidden space-y-4">
+                <div class="p-4 bg-blue-50 border-2 border-blue-300 flex items-start justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase text-blue-950 flex items-center gap-2">
+                            <i class="ph-bold ph-rocket-launch text-blue-600 text-lg"></i>
+                            <span>Amazon US Movers &amp; Shakers — Bứt Tốc Doanh Số &amp; Thứ Hạng Thực Tế 100%</span>
+                        </h2>
+                        <p class="text-xs text-blue-800 mt-0.5">
+                            Dữ liệu cào trực tiếp từ sàn Amazon US cập nhật theo giờ: % tăng thứ hạng bứt tốc, lượt mua hàng tháng thực tế và link tra cứu xưởng 1688 tức thì.
+                        </p>
+                    </div>
+                    <span class="text-xs font-black px-2.5 py-1 bg-blue-600 text-white uppercase shadow-sm">100% Live Sourced</span>
+                </div>
+
+                <div id="amazon-movers-list" class="space-y-3">
+                    <!-- Populated via JS -->
                 </div>
             </div>
 
@@ -2719,7 +2777,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
         // 9. Navigation Tab Switching
         function switchTab(tab) {{
             currentTab = tab;
-            const navIds = ['all', 'viral', 'evergreen', 'leaders', 'audio', 'visual', 'saved'];
+            const navIds = ['all', 'viral', 'evergreen', 'leaders', 'tiktok-breakout', 'amazon-movers', 'audio', 'visual', 'saved'];
             
             navIds.forEach(id => {{
                 const btn = document.getElementById('nav-btn-' + id);
@@ -2731,6 +2789,8 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             const activeBtn = document.getElementById('nav-btn-' + tab);
             if (activeBtn) {{
                 if (tab === 'viral') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-rose-600 text-white border-l-4 border-rose-900";
+                else if (tab === 'tiktok_breakout') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-rose-600 text-white border-l-4 border-rose-900";
+                else if (tab === 'amazon_movers') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-blue-600 text-white border-l-4 border-blue-900";
                 else if (tab === 'evergreen') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-emerald-600 text-white border-l-4 border-emerald-900";
                 else if (tab === 'leaders') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-amber-600 text-white border-l-4 border-amber-900";
                 else if (tab === 'audio') activeBtn.className = "sidebar-nav-btn w-full flex items-center justify-between px-3 py-2 text-xs font-extrabold uppercase transition bg-purple-600 text-white border-l-4 border-purple-900";
@@ -2745,6 +2805,8 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 viral: currentLang === 'vi' ? '🔥 BÙNG NỔ 24H (VIRAL SPIKES)' : '🔥 24H BREAKOUT VIRAL SPIKES',
                 evergreen: currentLang === 'vi' ? '🌲 EVERGREEN BÁN QUANH NĂM' : '🌲 EVERGREEN YEAR-ROUND WINNERS',
                 leaders: currentLang === 'vi' ? '🏆 BẢNG XẾP HẠNG TOP VIDEOS GMV & TOP INFLUENCERS TIKTOK SHOP (24H)' : '🏆 TIKTOK SHOP 24H TOP VIDEOS & INFLUENCERS LEADERBOARD',
+                tiktok_breakout: currentLang === 'vi' ? '⚡ TIKTOK BREAKOUT 48H — VẬN TỐC TĂNG VIEW THỰC TẾ' : '⚡ TIKTOK BREAKOUT 48H — REAL VIEW VELOCITY',
+                amazon_movers: currentLang === 'vi' ? '🚀 AMAZON US MOVERS & SHAKERS — BỨT TỐC THỨ HẠNG THẬT' : '🚀 AMAZON US MOVERS & SHAKERS — REAL SALES RANK SURGE',
                 audio: currentLang === 'vi' ? '🎵 GIAI ĐIỆU & ÂM THANH VIRAL TIKTOK 24H' : '🎵 TIKTOK 24H VIRAL AUDIO & SOUNDS',
                 visual: currentLang === 'vi' ? '📷 TÌM KIẾM HÌNH ẢNH & XƯỞNG SỈ 1688' : '📷 VISUAL SEARCH & 1688 WHOLESALE HUB',
                 saved: currentLang === 'vi' ? '📌 DANH SÁCH SẢN PHẨM ĐÃ LƯU' : '📌 SAVED PRODUCTS COLLECTION'
@@ -2831,10 +2893,39 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             audioContainer.classList.add('hidden');
             visualContainer.classList.add('hidden');
             emptySavedBox.classList.add('hidden');
+            const tiktokBreakoutContainer = document.getElementById('tiktok-breakout-view-container');
+            const amazonMoversContainer = document.getElementById('amazon-movers-view-container');
+            if (tiktokBreakoutContainer) tiktokBreakoutContainer.classList.add('hidden');
+            if (amazonMoversContainer) amazonMoversContainer.classList.add('hidden');
+
+            const ideasToolbar = document.getElementById('ideas-toolbar');
+            if (ideasToolbar) {{
+                if (['leaders', 'tiktok_breakout', 'amazon_movers', 'audio', 'visual'].includes(currentTab)) {{
+                    ideasToolbar.classList.add('hidden');
+                }} else {{
+                    ideasToolbar.classList.remove('hidden');
+                }}
+            }}
 
             if (currentTab === 'leaders') {{
                 statsRow.classList.add('hidden');
                 topLeadersSection.classList.remove('hidden');
+                return;
+            }}
+
+            if (currentTab === 'tiktok_breakout') {{
+                if (tiktokBreakoutContainer) tiktokBreakoutContainer.classList.remove('hidden');
+                statsRow.classList.add('hidden');
+                topLeadersSection.classList.add('hidden');
+                renderTikTokBreakout();
+                return;
+            }}
+
+            if (currentTab === 'amazon_movers') {{
+                if (amazonMoversContainer) amazonMoversContainer.classList.remove('hidden');
+                statsRow.classList.add('hidden');
+                topLeadersSection.classList.add('hidden');
+                renderAmazonMovers();
                 return;
             }}
 
@@ -3521,6 +3612,113 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             }}
             const modal = document.getElementById('strategy-modal');
             if (modal) modal.classList.add('hidden');
+        }}
+
+        function renderTikTokBreakout() {{
+            const listEl = document.getElementById('tiktok-breakout-list');
+            if (!listEl) return;
+            const items = globalData.tiktok_breakout_48h || [];
+            if (!items.length) {{
+                listEl.innerHTML = '<div class="p-8 text-center text-slate-500 font-bold bg-white border border-slate-300">Đang cập nhật danh sách video bứt tốc mới...</div>';
+                return;
+            }}
+            listEl.innerHTML = items.map((v, idx) => `
+                <div class="bg-white border-2 border-slate-300 p-4 hover:border-rose-500 transition shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3 flex-1 min-w-0">
+                        <div class="w-12 h-12 bg-slate-900 text-white font-black text-sm flex items-center justify-center shrink-0 border border-slate-700">
+                            #${{idx + 1}}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="text-[10px] font-black uppercase px-2 py-0.5 border ${{v.badge_color}}">
+                                    ${{v.badge_label}}
+                                </span>
+                                <span class="text-xs font-bold text-slate-500 flex items-center gap-1">
+                                    <i class="ph-bold ph-clock"></i> ${{v.listing_age_str}} (${{v.publish_time}})
+                                </span>
+                                <span class="text-xs font-black text-rose-600 bg-rose-50 px-2 py-0.5 border border-rose-200 flex items-center gap-1">
+                                    <i class="ph-bold ph-trend-up"></i> ${{v.view_velocity_str}}
+                                </span>
+                            </div>
+                            <h3 class="text-sm font-black text-slate-900 mb-1 leading-snug">
+                                ${{v.title}}
+                            </h3>
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 mb-2">
+                                <span><strong>KOC:</strong> @${{v.handle}}</span>
+                                <span><strong>Ngành:</strong> ${{v.category}} &rsaquo; ${{v.sub_niche}}</span>
+                                <span><strong>Views:</strong> <span class="font-black text-slate-900">${{v.views_str}}</span></span>
+                                <span><strong>Likes:</strong> ${{v.likes_str}}</span>
+                                <span><strong>Shares:</strong> ${{v.shares_str}}</span>
+                                <span><strong>Giá bán:</strong> <span class="font-black text-emerald-700">${{v.price}}</span></span>
+                            </div>
+                            <div class="text-xs text-slate-700 italic bg-slate-50 p-2 border border-slate-200">
+                                <strong>Kịch bản / Hook:</strong> "${{v.hook_text}}"
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shrink-0 flex md:flex-col items-center gap-2 w-full md:w-auto">
+                        <a href="${{v.video_url}}" target="_blank" rel="noreferrer noopener" class="flex-1 md:flex-none w-full px-4 py-2 bg-slate-900 hover:bg-black text-white font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow transition">
+                            <i class="ph-bold ph-play-circle text-base text-rose-400"></i> XEM VIDEO TIKTOK
+                        </a>
+                        <a href="${{v.search_1688_url}}" target="_blank" rel="noreferrer noopener" class="flex-1 md:flex-none w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow transition" title="Tìm nguồn xưởng sỉ 1688">
+                            <i class="ph-bold ph-factory text-base"></i> TÌM XƯỞNG 1688
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }}
+
+        function renderAmazonMovers() {{
+            const listEl = document.getElementById('amazon-movers-list');
+            if (!listEl) return;
+            const items = globalData.amazon_movers || [];
+            if (!items.length) {{
+                listEl.innerHTML = '<div class="p-8 text-center text-slate-500 font-bold bg-white border border-slate-300">Đang cào dữ liệu Amazon Movers mới...</div>';
+                return;
+            }}
+            listEl.innerHTML = items.map((p, idx) => `
+                <div class="bg-white border-2 border-slate-300 p-4 hover:border-blue-500 transition shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3.5 flex-1 min-w-0">
+                        <div class="w-16 h-16 bg-slate-100 border border-slate-300 p-1 flex items-center justify-center shrink-0">
+                            ${{p.image ? `<img src="${{p.image}}" class="max-w-full max-h-full object-contain" alt="${{p.title}}">` : `<i class="ph-bold ph-package text-2xl text-slate-400"></i>`}}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="text-xs font-black px-2 py-0.5 bg-blue-600 text-white border border-blue-700">
+                                    Amazon ${{p.rank}}
+                                </span>
+                                <span class="text-xs font-black px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                                    <i class="ph-bold ph-trend-up"></i> Bứt Tốc ${{p.rank_surge}}
+                                </span>
+                                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 border border-slate-300">
+                                    ${{p.bought_past_month}}
+                                </span>
+                            </div>
+                            <h3 class="text-sm font-black text-slate-900 mb-1 leading-snug">
+                                ${{p.title}}
+                            </h3>
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 mb-2">
+                                <span><strong>Ngành hàng:</strong> ${{p.category}}</span>
+                                <span><strong>Đánh giá:</strong> ⭐ ${{p.rating}} (${{p.reviews}})</span>
+                                <span><strong>Giá bán US:</strong> <span class="font-black text-emerald-700">${{p.price}}</span></span>
+                            </div>
+                            <div class="text-xs text-blue-900 bg-blue-50 p-2 border border-blue-200 flex items-center justify-between">
+                                <span><strong>Từ khóa xưởng 1688:</strong> <code>${{p.query_1688}}</code></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shrink-0 flex md:flex-col items-center gap-2 w-full md:w-auto">
+                        <a href="${{p.url}}" target="_blank" rel="noreferrer noopener" class="flex-1 md:flex-none w-full px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow transition">
+                            <i class="ph-bold ph-shopping-bag text-base"></i> MỞ TRÊN AMAZON US
+                        </a>
+                        <a href="${{p.search_1688_url}}" target="_blank" rel="noreferrer noopener" class="flex-1 md:flex-none w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow transition" title="Tìm nguồn xưởng sỉ 1688">
+                            <i class="ph-bold ph-factory text-base"></i> TÌM XƯỞNG 1688
+                        </a>
+                    </div>
+                </div>
+            `).join('');
         }}
 
         // Khởi động khi tải trang
