@@ -63,3 +63,37 @@ class AutoScheduler:
         }
 
 scheduler_instance = AutoScheduler()
+
+if __name__ == "__main__":
+    import sys
+    from web.app import perform_full_scan
+
+    print("=" * 60)
+    print("🚀 TRENDL TIKTOK - 6-HOUR AUTO-SCANNER DAEMON INITIALIZED")
+    print(f"⏰ Cycle: Every 6 hours (21600 seconds)")
+    print(f"📡 Platforms: TikTok Shop Leaders, Google Trends, Amazon Movers, eBay Deals, Supabase Sync")
+    print("=" * 60)
+    
+    # Run first scan immediately upon start
+    print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ⚡ Running initial baseline scan...")
+    try:
+        perform_full_scan()
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ✅ Initial scan completed and synced to Supabase!")
+    except Exception as e:
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ❌ Scan error: {e}")
+
+    # Start 6-hour scheduler loop
+    scheduler_instance.start(perform_full_scan)
+    
+    print("\n🟢 Daemon is running continuously. Press Ctrl+C to stop.")
+    try:
+        while True:
+            status = scheduler_instance.get_status()
+            rem = status.get("seconds_remaining", 0)
+            mins = rem // 60
+            secs = rem % 60
+            print(f"\r⏳ Next automated scan in: {mins:02d}m {secs:02d}s | Status: ACTIVE 🟢", end="", flush=True)
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\n🛑 Auto-scanner daemon terminated by user.")
+

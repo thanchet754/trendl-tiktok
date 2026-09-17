@@ -175,13 +175,13 @@ def calculate_scores(item: Dict[str, Any]) -> Dict[str, Any]:
         rank_gain_text = f"+{int(viral_score * 45 + 500):,} ranks ↗"
 
     # 5.3 Trajectory Sparkline Points (30d -> 14d -> 7d -> 3d -> now)
-    # Generates 5 normalized height values (0-30px) for inline SVG rendering
+    # Generates 5 (x,y) coordinates for inline SVG polyline rendering (width=60, height=28)
     if surge_type == "BREAKOUT_V3":
-        sparkline_points = [6, 8, 12, 22, 28] # Sharp exponential breakout
+        sparkline_points = "0,22 15,20 30,16 45,6 60,2" # Sharp exponential breakout
     elif surge_type == "SUSTAINED_MOVER":
-        sparkline_points = [16, 18, 20, 24, 26] # Solid sustained climb
+        sparkline_points = "0,16 15,14 30,11 45,7 60,3" # Solid sustained climb
     else:
-        sparkline_points = [10, 14, 15, 19, 23] # Steady gradual rise
+        sparkline_points = "0,20 15,16 30,13 45,9 60,5" # Steady gradual rise
 
     # 6. New Listing Detection (<24h with real sales >= 5)
     listing_age_hours = item.get("listing_age_hours")

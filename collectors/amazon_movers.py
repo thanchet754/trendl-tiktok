@@ -21,7 +21,12 @@ AMAZON_CATEGORIES = [
     {"name": "Kitchen & Dining", "slug": "kitchen", "niche": "Home & Kitchen"},
     {"name": "Home & Kitchen", "slug": "home-garden", "niche": "Home Gadgets"},
     {"name": "Electronics", "slug": "electronics", "niche": "Tech Gadgets"},
-    {"name": "Pet Supplies", "slug": "pet-supplies", "niche": "Pets & Animals"}
+    {"name": "Pet Supplies", "slug": "pet-supplies", "niche": "Pets & Animals"},
+    {"name": "Sports & Outdoors", "slug": "sporting-goods", "niche": "Fitness & Outdoor"},
+    {"name": "Toys & Games", "slug": "toys-and-games", "niche": "Toys & Hobbies"},
+    {"name": "Tools & Home Improvement", "slug": "hi", "niche": "Tools & Hardware"},
+    {"name": "Health & Household", "slug": "hpc", "niche": "Health & Wellness"},
+    {"name": "Automotive", "slug": "automotive", "niche": "Automotive Gadgets"}
 ]
 
 def scrape_amazon_bestsellers(limit_per_category: int = 12) -> List[Dict[str, Any]]:
