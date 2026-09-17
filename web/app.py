@@ -263,8 +263,8 @@ async def scan_trends():
         try:
             from database.supabase_client import fetch_trends_from_supabase, fetch_creators_from_supabase, fetch_videos_from_supabase
             trends = fetch_trends_from_supabase(limit=1000)
-            creators = fetch_creators_from_supabase(limit=100)
-            videos = fetch_videos_from_supabase(limit=100)
+            creators = fetch_creators_from_supabase(limit=1000)
+            videos = fetch_videos_from_supabase(limit=1000)
             if trends and len(trends) > 0:
                 now_str = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                 fresh = {

@@ -215,7 +215,7 @@ def fetch_trends_from_supabase(limit: int = 1000) -> List[Dict[str, Any]]:
         logger.error(f"Lỗi khi đọc trends từ Supabase: {e}")
         return []
 
-def fetch_creators_from_supabase(limit: int = 50) -> List[Dict[str, Any]]:
+def fetch_creators_from_supabase(limit: int = 1000) -> List[Dict[str, Any]]:
     """Lấy danh sách top influencers từ Supabase"""
     try:
         url = f"{SUPABASE_URL}/rest/v1/tiktok_creators?select=*&order=gmv_24h.desc&limit={limit}"
@@ -227,7 +227,7 @@ def fetch_creators_from_supabase(limit: int = 50) -> List[Dict[str, Any]]:
         logger.error(f"Lỗi khi đọc creators từ Supabase: {e}")
         return []
 
-def fetch_videos_from_supabase(limit: int = 50) -> List[Dict[str, Any]]:
+def fetch_videos_from_supabase(limit: int = 1000) -> List[Dict[str, Any]]:
     """Lấy danh sách top viral videos từ Supabase"""
     try:
         url = f"{SUPABASE_URL}/rest/v1/tiktok_videos?select=*&order=est_gmv_24h.desc&limit={limit}"
