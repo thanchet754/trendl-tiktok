@@ -226,8 +226,8 @@ async def get_data():
         try:
             from database.supabase_client import fetch_trends_from_supabase, fetch_creators_from_supabase, fetch_videos_from_supabase
             trends = fetch_trends_from_supabase(limit=1000)
-            creators = fetch_creators_from_supabase(limit=50)
-            videos = fetch_videos_from_supabase(limit=50)
+            creators = fetch_creators_from_supabase(limit=1000)
+            videos = fetch_videos_from_supabase(limit=1000)
             if trends:
                 return {
                     "all_ideas": trends,
