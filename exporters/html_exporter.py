@@ -591,7 +591,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 </div>
                 <div class="text-[10px] text-slate-500 font-medium leading-tight flex items-center justify-between sidebar-full-item">
                     <span>Lần quét tới: <strong id="next-scan-label" class="text-slate-800 font-bold">--:--</strong></span>
-                    <span class="text-emerald-700 font-black flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> Daemon</span>
+                    <span class="text-emerald-700 font-black flex items-center gap-1" title="Tự động đồng bộ và cào quét mỗi 6 tiếng qua Cloud GitHub Actions & Supabase 24/7"><i class="ph-fill ph-check-circle"></i> Cloud 24/7</span>
                 </div>
             </div>
 
@@ -2364,7 +2364,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
 
             try {{
                 const isHttp = window.location.origin.startsWith('http');
-                const apiUrl = isHttp ? '/api/scan' : 'http://127.0.0.1:8000/api/scan';
+                const apiUrl = isHttp ? '/api/scan' : 'https://trendl-tiktok-eight.vercel.app/api/scan';
 
                 // Step 1: Connecting
                 updateScanStep(1, 'active', '1. Khởi tạo Engine & Kết nối Supabase Cloud DB');
@@ -2463,8 +2463,8 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                 }}
             }} catch (err) {{
                 console.warn('API scan connection error:', err);
-                appendScanLog(`Lỗi phản hồi API: ${{err.message || 'Mất kết nối'}}`, 'error');
-                appendScanLog('Lưu ý: Bạn có thể chạy backend local bằng auto_scanner_daemon.bat', 'warn');
+                appendScanLog(`Lỗi phản hồi Cloud API: ${{err.message || 'Mất kết nối'}}`, 'error');
+                appendScanLog('Vui lòng kiểm tra kết nối mạng Internet tới máy chủ đám mây.', 'warn');
                 const closeBtn = document.getElementById('scan-modal-close-btn');
                 if (closeBtn) {{
                     closeBtn.disabled = false;
@@ -2472,8 +2472,8 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     closeBtn.innerText = 'Đóng Cửa Sổ';
                 }}
                 showToast(currentLang === 'vi' 
-                    ? '💡 Để quét dữ liệu theo yêu cầu bằng nút bấm, hãy khởi động server nền bằng cách nhấp đúp file "run_dashboard.bat" (hoặc chạy "python main.py")!' 
-                    : '💡 To enable on-demand scanning from this button, launch run_dashboard.bat to start the backend server!', true);
+                    ? '⚠️ Lỗi kết nối Cloud API. Vui lòng kiểm tra kết nối Internet của bạn!' 
+                    : '⚠️ Cloud API connection error. Please check your internet connection!', true);
             }} finally {{
                 isScanning = false;
                 if (btn) btn.disabled = false;
