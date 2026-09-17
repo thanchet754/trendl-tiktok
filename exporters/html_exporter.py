@@ -1819,7 +1819,7 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     const vDuration = v.duration || '0:45';
                     const vCaption = v.caption || v.title || 'TikTok Shop Viral Trend';
                     const vCreatorHandle = v.creator_handle || (v.author_handle ? (v.author_handle.startsWith('@') ? v.author_handle : '@' + v.author_handle) : '@tiktokshop');
-                    const vChannelUrl = v.channel_url || ('https://www.tiktok.com/' + vCreatorHandle);
+                    const vChannelUrl = v.channel_url || ('https://www.tiktok.com/@' + vCreatorHandle.replace(/^@/, ''));
                     const vViews = typeof v.views === 'string' ? v.views : ((Number(v.views_24h || v.views || 500000)).toLocaleString() + ' views');
                     const vProductImg = v.product_image || vCover;
                     const vProductName = v.product_name || vCaption;
@@ -1965,9 +1965,10 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                         ${{inf.verified !== false ? '<i class="ph-fill ph-seal-check text-blue-500 text-xs shrink-0" title="Tài khoản chính chủ TikTok"></i>' : ''}}
                                     </div>
                                     <div class="text-[10px] text-slate-500 flex items-center gap-1.5 flex-wrap mt-0.5">
-                                        <span class="font-mono text-slate-600 font-bold">@${{infHandle.replace(/^@/, '')}}</span>
+                                        <a href="${{infChannelUrl}}" target="_blank" rel="noreferrer noopener" class="font-mono text-slate-600 hover:text-blue-600 hover:underline font-bold" title="Mở trang cá nhân TikTok">@${{infHandle.replace(/^@/, '')}}</a>
                                         <span>·</span>
                                         <span class="bg-slate-100 text-slate-700 font-bold px-1 border border-slate-200" title="Số follower thực tế trên TikTok">${{infFollowers}}</span>
+
                                         <span class="bg-emerald-50 text-emerald-700 font-bold px-1 border border-emerald-200 text-[9px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>LIVE</span>
                                     </div>
                                 </div>
