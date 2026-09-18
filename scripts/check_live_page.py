@@ -1,5 +1,6 @@
 import sys
 import time
+sys.stdout.reconfigure(encoding='utf-8')
 from playwright.sync_api import sync_playwright
 
 with sync_playwright() as p:
@@ -34,8 +35,16 @@ with sync_playwright() as p:
             print("Unique images:", len(unique_imgs))
             
             artifact_path = r"C:\Users\Ngoc\.gemini\antigravity\brain\55e08546-d9ad-4004-abaf-f3e850339471\verified_live_vercel_tiktok_drawer.png"
-            drawer.screenshot(path=artifact_path)
-            print("Saved screenshot to:", artifact_path)
+            try:
+                drawer.screenshot(path=artifact_path, timeout=5000)
+                print("Saved screenshot to:", artifact_path)
+            except Exception as e:
+                print("Drawer screenshot error:", e)
+                try:
+                    page.screenshot(path=artifact_path, timeout=5000, animations="disabled")
+                    print("Saved page screenshot to:", artifact_path)
+                except Exception as e2:
+                    print("Page screenshot error:", e2)
     else:
         print("Drop stop row not found! Checking why...")
         # Check all table rows
