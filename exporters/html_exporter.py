@@ -462,6 +462,11 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
         item["query_1688"] = get_1688_query(item.get("title", ""), item.get("category", ""))
         item["query_alibaba"] = get_alibaba_query(item.get("title", ""))
 
+    core_pools_json = "{}"
+    if os.path.exists("data/core_real_pools.json"):
+        with open("data/core_real_pools.json", "r", encoding="utf-8") as f_cp:
+            core_pools_json = f_cp.read()
+
     data_json = json.dumps(analyzed_data, ensure_ascii=False)
     updated_at = analyzed_data.get("updated_at", datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     stats = analyzed_data.get("stats", {})
@@ -3057,9 +3062,16 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
             ],
         }};
 
+        const CORE_REAL_POOLS = {core_pools_json};
+        window.CORE_REAL_POOLS = CORE_REAL_POOLS;
+
         function getClusterProducts(it) {{
             if (it.child_products && Array.isArray(it.child_products) && it.child_products.length > 0) {{
                 return it.child_products;
+            }}
+            const poolKey = it.pool_id || 'tactical_backseat_organizer';
+            if (window.CORE_REAL_POOLS && window.CORE_REAL_POOLS[poolKey] && window.CORE_REAL_POOLS[poolKey].length > 0) {{
+                return window.CORE_REAL_POOLS[poolKey];
             }}
 
             const cat = it.category || 'General';
