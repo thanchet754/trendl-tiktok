@@ -1977,14 +1977,20 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     vidPagination.innerHTML = `<span class="px-2 py-0.5 bg-slate-100 text-slate-400 text-[10px] font-bold border border-slate-200 uppercase">${{currentLang === 'vi' ? 'Đã mở toàn bộ' : 'All Rows Shown'}}</span>`;
                 }} else {{
                     vidPagination.innerHTML = `
-                        <button onclick="changeTopVideosPage(${{topVideosPage - 1}})" ${{topVideosPage <= 1 ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]">
-                            &lt;
+                        <button onclick="changeTopVideosPage(1)" ${{topVideosPage <= 1 ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang đầu">
+                            &laquo;
                         </button>
-                        <span class="px-2 py-0.5 bg-slate-100 border border-slate-300 text-[10px] font-bold font-mono">
+                        <button onclick="changeTopVideosPage(${{topVideosPage - 1}})" ${{topVideosPage <= 1 ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang trước">
+                            &lsaquo;
+                        </button>
+                        <span class="px-2.5 py-0.5 bg-slate-100 border border-slate-300 text-[10px] font-bold font-mono">
                             ${{topVideosPage}} / ${{totalVidPages}}
                         </span>
-                        <button onclick="changeTopVideosPage(${{topVideosPage + 1}})" ${{topVideosPage >= totalVidPages ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]">
-                            &gt;
+                        <button onclick="changeTopVideosPage(${{topVideosPage + 1}})" ${{topVideosPage >= totalVidPages ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang sau">
+                            &rsaquo;
+                        </button>
+                        <button onclick="changeTopVideosPage(${{totalVidPages}})" ${{topVideosPage >= totalVidPages ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang cuối">
+                            &raquo;
                         </button>
                     `;
                 }}
@@ -2078,20 +2084,30 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     infPageInfo.innerHTML = `${{currentLang === 'vi' ? 'Hiển thị tối đa' : 'Showing all'}} <strong>${{filteredInfluencers.length}}</strong> / <strong>${{filteredInfluencers.length}}</strong> creators`;
                 }} else {{
                     const endInfIdx = Math.min(startInfIdx + pageSize, filteredInfluencers.length);
-                    infPageInfo.innerHTML = `${{currentLang === 'vi' ? 'Hiển thị' : 'Showing'}} <strong>${{startInfIdx + 1}} - ${{endInfIdx}}</strong> / <strong>${{filteredInfluencers.length}}</strong> creators`;
+                    infPageInfo.innerHTML = `${{currentLang === 'vi' ? 'Hiển thị' : 'Showing'}} <strong>${{startInfIdx + 1}} - ${{endInfIdx}}</strong> / <strong>${{filteredInfluencers.length}}</strong> creators (Trang ${{topInfluencersPage}}/${{totalInfPages}})`;
                 }}
             }}
             if (infPagination) {{
                 if (leadersPageSize === 'all' || totalInfPages <= 1) {{
                     infPagination.innerHTML = leadersPageSize === 'all' ? '<span class="text-[10px] font-bold text-slate-400 uppercase bg-slate-100 px-2 py-0.5 border border-slate-200">Đã mở toàn bộ</span>' : '';
                 }} else {{
-                    let h = '';
-                    h += `<button onclick="changeTopInfluencersPage(${{topInfluencersPage - 1}})" ${{topInfluencersPage <= 1 ? 'disabled' : ''}} class="px-2.5 py-1 text-[11px] font-bold border border-slate-300 ${{topInfluencersPage <= 1 ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-800'}} transition"><i class="ph-bold ph-caret-left"></i> ${{currentLang === 'vi' ? 'Trước' : 'Prev'}}</button>`;
-                    for (let p = 1; p <= totalInfPages; p++) {{
-                        h += `<button onclick="changeTopInfluencersPage(${{p}})" class="px-2.5 py-1 text-[11px] font-black border ${{p === topInfluencersPage ? 'bg-blue-600 text-white border-blue-700' : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300'}} transition">${{p}}</button>`;
-                    }}
-                    h += `<button onclick="changeTopInfluencersPage(${{topInfluencersPage + 1}})" ${{topInfluencersPage >= totalInfPages ? 'disabled' : ''}} class="px-2.5 py-1 text-[11px] font-bold border border-slate-300 ${{topInfluencersPage >= totalInfPages ? 'opacity-40 cursor-not-allowed bg-slate-100 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-800'}} transition">${{currentLang === 'vi' ? 'Sau' : 'Next'}} <i class="ph-bold ph-caret-right"></i></button>`;
-                    infPagination.innerHTML = h;
+                    infPagination.innerHTML = `
+                        <button onclick="changeTopInfluencersPage(1)" ${{topInfluencersPage <= 1 ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang đầu">
+                            &laquo;
+                        </button>
+                        <button onclick="changeTopInfluencersPage(${{topInfluencersPage - 1}})" ${{topInfluencersPage <= 1 ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang trước">
+                            &lsaquo;
+                        </button>
+                        <span class="px-2.5 py-0.5 bg-slate-100 border border-slate-300 text-[10px] font-bold font-mono">
+                            ${{topInfluencersPage}} / ${{totalInfPages}}
+                        </span>
+                        <button onclick="changeTopInfluencersPage(${{topInfluencersPage + 1}})" ${{topInfluencersPage >= totalInfPages ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang sau">
+                            &rsaquo;
+                        </button>
+                        <button onclick="changeTopInfluencersPage(${{totalInfPages}})" ${{topInfluencersPage >= totalInfPages ? 'disabled' : ''}} class="px-2 py-0.5 bg-white hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed border border-slate-300 font-black text-[10px]" title="Trang cuối">
+                            &raquo;
+                        </button>
+                    `;
                 }}
             }}
         }}
