@@ -9,8 +9,10 @@ with sync_playwright() as p:
     page = b.new_page(viewport={"width": 1600, "height": 1200})
     print("Navigating to https://trendl-tiktok-eight.vercel.app ...")
     page.goto("https://trendl-tiktok-eight.vercel.app", wait_until="domcontentloaded", timeout=45000)
-    print("DOM loaded, waiting 4s...")
-    time.sleep(4)
+    print("DOM loaded, waiting for table row...")
+    
+    page.wait_for_selector('tr:has-text("Drop Stop Multi-Pocket")', timeout=20000)
+    time.sleep(2)
     
     # Check first 4 rows
     row1 = page.locator('tr:has-text("Drop Stop Multi-Pocket")').first

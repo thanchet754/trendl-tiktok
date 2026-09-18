@@ -3573,19 +3573,40 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                     <tr id="${{drawerId}}" class="hidden bg-slate-50 border-b-2 border-slate-300 transition-all">
                         <td colspan="11" class="p-0">
                             <div class="p-4 bg-slate-50 border-t border-slate-200">
+                                <!-- Notice explaining US Geo-blocking for users in Vietnam -->
+                                <div class="mb-3 p-3 bg-amber-50 border-l-4 border-amber-500 text-slate-800 text-xs flex items-start gap-2.5 shadow-2xs">
+                                    <i class="ph-fill ph-warning-circle text-amber-600 text-lg shrink-0 mt-0.5"></i>
+                                    <div class="leading-relaxed">
+                                        <div class="font-black text-amber-950 mb-0.5">
+                                            🇺🇸 100% SẢN PHẨM & DỮ LIỆU THỊ TRƯỜNG MỸ (US MARKET):
+                                        </div>
+                                        <div>
+                                            TikTok Shop US áp dụng cơ chế <strong>Khóa vùng địa lý (Geo-blocking)</strong>, do đó khi truy cập từ IP mạng Việt Nam, link TikTok Shop trực tiếp sẽ hiện thông báo <em class="text-rose-700 font-semibold">"Product not available in this country or region"</em> (như ảnh bạn chụp).
+                                        </div>
+                                        <div class="mt-1 flex items-center gap-2 flex-wrap">
+                                            <span class="inline-flex items-center gap-1 font-bold text-slate-900 bg-amber-200/80 px-2 py-0.5 border border-amber-400 text-[11px]">
+                                                👉 Xem ngay tại VN không cần VPN: Bấm nút vàng <strong class="text-amber-950">📦 MỞ AMAZON US</strong> (xem ảnh HD, giá USD, thông số, review 5★) hoặc nút <strong class="text-slate-900">🎬 Video</strong>.
+                                            </span>
+                                            <span class="inline-flex items-center gap-1 font-semibold text-slate-700 text-[11px]">
+                                                👉 Mở trực tiếp TikTok Shop: Bật VPN/Proxy sang Mỹ (US IP) rồi bấm nút đỏ <strong>🇺🇸 TTS (VPN)</strong>.
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Header matching screenshot -->
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-200">
                                     <div>
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <span class="text-xs font-black text-slate-900 uppercase tracking-tight flex items-center gap-1.5">
-                                                <i class="ph-bold ph-squares-four text-blue-600 text-base"></i> CỤM SẢN PHẨM TIKTOK SHOP THỰC TẾ &bull; ${{it.title}}
+                                                <i class="ph-bold ph-squares-four text-blue-600 text-base"></i> CỤM SẢN PHẨM THỰC TẾ &bull; ${{it.title}}
                                             </span>
                                             <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-300">
                                                 ${{clusterProducts.length}} of ${{asinCount}} products
                                             </span>
                                         </div>
                                         <div class="text-[11px] text-slate-500 font-medium mt-0.5">
-                                            <span class="text-emerald-700 font-bold">✓ 100% Direct Product URLs:</span> Bấm vào từng ảnh hoặc tiêu đề để mở trực tiếp trang sản phẩm thực tế trên TikTok Shop US (Không qua trang tìm kiếm hay hashtag).
+                                            <span class="text-emerald-700 font-bold">✓ Direct US Listings:</span> Xem chi tiết sản phẩm trên Amazon US & TikTok Shop US (Khớp chính xác từng biến thể).
                                         </div>
                                     </div>
 
@@ -3593,50 +3614,73 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                         <span class="text-emerald-700 font-bold bg-emerald-50 border border-emerald-300 px-2 py-0.5">${{it.crawl_change || '+2 this crawl'}}</span>
                                         <span class="text-blue-700 font-bold bg-blue-50 border border-blue-300 px-2 py-0.5">${{it.velocity_multiplier || '▲ 16.0x'}}</span>
                                         <a href="${{firstDirectUrl}}" target="_blank" rel="noreferrer noopener" class="text-blue-700 hover:text-blue-900 font-black text-xs flex items-center gap-1 hover:underline">
-                                            <span>Xem toàn bộ ${{asinCount}} sản phẩm trên TikTok Shop US</span> <i class="ph-bold ph-arrow-right"></i>
+                                            <span>Xem toàn bộ ${{asinCount}} sản phẩm</span> <i class="ph-bold ph-arrow-right"></i>
                                         </a>
                                     </div>
                                 </div>
 
-                                <!-- 8-Column Responsive Grid matching screenshot exactly -->
+                                <!-- 8-Column Responsive Grid with Dual Action (Amazon US & TikTok Shop US) -->
                                 <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5">
-                                    ${{clusterProducts.map(p => `
-                                        <div class="group bg-white border border-slate-200 hover:border-blue-600 hover:shadow-md transition p-2 flex flex-col justify-between relative">
-                                            <!-- Direct Product Image Link (Opens Real Product Page) -->
-                                            <a href="${{p.direct_url}}" target="_blank" rel="noreferrer noopener" class="block aspect-square w-full bg-slate-50 border border-slate-100 overflow-hidden relative mb-1.5 cursor-pointer" title="Bấm để mở trực tiếp trang sản phẩm: ${{p.title}}">
+                                    ${{clusterProducts.map(p => {{
+                                        const amzUrl = p.amazon_url || (p.asin ? ('https://www.amazon.com/dp/' + p.asin) : p.direct_url);
+                                        const ttsUrl = p.direct_url;
+                                        const searchUrl = 'https://www.tiktok.com/search?q=' + encodeURIComponent(p.title);
+                                        return `
+                                        <div class="group bg-white border border-slate-200 hover:border-amber-500 hover:shadow-md transition p-2 flex flex-col justify-between relative">
+                                            <!-- Product Image Link (Opens Amazon US - Works 100% in Vietnam) -->
+                                            <a href="${{amzUrl}}" target="_blank" rel="noreferrer noopener" class="block aspect-square w-full bg-slate-50 border border-slate-100 overflow-hidden relative mb-1.5 cursor-pointer" title="Bấm để mở trang Amazon US (Xem được ngay tại Việt Nam): ${{p.title}}">
                                                 <img src="${{p.image}}" alt="${{p.title}}" class="w-full h-full object-contain group-hover:scale-105 transition duration-200" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300'"/>
-                                                <span class="absolute top-1 right-1 bg-black/85 text-white font-mono text-[8.5px] px-1.5 py-0.5 font-bold shadow-xs">
-                                                    TikTok Shop
+                                                <span class="absolute top-1 right-1 bg-amber-500 text-slate-950 font-mono text-[8px] px-1 py-0.2 font-black shadow-xs" title="Sản phẩm niêm yết tại Mỹ">
+                                                    Amazon US
+                                                </span>
+                                                <span class="absolute bottom-1 left-1 bg-black/80 text-white font-mono text-[7.5px] px-1 py-0.2 font-bold shadow-xs">
+                                                    US Market
                                                 </span>
                                             </a>
 
                                             <!-- Direct Product Title Link -->
-                                            <a href="${{p.direct_url}}" target="_blank" rel="noreferrer noopener" class="text-[10px] font-semibold text-slate-800 hover:text-blue-700 line-clamp-2 leading-tight mb-1.5 cursor-pointer group-hover:text-blue-600" title="${{p.title}}">
+                                            <a href="${{amzUrl}}" target="_blank" rel="noreferrer noopener" class="text-[10px] font-semibold text-slate-800 hover:text-amber-700 line-clamp-2 leading-tight mb-1.5 cursor-pointer group-hover:text-blue-600" title="Mở Amazon US: ${{p.title}}">
                                                 ${{p.title}}
                                             </a>
 
                                             <!-- Price, Rating & Direct Open Button -->
-                                            <div class="mt-auto pt-1 border-t border-slate-100">
-                                                <div class="flex items-center justify-between text-[10px] font-mono mb-1">
+                                            <div class="mt-auto pt-1 border-t border-slate-100 flex flex-col gap-1">
+                                                <div class="flex items-center justify-between text-[10px] font-mono mb-0.5">
                                                     <span class="font-black text-slate-900">${{p.price}}</span>
                                                     <span class="text-amber-600 font-bold flex items-center gap-0.5">
                                                         <i class="ph-fill ph-star text-[9px]"></i> ${{p.rating}}
                                                     </span>
                                                 </div>
-                                                <a href="${{p.direct_url}}" target="_blank" rel="noreferrer noopener" class="block w-full text-center text-[9px] font-black uppercase py-1 bg-rose-600 hover:bg-rose-700 text-white border border-rose-700 transition shadow-xs" title="Mở trực tiếp trang sản phẩm trên TikTok Shop US">
-                                                    MỞ TIKTOK SHOP ↗
+                                                <!-- Nút 1: Mở Amazon US (Xem tại VN 100% không bị chặn) -->
+                                                <a href="${{amzUrl}}" target="_blank" rel="noreferrer noopener" class="block w-full text-center text-[9px] font-black uppercase py-1 bg-amber-400 hover:bg-amber-500 text-slate-950 border border-amber-500 transition shadow-xs" title="Mở trang sản phẩm Amazon US (Xem được ngay tại Việt Nam, không bao giờ bị lỗi vùng)">
+                                                    📦 MỞ AMAZON US ↗
                                                 </a>
+                                                <!-- Nút 2: Link TikTok Shop & Video TikTok -->
+                                                <div class="flex items-center gap-1">
+                                                    <a href="${{ttsUrl}}" target="_blank" rel="noreferrer noopener" class="flex-1 text-center text-[8px] font-bold uppercase py-0.5 bg-rose-600 hover:bg-rose-700 text-white border border-rose-700 transition" title="Mở TikTok Shop US (Yêu cầu bật VPN sang Mỹ nếu đang truy cập tại Việt Nam)">
+                                                        🇺🇸 TTS (VPN)
+                                                    </a>
+                                                    <a href="${{searchUrl}}" target="_blank" rel="noreferrer noopener" class="flex-1 text-center text-[8px] font-bold uppercase py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition" title="Xem các video TikTok US review sản phẩm này (Xem được tại Việt Nam)">
+                                                        🎬 Video
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
-                                    `).join('')}}
+                                        `;
+                                    }}).join('')}}
                                 </div>
 
                                 <!-- Drawer Footer matching user screenshot -->
                                 <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-200 text-xs text-slate-600">
-                                    <span class="font-medium">${{clusterProducts.length}} of ${{asinCount}} products</span>
-                                    <a href="${{firstDirectUrl}}" target="_blank" rel="noreferrer noopener" class="text-blue-700 hover:text-blue-900 font-bold hover:underline flex items-center gap-1">
-                                        <span>Xem toàn bộ ${{asinCount}} sản phẩm trên TikTok Shop US</span> &rarr;
-                                    </a>
+                                    <span class="font-medium">${{clusterProducts.length}} of ${{asinCount}} products (US Market)</span>
+                                    <div class="flex items-center gap-4">
+                                        <a href="${{firstDirectUrl}}" target="_blank" rel="noreferrer noopener" class="text-amber-700 hover:text-amber-900 font-bold hover:underline flex items-center gap-1">
+                                            <span>Mở toàn bộ ${{asinCount}} sản phẩm trên Amazon US</span> &rarr;
+                                        </a>
+                                        <a href="${{it.url_tiktok || 'https://www.tiktok.com'}}" target="_blank" rel="noreferrer noopener" class="text-rose-600 hover:text-rose-800 font-bold hover:underline flex items-center gap-1" title="Yêu cầu VPN US nếu ở VN">
+                                            <span>Mở TikTok Shop US (VPN)</span> ↗
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </td>
