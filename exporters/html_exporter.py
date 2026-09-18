@@ -3459,14 +3459,27 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                 <span class="text-[10px] font-mono font-bold ${{isBreakout ? 'text-rose-600' : 'text-emerald-700'}}">${{it.rank_gain_text || '▲ 16.0x'}}</span>
                             </div>
                         </td>
-                        <td class="py-3 px-4 min-w-[280px] max-w-md">
-                            <div class="flex items-start justify-between gap-2">
+                        <td class="py-3 px-4 min-w-[320px] max-w-lg">
+                            <div class="flex items-start gap-2.5">
+                                <!-- Thumbnail ảnh sản phẩm thực tế của từng dòng -->
+                                ${{it.image ? `
+                                <button type="button" onclick="toggleClusterDrawer('${{drawerId}}', event)" class="shrink-0 w-11 h-11 bg-white border border-slate-200 hover:border-blue-500 rounded overflow-hidden p-0.5 shadow-2xs group cursor-pointer" title="Bấm để mở cụm ${{asinCount}} sản phẩm thực tế">
+                                    <img src="${{it.image}}" alt="${{it.title}}" class="w-full h-full object-contain group-hover:scale-105 transition duration-150" loading="lazy" onerror="this.src='https://m.media-amazon.com/images/I/614HyALrlzL.jpg'"/>
+                                </button>
+                                ` : ''}}
                                 <div class="flex-1 min-w-0">
-                                    <!-- Badges matching user screenshot: Rising, New Trend, Verified -->
-                                    <div class="flex items-center gap-1 mb-1 flex-wrap">
-                                        <span class="text-[9px] font-black uppercase px-1.5 py-0.2 bg-blue-100 text-blue-800 border border-blue-300">Rising</span>
-                                        <span class="text-[9px] font-black uppercase px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300">New Trend</span>
-                                        <span class="text-[9px] font-black px-1 py-0.2 bg-slate-100 text-slate-700 border border-slate-300" title="Đã đối soát sản phẩm thực tế">✓</span>
+                                    <div class="flex items-center justify-between gap-2 mb-1">
+                                        <!-- Badges matching user screenshot: Rising, New Trend, Verified -->
+                                        <div class="flex items-center gap-1 flex-wrap">
+                                            <span class="text-[9px] font-black uppercase px-1.5 py-0.2 bg-blue-100 text-blue-800 border border-blue-300">Rising</span>
+                                            <span class="text-[9px] font-black uppercase px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300">New Trend</span>
+                                            <span class="text-[9px] font-black px-1 py-0.2 bg-slate-100 text-slate-700 border border-slate-300" title="Đã đối soát sản phẩm thực tế">✓</span>
+                                        </div>
+                                        <!-- Nút ASINs & Chevron Accordion Toggle bên phải (khớp 100% ảnh người dùng) -->
+                                        <button type="button" onclick="toggleClusterDrawer('${{drawerId}}', event)" class="shrink-0 flex items-center gap-1 px-2 py-0.5 bg-slate-100 hover:bg-blue-50 text-slate-800 hover:text-blue-700 border border-slate-300 hover:border-blue-400 text-[11px] font-bold transition shadow-2xs" title="Xem ${{asinCount}} sản phẩm thực tế (TikTok Shop Products)">
+                                            <span class="font-mono font-bold">${{asinCount}} SP TikTok</span>
+                                            <i class="ph-bold ph-caret-down text-xs transition-transform duration-200" id="${{chevronId}}"></i>
+                                        </button>
                                     </div>
                                     <!-- Bấm vào từ khóa để mở rộng cụm sản phẩm bên dưới -->
                                     <button type="button" onclick="toggleClusterDrawer('${{drawerId}}', event)" class="text-left font-black text-slate-900 hover:text-blue-600 transition text-xs block leading-snug cursor-pointer group" title="Bấm vào từ khóa để mở rộng ${{asinCount}} sản phẩm thực tế">
@@ -3482,12 +3495,6 @@ def export_to_standalone_html(analyzed_data: Dict[str, Any], output_path: str = 
                                         <i class="ph-bold ph-lightning"></i> Awaiting LLM confirmation &bull; 24h Real velocity
                                     </div>
                                 </div>
-
-                                <!-- Nút ASINs & Chevron Accordion Toggle bên phải (khớp 100% ảnh người dùng) -->
-                                <button type="button" onclick="toggleClusterDrawer('${{drawerId}}', event)" class="shrink-0 flex items-center gap-1 px-2 py-1 bg-slate-100 hover:bg-blue-50 text-slate-800 hover:text-blue-700 border border-slate-300 hover:border-blue-400 text-xs font-bold transition shadow-2xs" title="Xem ${{asinCount}} sản phẩm thực tế (TikTok Shop Products)">
-                                    <span class="font-mono font-bold">${{asinCount}} SP TikTok</span>
-                                    <i class="ph-bold ph-caret-down text-sm transition-transform duration-200" id="${{chevronId}}"></i>
-                                </button>
                             </div>
                         </td>
                         <td class="py-3 px-3 whitespace-nowrap min-w-[120px]">
